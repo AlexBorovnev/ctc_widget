@@ -1,0 +1,36 @@
+.price_text{
+    color: #cc0835;
+    text-align: center;
+    margin: 0 auto;
+    display: block;
+
+}
+
+.int_val {
+    font-weight: 800;
+    font-size: 30px;
+}
+
+.float_val {
+    vertical-align: baseline;
+    position: relative;
+    bottom: 10px;
+}
+
+.button_sell img{
+    margin: 0 auto;
+    display: block;
+}
+
+.widget {
+    float: left;
+    width: 250px;
+    margin: 20px;
+    padding: 10px;
+    border: 1px solid #cc0835;
+}
+
+.offer_img{
+    width:240px;
+    height:320px;
+}
