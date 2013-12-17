@@ -10,6 +10,7 @@ class initBase
 
     private $backupCreate = false;
     private $backupName = '';
+
     private $dbh = null;
     private $config = array();
 
@@ -106,6 +107,7 @@ class initBase
     {
         if (file_exists(self::BASE_NAME)) {
             try {
+
                 $this->dbh = new PDO(sprintf(
                     "mysql:host=%s;dbname=%s;charset=UTF8",
                     $this->config['db']['db_host'],
@@ -161,12 +163,15 @@ class initBase
 
     private function updateOffers($shopId, $offers)
     {
-        $stmt = $this->dbh->prepare(
+
+        $offerUpdate = $this->dbh->prepare(
             "INSERT INTO goods (offer_id, category_id,shop_id, is_available, url, price, currency, picture, title, common_data) VALUES (:offer_id, :category_id, :shop_id, :is_available, :url, :price, :currency, :picture, :title, :common_data) ON DUPLICATE KEY UPDATE category_id=:category_id, is_available=:is_available, url=:url, price=:price, currency=:currency, picture=:picture, title=:title, common_data=:common_data"
         );
+        $offerAvaliableReset = $this->dbh->prepare('UPDATE goods SET is_available = 0 WHERE shop_id=:shop_id');
         $this->dbh->beginTransaction();
+        $offerAvaliableReset->execute(array('shop_id' => $shopId));
         foreach ($offers->children() as $offer) {
-            $stmt->execute(
+            $offerUpdate->execute(
                 array(
                     'offer_id' => (string)$offer->attributes()->id,
                     'category_id' => (int)$offer->categoryId,

@@ -15,7 +15,9 @@
     <?php  $widgets = $widget->getWidget($widgetsId);
     foreach ($widgets as $key => $widget):?>
         <div class="<?php if (count($widgets) <= 3) echo 'widget';?> widget_<?= $widget['id'] ?>">
-            <a href="<?= $widget['url']; ?>"><img class="offer_img" src="<?= $widget['picture']; ?>" alt="" st></a>
+            <a href="<?= $widget['url']; ?>"><img class="offer_img"
+                                                  src="picture.php?picture_custom=<?= $widget['picture']; ?>&picture_id=<?= $widget['picture_our_src']; ?>"
+                                                  alt="" ></a>
             <div>
                 <span class="price_text">
                     <span class="int_val"><?= $widget['price']['viewPrice']['intValue'] ?></span>

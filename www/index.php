@@ -1,7 +1,7 @@
 <?php
 class shopWidget
 {
-    const BASE_PATH = '../base.xml';
+    const BASE_PATH = '../base_db.xml';
     private $cache = null;
 
     public function __construct()
@@ -43,14 +43,17 @@ class shopWidget
         $widgetsContent = array();
         foreach ($this->getOffers()->offer as $offer) {
             if (in_array((string)$offer->attributes()->id, $widgetsId)) {
+                $pictureSrc = (string)$offer->attributes()->id . time();
                 $widgetsContent[] = array(
                     'picture' => (string)$offer->picture,
+                    'picture_our_src' => $pictureSrc,
                     'price' => array('totalPrice' => (string)$offer->price,
                                       'viewPrice' => $this->getPrice((string)$offer->price)
                     ),
                     'url' => (string)$offer->url,
                     'id' => (string)$offer->attributes()->id
                 );
+                $this->addPictureInCache($pictureSrc, (string)$offer->picture);
             }
         }
         return $widgetsContent;
@@ -62,6 +65,11 @@ class shopWidget
         return array('intValue' => $intValue?:'0', 'floatValue' => $floatValue?:'00');
     }
 
+    private function addPictureInCache($key, $url){
+        if ($this->cache->get($key) === false){
+            $this->cache->add($key, @file_get_contents($url));
+        }
+    }
 
 }
 $widget = new shopWidget();
