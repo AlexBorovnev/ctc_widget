@@ -24,7 +24,7 @@ class shopWidget
         $key = implode($widgetsId);
         if ($this->cache->get($key) === false) {
             $widgetContent = $this->getWidgetContent($widgetsId);
-            if ($widgetContent){
+            if ($widgetContent) {
                 $this->cache->add($key, serialize($widgetContent));
             }
             return $widgetContent;
@@ -47,8 +47,9 @@ class shopWidget
                 $widgetsContent[] = array(
                     'picture' => (string)$offer->picture,
                     'picture_our_src' => $pictureSrc,
-                    'price' => array('totalPrice' => (string)$offer->price,
-                                      'viewPrice' => $this->getPrice((string)$offer->price)
+                    'price' => array(
+                        'totalPrice' => (string)$offer->price,
+                        'viewPrice' => $this->getPrice((string)$offer->price)
                     ),
                     'url' => (string)$offer->url,
                     'id' => (string)$offer->attributes()->id
@@ -59,19 +60,22 @@ class shopWidget
         return $widgetsContent;
     }
 
-    private function getPrice($value){
+    private function getPrice($value)
+    {
         list($intValue, $floatValue) = explode('.', $value);
 
-        return array('intValue' => $intValue?:'0', 'floatValue' => $floatValue?:'00');
+        return array('intValue' => $intValue ? : '0', 'floatValue' => $floatValue ? : '00');
     }
 
-    private function addPictureInCache($key, $url){
-        if ($this->cache->get($key) === false){
+    private function addPictureInCache($key, $url)
+    {
+        if ($this->cache->get($key) === false) {
             $this->cache->add($key, @file_get_contents($url));
         }
     }
 
 }
+
 $widget = new shopWidget();
 if (!empty($_GET['widget_id'])) {
     $widgetsId = explode(',', strip_tags(trim($_GET['widget_id'])));

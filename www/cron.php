@@ -3,9 +3,7 @@ class initBase
 {
     const BASE_TMP_NAME = 'base_tmp.xml';
     const BASE_NAME = 'base_db.xml';
-    const BACKUP_FOLDER = 'backup/';
     const PROJECT_DIR = '/home/developer/dev/projects/test.loc';
-    const MAX_BACKUP_FILE = '20';
     const CONFIG_PATH = 'base_url.ini';
 
     private $backupCreate = false;
@@ -23,11 +21,11 @@ class initBase
     public function updateBase()
     {
         foreach ($this->getBaseUrl() as $shopName => $baseUrl) {
-            echo "Begin download {$shopName}: ". time();
-            if ($this->downloadBase($baseUrl, $shopName)){
-                echo "Begin DB {$shopName}: ". time();
+            echo "Begin download {$shopName}: " . time();
+            if ($this->downloadBase($baseUrl, $shopName)) {
+                echo "Begin DB {$shopName}: " . time();
                 $this->updateDB($shopName);
-                echo "Begin remove {$shopName}: ". time();
+                echo "Begin remove {$shopName}: " . time();
                 $this->removeTmp();
             }
         }
@@ -49,19 +47,23 @@ class initBase
         return true;
     }
 
-    private function fileExists($baseUrl){
+    private function fileExists($baseUrl)
+    {
         $file_headers = @get_headers($baseUrl);
-        if(strpos($file_headers[0], 'HTTP/1.1 200 OK') === false) {
+        if (strpos($file_headers[0], 'HTTP/1.1 200 OK') === false) {
             return false;
-        }
-        else {
+        } else {
             return true;
         }
     }
+
     private function setupBackup($shopName)
     {
         if ($backupName = $this->getLastBackup($this->prependBackupFolder($shopName))) {
-            copy(self::PROJECT_DIR . '/' . $this->config['backup']['folder'] . $shopName . '/' . $backupName, self::BASE_NAME);
+            copy(
+                self::PROJECT_DIR . '/' . $this->config['backup']['folder'] . $shopName . '/' . $backupName,
+                self::BASE_NAME
+            );
         }
     }
 
@@ -124,7 +126,9 @@ class initBase
             }
         }
     }
-    private function getShopId($shopName, $url = ''){
+
+    private function getShopId($shopName, $url = '')
+    {
         $STH = $this->dbh->prepare('SELECT id from shops WHERE title = :shop_name LIMIT 1');
         $STH->bindValue(':shop_name', $shopName);
         $STH->execute();
@@ -133,6 +137,7 @@ class initBase
         }
         return $shopId['id'];
     }
+
     private function addShop($shopName, $url)
     {
         $stmt = $this->dbh->prepare("INSERT INTO shops (title, url) values (:title, :url)");
