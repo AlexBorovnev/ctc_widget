@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Expires" content="Fri, Jan 01 1900 00:00:00 GMT">
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="Lang" content="en">
+
+		<meta name="author" content="">
+		<meta name="description" content="">
+		<meta name="keywords" content="">
+
+		<title>Untitled</title>
+
+
+
+		<link rel="stylesheet" type="text/css" href="css/redmond/jquery-ui-1.10.3.custom.css">
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+		<link rel="stylesheet" type="text/css" href="css/chosen.min.css">
+
+		<script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+		<script type="text/javascript" src="js/jquery-ui-1.10.3.custom.min.js"></script>
+		<script type="text/javascript" src="js/jquery.carouFredSel-6.2.1-packed.js"></script>
+		<script type="text/javascript" src="js/chosen.jquery.min.js"></script>
+
+
+		<script type="text/javascript" src="js/main.js"></script>
+	</head>
+	<body>
+		<div class="wrapper clearfix">
+			<div id="tabs">
+				<ul>
+					<li><a href="#tab1">Магазин 1</a></li>
+					<li><a href="#tab2">Магазин 2</a></li>
+
+				</ul>
+				<div id="tab1">
+					<div class="wrap">
+						<div class="widgets">
+							<a href="#" class="btn add-widget">+ виджет</a>
+							<div>
+								<ul class="widget-list">
+									<li><a href="#">виджет 7525</a></li>
+									<li><a href="#">виджет 8452</a></li>
+									<li><a href="#">виджет 1234</a></li>
+									<li><a href="#">виджет 2549</a></li>
+								</ul>
+							</div>
+						</div>
+						<div class="new_widget clearfix">
+							<h3>Создание нового виджета</h3>
+
+							<div class="clearfix">
+								<div class="input-block">
+									<span class="prepend">Код для вставки:&nbsp;&nbsp;</span> 
+									<div class="fl"><input type="text" class="custom fl" /></div>
+									<div class="fl"><input type="button" value="Скопировать" /></div>
+								</div>
+								<div class="input-block"><span class="prepend">Тип: </span><select><option>Свободный</option><option>Малый</option><option>Большой</option></select> </div>
+								<div class="input-block"><span class="prepend">Скин: </span><select><option>Домашний</option><option>СТС</option><option>Видеоморе</option></select></div>
+								<p>&nbsp;</p>
+							</div>
+							<div class="clearfix">
+								<a href="#" class="btn choseProduct">Выбрать товар</a>
+								<a href="#" class="btn createRule">Создать правило</a>
+							</div>
+
+							<div class="block choose-product clearfix">
+								<div class="block-header"><span>Выбор товара</span><div class="close">X</div></div>
+								<div class="block-content clearfix">
+									<div class="block-left">
+										<h4>Выбор категории</h4>
+										<div class="tree" onclick="tree_toggle(arguments[0])">
+											<ul class="Container">
+												<li class="Node IsRoot ExpandOpen">
+													<div class="Expand"></div>
+													<div class="Content">Верхняя одежда</div>
+													<ul class="Container">
+														<li class="Node ExpandOpen">
+															<div class="Expand"></div>
+															<div class="Content">Шубы</div>
+
+															<ul class="Container">
+																<li class="Node ExpandLeaf">
+																	<div class="Expand"></div>
+																	<div class="Content">Лисьи шубы</div>
+																</li>
+																<li class="Node ExpandLeaf">
+																	<div class="Expand"></div>
+																	<div class="Content">Норковые шубы</div>
+																</li>
+															</ul>
+														</li>
+														<li class="Node ExpandLeaf">
+															<div class="Expand"></div>
+															<div class="Content">Дубленки</div>
+
+														</li>
+													</ul>
+												</li>
+												<li class="Node IsRoot ExpandLeaf">
+													<div class="Expand"></div>
+													<div class="Content">Нижнее белье</div>
+
+												</li>
+											</ul>                         
+										</div>
+									</div>
+									<div class="block-right">
+										<div class="preview">
+											Предпросмотр:
+											<div class="previewPic">
+												<img src="./img/preview.png" />
+											</div>
+											<div class="previewPrice">
+												324руб.
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="block-footer">
+									<a href="#" class="btn addProduct">Выбрать</a>
+								</div>
+							</div>
+
+							<div class="block create-rule clearfix">
+								<div class="block-header"><span>Создание правила</span><div class="close">X</div></div>
+								<div class="block-content clearfix">
+									<div class="block-left">
+										<h4>Выбор категории</h4>
+										<div class="tree" onclick="tree_toggle(arguments[0])">
+											<ul class="Container">
+												<li class="Node IsRoot ExpandOpen">
+													<div class="Expand"></div>
+													<div class="Content">Верхняя одежда</div>
+													<ul class="Container">
+														<li class="Node ExpandOpen">
+															<div class="Expand"></div>
+															<div class="Content">Шубы</div>
+
+															<ul class="Container">
+																<li class="Node ExpandLeaf">
+																	<div class="Expand"></div>
+																	<div class="Content">Лисьи шубы</div>
+																</li>
+																<li class="Node ExpandLeaf">
+																	<div class="Expand"></div>
+																	<div class="Content">Норковые шубы</div>
+																</li>
+															</ul>
+														</li>
+														<li class="Node ExpandLeaf">
+															<div class="Expand"></div>
+															<div class="Content">Дубленки</div>
+
+														</li>
+													</ul>
+												</li>
+												<li class="Node IsRoot ExpandLeaf">
+													<div class="Expand"></div>
+													<div class="Content">Нижнее белье</div>
+
+												</li>
+											</ul>                         
+										</div>
+										<hr />
+										<div class="choose-season">
+											<h4>Выбор сезона</h4>
+											<ul>
+												<li><input class="check" type="checkbox" value="1" id="check" /><label for="check">Лето</label></li>
+												<li><input class="check" type="checkbox" value="1" id="check1" /><label for="check1">Осень</label></li>
+												<li><input class="check" type="checkbox" value="1" id="check2" /><label for="check2">Осень-зима</label></li>
+												<li><input class="check" type="checkbox" value="1" id="check3" /><label for="check3">Весна-лето</label></li>
+												<li><input class="check" type="checkbox" value="1" id="check4" /><label for="check4">Демисезонная</label></li>
+											</ul>
+										</div>
+										<hr />
+										<div class="choose-color clearfix">
+											<h4>Выбор цвета</h4>
+											<div class="colors">
+												<div class="color-item color-black"></div>
+												<div class="color-item color-white"></div>
+												<div class="color-item color-red"></div>
+												<div class="color-item color-blue"></div>
+												<div class="color-item color-orange"></div>
+												<div class="color-item color-green"></div>
+												<div class="color-item color-yellow"></div>
+												<div class="color-item color-aqua"></div>
+												<div class="color-item color-gray"></div>
+
+											</div>
+										</div>
+									</div>
+									<div class="block-right">
+										<div class="preview">
+											Предпросмотр:
+											<div class="previewPic">
+												<img src="./img/preview.png" />
+											</div>
+											<div class="previewPrice">
+												324руб.
+											</div>
+										</div>
+									</div>
+
+
+								</div>
+								<div class="block-footer">
+									<a href="#" class="btn addProduct">Выбрать</a>
+								</div>
+							</div>
+
+							<div class="block clearfix">
+								<div class="block-header">Предпросмотр виджета</div>
+								<div class="block-content">
+
+									<iframe src="http://146.185.169.28/test.loc/www/?widget_id=W13102397138,PW13090391001,W13042510689,W12022165588,W11082491792,PW13101687512,PW13091197141,PW13082378679,W12121238463,W13032862467" width="100%" height="550px"></iframe>
+								</div>
+
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+
+			</div>
+		</div>
+	</body>
+</html>
