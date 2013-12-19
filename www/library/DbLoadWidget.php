@@ -15,7 +15,7 @@ class DbLoadWidget extends WidgetAbstract
     public function __construct()
     {
 
-        $this->config = parse_ini_file(__DIR__ . self::CONFIG_PATH, true);
+        $this->config = array_merge(parse_ini_file(__DIR__ . self::CONFIG_PATH, true), parse_ini_file(__DIR__ . self::CONFIG_LOCAL_PATH, true));
         self::$dbh = new \PDO(sprintf(
             "mysql:host=%s;dbname=%s;charset=UTF8",
             $this->config['db']['db_host'],

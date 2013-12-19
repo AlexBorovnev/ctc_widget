@@ -6,7 +6,8 @@ namespace library;
 abstract class WidgetAbstract
 {
     protected $cache = null;
-    const CONFIG_PATH = '../../../base_url.ini';
+    const CONFIG_PATH = '../../../config.ini';
+    const CONFIG_LOCAL_PATH = '../../../config_local.ini';
 
     public function __construct()
     {

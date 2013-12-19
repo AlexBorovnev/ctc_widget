@@ -4,7 +4,8 @@ class initBase
     const BASE_TMP_NAME = 'base_tmp.xml';
     const BASE_NAME = 'base_db.xml';
     const PROJECT_DIR = '/home/developer/dev/projects/test.loc';
-    const CONFIG_PATH = 'base_url.ini';
+    const CONFIG_PATH = 'config.ini';
+    const CONFIG_LOCAL_PATH = 'config_local.ini';
 
     private $backupCreate = false;
     private $backupName = '';
@@ -15,7 +16,7 @@ class initBase
     public function __construct()
     {
         chdir(self::PROJECT_DIR);
-        $this->config = parse_ini_file(self::CONFIG_PATH, true);
+        $this->config = array_merge(parse_ini_file(__DIR__ . self::CONFIG_PATH, true), parse_ini_file(__DIR__ . self::CONFIG_LOCAL_PATH, true));
     }
 
     public function updateBase()
