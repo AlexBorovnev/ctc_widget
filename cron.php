@@ -8,15 +8,14 @@ class initBase
 
     private $backupCreate = false;
     private $backupName = '';
-    private $projectDir = __DIR__;
+    private $projectDir = __DIR__ ;
     private static $dbh = null;
     private $config = array();
 
     public function __construct()
     {
-        $this->projectDir = __DIR__. '/../';
         chdir($this->projectDir);
-        $this->config = array_merge(parse_ini_file($this->projectDir . self::CONFIG_PATH, true), parse_ini_file($this->projectDir . self::CONFIG_LOCAL_PATH, true));
+        $this->config = array_merge(parse_ini_file($this->projectDir . '/'.  self::CONFIG_PATH, true), parse_ini_file($this->projectDir . '/'. self::CONFIG_LOCAL_PATH, true));
     }
 
     public function updateBase()
