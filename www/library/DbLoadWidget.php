@@ -14,14 +14,13 @@ class DbLoadWidget extends WidgetAbstract
     protected static $dbh = null;
     public function __construct()
     {
-        $this->config = array_merge(parse_ini_file(__DIR__ . self::CONFIG_PATH, true), parse_ini_file(__DIR__ . self::CONFIG_LOCAL_PATH, true));
+        parent::__construct();
         self::$dbh = new \PDO(sprintf(
             "mysql:host=%s;dbname=%s;charset=UTF8",
             $this->config['db']['db_host'],
             $this->config['db']['db_name']
         ), $this->config['db']['login'], $this->config['db']['password']);
         self::$dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        parent::__construct();
     }
 
     protected function getOffers($widgetId)
