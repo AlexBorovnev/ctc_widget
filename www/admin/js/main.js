@@ -80,7 +80,17 @@ $(function(){
 		shopId = response.list[0].id;
 		getCategoryList(shopId);
     })
-    
+    $(".addProduct").unbind('click').bind('click', function(e){
+    	e.preventDefault();
+    	if($(".offerItem.active").length == 0){
+			toastr.error('необходимо выбрать товар');
+			return;
+    	}
+		var offer = $(".offerItem.active").data('offer');
+		_offers.push(offer);
+		toastr.info('Товар выбран');
+		console.log(_offers);
+    });
 //    console.log(shopId);
     
    
@@ -95,12 +105,26 @@ function getCategoryList(shopId){
 		$(".treeHolder").append(buildTree('myTree', list));
 		
 		$(".Content").bind('click', function(){
-			$(".Content").removeClass('b');
-			$(this).addClass('b');
+			
 			var cid = $(this).parent().data('cid'),
 			pid = $(this).parent().data('pid');
+			
+			$(".previewPic img").attr('src', './img/preview.png');
+			$(".offerInfo").empty();
+			
 			if(pid != 0){
+				$(".Content").removeClass('b');
+				$(this).addClass('b');
+				$(".noOffers").remove();
+				$(".offerHolder li").remove();
 				getOfferList(cid);
+			}
+			else{
+				
+				$(this).prev().trigger('click');
+				var event = {};
+				event.target = $(this).prev()[0];
+				tree_toggle(event);
 			}
 		});
 		
@@ -110,8 +134,13 @@ function getCategoryList(shopId){
 
 function getOfferList(cid){
 	api.call('getOfferList', {'shopId': shopId, 'categoryId' : [cid]}, function(response){	
+		
 		console.log(response);
 		var offers = [];
+		if(response.list.length == 0){
+			$(".offerHolder").before('<div class="noOffers">товаров нет</div>');
+			return;
+		}
 		for(var i in response.list){
 			var item = response.list[i];
 			offers.push(jQuery.parseJSON(item));
@@ -124,7 +153,7 @@ function getOfferList(cid){
 
 function buildOfferList(offers){
 	var $ul = $("ol.offerHolder");
-	$ul.empty();
+	
 	//console.log(offers);
 	for(var i in offers){
 		
@@ -158,13 +187,7 @@ function buildOfferList(offers){
 		
 		$(".widgetCount").html(offerCount + 1);
     });
-    $(".addProduct").unbind('click').bind('click', function(e){
-    	e.preventDefault();
-		var offer = $(".offerItem.active").data('offer');
-		_offers.push(offer);
-		toastr.info('Товар выбран');
-		console.log(_offers);
-    });
+    
     
 }
 
@@ -318,6 +341,10 @@ function model(){
 }
 
 function generateWidgetPreview(idArray){
+	if(idArray.length == 0){
+		toastr.error('Необходимо выбрать товар');
+		return;
+	}
 	var host = "http://146.185.169.28/test.loc/www/?widget_id=";
 	host += idArray.join(',');
 	
