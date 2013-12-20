@@ -5,16 +5,21 @@ use library\DbLoadWidget;
 use library\ApiServer;
 use library\Config;
 
-define ('KASTIL', '/sts.loc/www');
-define ('HOST', 'http://' . $_SERVER['HTTP_HOST'] . '/sts.loc/www/');
+define ('HOST', 'http://' . $_SERVER['HTTP_HOST'] . '/'.  getScripPath());
 
 function __autoload($class_name)
 {
     require_once __DIR__ . '/../' . str_replace('\\', '/', $class_name) . '.php';
 }
 
+function getScripPath(){
+    $rout = array_diff(explode('/', $_SERVER['SCRIPT_NAME']), array(''));
+    array_pop($rout);
+    $path = implode('/', $rout);
+    return ($path) ? $path . '/' : '';
+}
 $widget = new TemporaryWidget();
-$rout = explode('/', strtok(trim(str_replace(KASTIL, '', $_SERVER['REQUEST_URI']), '/'), '?'));
+$rout = explode('/', strtok(trim(str_replace(getScripPath(), '', $_SERVER['REQUEST_URI']), '/'), '?'));
 switch ($rout[0]) {
     case 'clear_widget_all':
         $widget->deleteAllWidget();
