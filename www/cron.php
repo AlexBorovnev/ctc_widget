@@ -1,10 +1,11 @@
 <?php
+require_once __DIR__.'/../library/Config.php';
+use library\Config;
+
 class initBase
 {
     const BASE_TMP_NAME = 'base_tmp.xml';
     const BASE_NAME = 'base_db.xml';
-    const CONFIG_PATH = 'config.ini';
-    const CONFIG_LOCAL_PATH = 'config_local.ini';
 
     private $backupCreate = false;
     private $backupName = '';
@@ -14,9 +15,10 @@ class initBase
 
     public function __construct()
     {
-        $this->projectDir = __DIR__. '/../';
+        $this->projectDir = __DIR__ . '/..';
         chdir($this->projectDir);
-        self::$config = array_merge(parse_ini_file($this->projectDir . self::CONFIG_PATH, true), parse_ini_file($this->projectDir . self::CONFIG_LOCAL_PATH, true));
+        self::$config = Config::getInstance()->getConfig();
+        Config::getInstance()->setBusyStatus(true);
     }
 
     public function updateBase()
@@ -80,6 +82,7 @@ class initBase
     {
         chdir($this->projectDir . '/' . self::$config['backup']['folder'] . $shopName);
         $filesList = glob('*.xml');
+        sort($filesList);
         if (count($filesList) > self::$config['backup']['max_backup_file']) {
             foreach (array_slice($filesList, self::$config['backup']['max_backup_file']) as $fileName) {
                 unlink($fileName);
@@ -118,12 +121,34 @@ class initBase
                 self::$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $newData = simplexml_load_file(self::BASE_NAME);
                 $shopId = $this->getShopId($shopName, (string)$newData->shop->url);
+                $this->addCurrency($shopId, $newData->shop->currencies);
                 $this->updateCategories($shopId, $newData->shop->categories);
                 $this->updateWithTmpTable($shopId, $newData->shop->offers);
             } catch (PDOException $e) {
                 die("Error: " . $e->getMessage());
             }
         }
+    }
+
+    private function addCurrency($shopId, $data = array())
+    {
+        $currencyList = array();
+        $currencyQuery = self::$dbh->prepare('DELETE FROM currency WHERE shop_id=:shop_id');
+        $currencyQuery->execute(array(':shop_id' => $shopId));
+        $currencyQuery = self::$dbh->prepare(
+            'INSERT INTO currency (currency_id, rate, shop_id) VALUES (:currency_id, :rate, :shop_id) ON DUPLICATE KEY UPDATE rate=:rate'
+        );
+        foreach ($data->currency as $value) {
+            $currencyList[$shopId][(string)$value->attributes()->id] = (string)$value->attributes()->rate;
+            $currencyQuery->execute(
+                array(
+                    ':currency_id' => (string)$value->attributes()->id,
+                    ':rate' => (string)$value->attributes()->rate,
+                    ':shop_id' => $shopId
+                )
+            );
+        }
+        return $currencyList;
     }
 
     private function getShopId($shopName, $url = '')
@@ -165,34 +190,6 @@ class initBase
         self::$dbh->commit();
     }
 
-    private function updateOffers($shopId, $offers)
-    {
-        $offerUpdate = self::$dbh->prepare(
-            "INSERT LOW_PRIORITY INTO goods (offer_id, category_id,shop_id, is_available, url, price, currency, picture, title, common_data) VALUES (:offer_id, :category_id, :shop_id, :is_available, :url, :price, :currency, :picture, :title, :common_data) ON DUPLICATE KEY UPDATE category_id=:category_id, is_available=:is_available, url=:url, price=:price, currency=:currency, picture=:picture, title=:title, common_data=:common_data"
-        );
-        $offerAvaliableReset = self::$dbh->prepare('UPDATE goods SET is_available = 0 WHERE shop_id=:shop_id');
-        self::$dbh->beginTransaction();
-        $offerAvaliableReset->execute(array('shop_id' => $shopId));
-        foreach ($offers->children() as $offer) {
-            $offerUpdate->execute(
-                array(
-                    'offer_id' => (string)$offer->attributes()->id,
-                    'category_id' => (int)$offer->categoryId,
-                    'shop_id' => (int)$shopId,
-                    'is_available' => (boolean)$offer->attributes()->available,
-                    'url' => (string)$offer->url,
-                    'price' => (string)$offer->price,
-                    'currency' => (string)$offer->currencyId,
-                    'picture' => (string)$offer->picture,
-                    'title' => (string)$offer->model,
-                    'common_data' => json_encode((array)$offer)
-                )
-            );
-        }
-        self::$dbh->commit();
-        return true;
-    }
-
     private function updateWithTmpTable($shopId, $offers)
     {
         self::$dbh->beginTransaction();
@@ -231,13 +228,14 @@ class initBase
         }
     }
 
-    private function prepareCommonData($data){
+    private function prepareCommonData($data)
+    {
         $paramsNameConvert = array('Цвет' => 'color', 'Размеры' => 'size');
         $params = array('param' => array(), 'attributes' => array());
-        foreach ($data->param as $value){
+        foreach ($data->param as $value) {
             $params['param'][$paramsNameConvert[(string)$value->attributes()->name]] = (string)$value;
         }
-        foreach ($data->attributes() as $key => $value){
+        foreach ($data->attributes() as $key => $value) {
             $params['attributes'][$key] = (string)$value;
         }
         return array_merge((array)$data, $params);
@@ -252,7 +250,7 @@ class initBase
 
     private function createTmpTable()
     {
-        self::$dbh->prepare($this->createTmpTableCode())->execute();
+        self::$dbh->prepare($this->createTmpTableCode('goods_tmp'))->execute();
     }
 
     private function copyDataToTmpTable()
@@ -261,11 +259,11 @@ class initBase
         $copyDataInTmpTable->execute();
     }
 
-    private function createTmpTableCode()
+    private function createTmpTableCode($tableName)
     {
         $key_prefix = time();
         return <<<EOL
-CREATE TABLE `goods_tmp` (
+CREATE TABLE `{$tableName}` (
 	`category_id` INT(11) UNSIGNED NOT NULL,
 	`shop_id` INT(11) NULL DEFAULT NULL,
 	`offer_id` VARCHAR(20) NULL DEFAULT NULL,
@@ -293,6 +291,7 @@ EOL;
 
     public function __destruct()
     {
+        Config::getInstance()->setBusyStatus(false);
         self::$dbh = null;
     }
 }

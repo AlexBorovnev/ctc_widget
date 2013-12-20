@@ -1,5 +1,5 @@
 <?php
-require_once 'library/Config.php';
+require_once __DIR__.'/library/Config.php';
 use library\Config;
 
 class initBase
@@ -81,6 +81,7 @@ class initBase
     {
         chdir($this->projectDir . '/' . self::$config['backup']['folder'] . $shopName);
         $filesList = glob('*.xml');
+        sort($filesList);
         if (count($filesList) > self::$config['backup']['max_backup_file']) {
             foreach (array_slice($filesList, self::$config['backup']['max_backup_file']) as $fileName) {
                 unlink($fileName);
@@ -119,12 +120,34 @@ class initBase
                 self::$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $newData = simplexml_load_file(self::BASE_NAME);
                 $shopId = $this->getShopId($shopName, (string)$newData->shop->url);
+                $this->addCurrency($shopId, $newData->shop->currencies);
                 $this->updateCategories($shopId, $newData->shop->categories);
                 $this->updateWithTmpTable($shopId, $newData->shop->offers);
             } catch (PDOException $e) {
                 die("Error: " . $e->getMessage());
             }
         }
+    }
+
+    private function addCurrency($shopId, $data = array())
+    {
+        $currencyList = array();
+        $currencyQuery = self::$dbh->prepare('DELETE FROM currency WHERE shop_id=:shop_id');
+        $currencyQuery->execute(array(':shop_id' => $shopId));
+        $currencyQuery = self::$dbh->prepare(
+            'INSERT INTO currency (currency_id, rate, shop_id) VALUES (:currency_id, :rate, :shop_id) ON DUPLICATE KEY UPDATE rate=:rate'
+        );
+        foreach ($data->currency as $value) {
+            $currencyList[$shopId][(string)$value->attributes()->id] = (string)$value->attributes()->rate;
+            $currencyQuery->execute(
+                array(
+                    ':currency_id' => (string)$value->attributes()->id,
+                    ':rate' => (string)$value->attributes()->rate,
+                    ':shop_id' => $shopId
+                )
+            );
+        }
+        return $currencyList;
     }
 
     private function getShopId($shopName, $url = '')

@@ -146,10 +146,14 @@ class ApiServer
             )
         );
         $qOfferMark = $this->getQueryMark($data['offerId']);
-        $offerList = self::$dbh->prepare("SELECT * FROM goods WHERE shop_id = ? AND offer_id IN ($qOfferMark)");
+        $offerList = self::$dbh->prepare("SELECT common_data FROM goods WHERE shop_id = ? AND offer_id IN ($qOfferMark)");
         $offerList->execute(array_merge(array($data['shopId']), $data['offerId']));
-        $offerList =  $offerList->fetchAll(\PDO::FETCH_ASSOC);;
-        return array('list' => $offerList, 'count' => count($offerList));
+        $offerList =  $offerList->fetchAll(\PDO::FETCH_ASSOC);
+        $commonData = array();
+        foreach ($offerList as $row){
+            $commonData[] = json_encode(unserialize($row['common_data']));
+        }
+        return array('list' => $commonData, 'count' => count($offerList));
     }
 
     protected function getOfferList($data){
@@ -164,15 +168,19 @@ class ApiServer
         $qMarks = 'shop_id = ?';
         $qValue = array($data['shopId']);
         $qMarks .= ' AND category_id IN (' . $this->getQueryMark($data['categoryId']). ')';
-        $qValue = array_merge($qValue, $data['parentId']);
+        $qValue = array_merge($qValue, $data['categoryId']);
         if (!empty($data['color'])){
             $qMarks .= ' AND color IN (' .$this->getQueryMark($data['color'])  .')';
             $qValue = array_merge($qValue, $data['color']);
         }
-        $offerList = self::$dbh->prepare("SELECT * FROM goods WHERE $qMarks ORDER BY RAND() LIMIT 1000");
+        $offerList = self::$dbh->prepare("SELECT common_data FROM goods WHERE $qMarks ORDER BY RAND() LIMIT 1000");
         $offerList->execute($qValue);
         $offerList = $offerList->fetchAll(\PDO::FETCH_ASSOC);
-        return array('list' => $offerList, 'count' => count($offerList));
+        $commonData = array();
+        foreach ($offerList as $row){
+            $commonData[] = json_encode(unserialize($row['common_data']));
+        }
+        return array('list' => $commonData, 'count' => count($offerList));
     }
 
     protected function getQueryMark($data){

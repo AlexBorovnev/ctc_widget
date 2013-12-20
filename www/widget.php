@@ -46,7 +46,7 @@
             $.ajax({
                 url: "<?=HOST?>handler",
                 dataType: "json",
-                data: {methodName: 'getOfferList', params: {categoryId: [1002100],offerId: ['PW13081470509', 'PW13072550705'], shopId: 11}},
+                data: {methodName: 'getOfferList', params: {categoryId: [1701900],offerId: ['PW13081470509', 'PW13072550705'], shopId: 11}},
                 type: "POST"
         })
             .done(function(response){
