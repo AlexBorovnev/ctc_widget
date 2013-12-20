@@ -79,18 +79,21 @@ class ApiServer
             }
         }
     }
-    protected function correctType($value, $type){
-        switch ($type){
+
+    protected function correctType($value, $type)
+    {
+        switch ($type) {
             case 'array':
-                return is_array($value)?:false;
+                return is_array($value) ? : false;
             case 'string':
-                return is_string($value)?:false;
+                return is_string($value) ? : false;
             default:
                 return false;
         }
     }
 
-    function __destruct() {
+    function __destruct()
+    {
         self::$dbh = null;
     }
 
@@ -112,7 +115,8 @@ class ApiServer
         return array('list' => $shopsList, 'count' => count($shopsList));
     }
 
-    protected function getCategoryList($data){
+    protected function getCategoryList($data)
+    {
         $this->checkNeededParam(
             $data,
             array(
@@ -123,12 +127,12 @@ class ApiServer
         );
         $qMarks = 'shop_id = ?';
         $qValue = array($data['shopId']);
-        if (!empty($data['parentId'])){
-            $qMarks .= ' AND parent_id IN (' . $this->getQueryMark($data['parentId']). ')';
+        if (!empty($data['parentId'])) {
+            $qMarks .= ' AND parent_id IN (' . $this->getQueryMark($data['parentId']) . ')';
             $qValue = array_merge($qValue, $data['parentId']);
         }
-        if (!empty($data['categoryId'])){
-            $qMarks .= ' AND category_id IN (' .$this->getQueryMark($data['categoryId'])  .')';
+        if (!empty($data['categoryId'])) {
+            $qMarks .= ' AND category_id IN (' . $this->getQueryMark($data['categoryId']) . ')';
             $qValue = array_merge($qValue, $data['categoryId']);
         }
         $categoryList = self::$dbh->prepare("SELECT * FROM categories WHERE $qMarks");
@@ -137,7 +141,8 @@ class ApiServer
         return array('list' => $categoryList, 'count' => count($categoryList));
     }
 
-    protected function getOffer($data){
+    protected function getOffer($data)
+    {
         $this->checkNeededParam(
             $data,
             array(
@@ -146,17 +151,20 @@ class ApiServer
             )
         );
         $qOfferMark = $this->getQueryMark($data['offerId']);
-        $offerList = self::$dbh->prepare("SELECT common_data FROM goods WHERE shop_id = ? AND offer_id IN ($qOfferMark)");
+        $offerList = self::$dbh->prepare(
+            "SELECT common_data FROM goods WHERE shop_id = ? AND offer_id IN ($qOfferMark)"
+        );
         $offerList->execute(array_merge(array($data['shopId']), $data['offerId']));
-        $offerList =  $offerList->fetchAll(\PDO::FETCH_ASSOC);
+        $offerList = $offerList->fetchAll(\PDO::FETCH_ASSOC);
         $commonData = array();
-        foreach ($offerList as $row){
+        foreach ($offerList as $row) {
             $commonData[] = json_encode(unserialize($row['common_data']));
         }
         return array('list' => $commonData, 'count' => count($offerList));
     }
 
-    protected function getOfferList($data){
+    protected function getOfferList($data)
+    {
         $this->checkNeededParam(
             $data,
             array(
@@ -167,23 +175,36 @@ class ApiServer
         );
         $qMarks = 'shop_id = ?';
         $qValue = array($data['shopId']);
-        $qMarks .= ' AND category_id IN (' . $this->getQueryMark($data['categoryId']). ')';
+        $qMarks .= ' AND category_id IN (' . $this->getQueryMark($data['categoryId']) . ')';
         $qValue = array_merge($qValue, $data['categoryId']);
-        if (!empty($data['color'])){
-            $qMarks .= ' AND color IN (' .$this->getQueryMark($data['color'])  .')';
+        if (!empty($data['color'])) {
+            $qMarks .= ' AND color IN (' . $this->getQueryMark($data['color']) . ')';
             $qValue = array_merge($qValue, $data['color']);
         }
         $offerList = self::$dbh->prepare("SELECT common_data FROM goods WHERE $qMarks ORDER BY RAND() LIMIT 1000");
         $offerList->execute($qValue);
         $offerList = $offerList->fetchAll(\PDO::FETCH_ASSOC);
         $commonData = array();
-        foreach ($offerList as $row){
+        foreach ($offerList as $row) {
             $commonData[] = json_encode(unserialize($row['common_data']));
         }
         return array('list' => $commonData, 'count' => count($offerList));
     }
 
-    protected function getQueryMark($data){
+    protected function getWidgetInfo()
+    {
+        $tableWithWidgetInfo = array('widget_type', 'widget_skin');
+        $infoList = array();
+        foreach ($tableWithWidgetInfo as $tableName) {
+            $query = self::$dbh->prepare("SELECT * FROM {$tableName}");
+            $query->execute();
+            $infoList[$tableName] = $query->fetchAll(\PDO::FETCH_ASSOC);
+        }
+        return $infoList;
+    }
+
+    protected function getQueryMark($data)
+    {
         return str_repeat('?,', count($data) - 1) . '?';
     }
 
