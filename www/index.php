@@ -1,88 +1,54 @@
 <?php
-class shopWidget
+use library\XmlLoadWidget;
+use library\TemporaryWidget;
+use library\DbLoadWidget;
+use library\ApiServer;
+use library\Config;
+
+define ('HOST', 'http://' . $_SERVER['HTTP_HOST'] . '/'.  getScripPath());
+
+function __autoload($class_name)
 {
-    const BASE_PATH = '../base_db.xml';
-    private $cache = null;
+    require_once __DIR__ . '/../' . str_replace('\\', '/', $class_name) . '.php';
+}
 
-    public function __construct()
-    {
-        $this->cache = new Memcache();
-        $this->cache->addServer('localhost', 11211);
-    }
-
-    private function getOffers()
-    {
-        if (file_exists(self::BASE_PATH)) {
-            $config = simplexml_load_file(self::BASE_PATH);
-            return $config->shop->offers;
+function getScripPath(){
+    $rout = array_diff(explode('/', $_SERVER['SCRIPT_NAME']), array(''));
+    array_pop($rout);
+    $path = implode('/', $rout);
+    return ($path) ? $path . '/' : '';
+}
+$widget = new TemporaryWidget();
+$rout = explode('/', strtok(trim(str_replace(getScripPath(), '', $_SERVER['REQUEST_URI']), '/'), '?'));
+switch ($rout[0]) {
+    case 'clear_widget_all':
+        $widget->deleteAllWidget();
+        break;
+    case 'clear_widget_id':
+        if (!empty($rout[1])) {
+            $widget->deleteWidget(strip_tags($rout[1]));
         }
-    }
-
-    public function getWidget($widgetsId)
-    {
-        sort($widgetsId);
-        $key = implode($widgetsId);
-        if ($this->cache->get($key) === false) {
-            $widgetContent = $this->getWidgetContent($widgetsId);
-            if ($widgetContent) {
-                $this->cache->add($key, serialize($widgetContent));
-            }
-            return $widgetContent;
+        break;
+    case 'widget_id':
+        if (!empty($rout[1])) {
+            $widgetsId = strip_tags($rout[1]);
+            require_once('widget.php');
+        }
+        break;
+    case 'handler':
+        if ($_SERVER['REQUEST_METHOD'] == 'POST'){
+            $apiServer = new ApiServer();
+            $apiServer->run($_POST);
+        }
+        break;
+    case 'admin':
+        if (Config::getInstance()->getBusyStatus() == true) {
+            echo "<h1>Database Update Now</h1>";
         } else {
-            return unserialize($this->cache->get($key));
+            echo "<h1>COOL</h1>";
         }
-    }
-
-    public function deleteWidget($widgetId)
-    {
-        $this->cache->delete($widgetId);
-    }
-
-    private function getWidgetContent($widgetsId)
-    {
-        $widgetsContent = array();
-        foreach ($this->getOffers()->offer as $offer) {
-            if (in_array((string)$offer->attributes()->id, $widgetsId)) {
-                $pictureSrc = (string)$offer->attributes()->id . time();
-                $widgetsContent[] = array(
-                    'picture' => (string)$offer->picture,
-                    'picture_our_src' => $pictureSrc,
-                    'price' => array(
-                        'totalPrice' => (string)$offer->price,
-                        'viewPrice' => $this->getPrice((string)$offer->price)
-                    ),
-                    'url' => (string)$offer->url,
-                    'id' => (string)$offer->attributes()->id
-                );
-                $this->addPictureInCache($pictureSrc, (string)$offer->picture);
-            }
-        }
-        return $widgetsContent;
-    }
-
-    private function getPrice($value)
-    {
-        list($intValue, $floatValue) = explode('.', $value);
-
-        return array('intValue' => $intValue ? : '0', 'floatValue' => $floatValue ? : '00');
-    }
-
-    private function addPictureInCache($key, $url)
-    {
-        if ($this->cache->get($key) === false) {
-            $this->cache->add($key, @file_get_contents($url));
-        }
-    }
-
+        break;
+    default:
+        header("HTTP/1.1 404 Not Found");
+        exit;
 }
-
-$widget = new shopWidget();
-if (!empty($_GET['widget_id'])) {
-    $widgetsId = explode(',', strip_tags(trim($_GET['widget_id'])));
-    require_once('widget.php');
-
-
-} elseif (!empty($_GET['clear_widget_id'])) {
-    $widget->deleteWidget(strip_tags(trim($_GET['clear_widget_id'])));
-}
-
