@@ -81,7 +81,7 @@ class initBase
     {
         chdir($this->projectDir . '/' . self::$config['backup']['folder'] . $shopName);
         $filesList = glob('*.xml');
-        sort($filesList);
+        rsort($filesList);
         if (count($filesList) > self::$config['backup']['max_backup_file']) {
             foreach (array_slice($filesList, self::$config['backup']['max_backup_file']) as $fileName) {
                 unlink($fileName);

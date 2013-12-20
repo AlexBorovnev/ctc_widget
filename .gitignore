@@ -4,3 +4,5 @@ backup/*
 config_local.ini
 base_tmp.xml
 base_db.xml
+www/cron.php
+busy
