@@ -86,6 +86,23 @@ html, body{
   zoom: 1;
 }
 
+
+.fr{
+	float: right;
+}
+.hidden{
+	display: none;
+}
+.widgetCount{
+	padding-right: 10px;
+}
+
+.widgetInfo{
+	padding: 10px;
+}
+.widgetInfo > div{
+	margin-bottom: 10px;
+}
 .wrapper{
 	width: 960px;
 	margin: 0 auto;
@@ -112,7 +129,7 @@ padding: 0;
 
 .new_widget{
 	border-left: 1px solid #999;
-	width: 600px;
+	width: 800px;
 	float: left;
 	padding: 10px;
 }
@@ -238,7 +255,7 @@ h4, h4 *{
  */
 .Node {
     margin-left: 18px;
-    zoom: 1; /* спецсвойство против багов IE6,7. Ставит hasLayout */
+    zoom: 1; 
 }
 
 /* Корневой узел от родительского контейнера не отодвинут. 
@@ -255,8 +272,6 @@ h4, h4 *{
 .Expand {
     width: 18px;
     height: 18px;
-    /* принцип двухколоночной верстки. */
-    /* float:left и width дива Expand + margin-left дива Content */
     float: left; 
 }
 
@@ -273,7 +288,7 @@ h4, h4 *{
 
  /* все правила после * html выполняет только IE6 */
 * html .Content {
-    height: 18px; /* аналог min-height для IE6 */
+    height: 18px; 
 }
 /* открытое поддерево */
 .ExpandOpen .Expand {  
@@ -544,4 +559,60 @@ hr{
 }
 .colors{
 	margin-left: 15px;
+}
+
+#toast-container{
+	right: 40%;
+}
+
+.grid13{
+	width: 250px;
+	float: left;
+	padding: 5px;
+	border-right: 1px solid #999;
+	padding-bottom: 5px;
+	min-height: 600px;
+	max-height: 600px;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.grid13:last-child{
+	border-right: none;
+}
+ol.offerHolder{
+	list-style-type: decimal;
+	padding-left: 24px;
+}
+.offerItem{
+	cursor: pointer;
+	padding: 5px 0;
+	line-height: 16px;
+	list-style-type: decimal;
+}
+.offerItem:hover{
+/*	text-decoration: underline;*/
+	font-weight: bold;
+}
+.offerItem.active{
+	font-weight: bold;
+}
+
+.previewPic img{
+	width: 100%;
+	height: 100%;
+	border: 1px solid #cc0835;
+}
+
+.preivewPic{
+	width: 100%;
+	
+}
+
+.offerInfo{
+	text-align: left;
+}
+
+.b{
+	font-weight: bold;
 }
