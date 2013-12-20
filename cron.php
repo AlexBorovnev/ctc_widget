@@ -1,6 +1,7 @@
 <?php
 require_once 'library/Config.php';
 use library\Config;
+
 class initBase
 {
     const BASE_TMP_NAME = 'base_tmp.xml';
@@ -8,7 +9,7 @@ class initBase
 
     private $backupCreate = false;
     private $backupName = '';
-    private $projectDir = __DIR__ ;
+    private $projectDir = __DIR__;
     private static $dbh = null;
     private static $config = array();
 
@@ -16,6 +17,7 @@ class initBase
     {
         chdir($this->projectDir);
         self::$config = Config::getInstance()->getConfig();
+        Config::getInstance()->setBusyStatus(true);
     }
 
     public function updateBase()
@@ -164,34 +166,6 @@ class initBase
         self::$dbh->commit();
     }
 
-    private function updateOffers($shopId, $offers)
-    {
-        $offerUpdate = self::$dbh->prepare(
-            "INSERT LOW_PRIORITY INTO goods (offer_id, category_id,shop_id, is_available, url, price, currency, picture, title, common_data) VALUES (:offer_id, :category_id, :shop_id, :is_available, :url, :price, :currency, :picture, :title, :common_data) ON DUPLICATE KEY UPDATE category_id=:category_id, is_available=:is_available, url=:url, price=:price, currency=:currency, picture=:picture, title=:title, common_data=:common_data"
-        );
-        $offerAvaliableReset = self::$dbh->prepare('UPDATE goods SET is_available = 0 WHERE shop_id=:shop_id');
-        self::$dbh->beginTransaction();
-        $offerAvaliableReset->execute(array('shop_id' => $shopId));
-        foreach ($offers->children() as $offer) {
-            $offerUpdate->execute(
-                array(
-                    'offer_id' => (string)$offer->attributes()->id,
-                    'category_id' => (int)$offer->categoryId,
-                    'shop_id' => (int)$shopId,
-                    'is_available' => (boolean)$offer->attributes()->available,
-                    'url' => (string)$offer->url,
-                    'price' => (string)$offer->price,
-                    'currency' => (string)$offer->currencyId,
-                    'picture' => (string)$offer->picture,
-                    'title' => (string)$offer->model,
-                    'common_data' => json_encode((array)$offer)
-                )
-            );
-        }
-        self::$dbh->commit();
-        return true;
-    }
-
     private function updateWithTmpTable($shopId, $offers)
     {
         self::$dbh->beginTransaction();
@@ -208,7 +182,7 @@ class initBase
     private function updateDataInTmpTable($shopId, $offers)
     {
         $offerUpdate = self::$dbh->prepare(
-            "INSERT INTO goods_tmp (offer_id, category_id,shop_id, is_available, url, price, currency, picture, title, common_data) VALUES (:offer_id, :category_id, :shop_id, :is_available, :url, :price, :currency, :picture, :title, :common_data) ON DUPLICATE KEY UPDATE category_id=:category_id, is_available=:is_available, url=:url, price=:price, currency=:currency, picture=:picture, title=:title, common_data=:common_data"
+            "INSERT INTO goods_tmp (offer_id, category_id,shop_id, is_available, url, price, currency, picture, title, common_data, color) VALUES (:offer_id, :category_id, :shop_id, :is_available, :url, :price, :currency, :picture, :title, :common_data, :color) ON DUPLICATE KEY UPDATE category_id=:category_id, is_available=:is_available, url=:url, price=:price, currency=:currency, picture=:picture, title=:title, common_data=:common_data, color=:color"
         );
         foreach ($offers->children() as $offer) {
             $data = $this->prepareCommonData($offer);
@@ -223,18 +197,21 @@ class initBase
                     'currency' => $data['currencyId'],
                     'picture' => $data['picture'],
                     'title' => $data['model'],
-                    'common_data' => serialize($this->prepareCommonData($offer))
+                    'common_data' => serialize($this->prepareCommonData($offer)),
+                    'color' => $data['param']['color']
                 )
             );
         }
     }
 
-    private function prepareCommonData($data){
+    private function prepareCommonData($data)
+    {
+        $paramsNameConvert = array('Цвет' => 'color', 'Размеры' => 'size');
         $params = array('param' => array(), 'attributes' => array());
-        foreach ($data->param as $value){
-            $params['param'][(string)$value->attributes()->name] = (string)$value;
+        foreach ($data->param as $value) {
+            $params['param'][$paramsNameConvert[(string)$value->attributes()->name]] = (string)$value;
         }
-        foreach ($data->attributes() as $key => $value){
+        foreach ($data->attributes() as $key => $value) {
             $params['attributes'][$key] = (string)$value;
         }
         return array_merge((array)$data, $params);
@@ -249,7 +226,7 @@ class initBase
 
     private function createTmpTable()
     {
-        self::$dbh->prepare($this->createTmpTableCode())->execute();
+        self::$dbh->prepare($this->createTmpTableCode('goods_tmp'))->execute();
     }
 
     private function copyDataToTmpTable()
@@ -258,11 +235,11 @@ class initBase
         $copyDataInTmpTable->execute();
     }
 
-    private function createTmpTableCode()
+    private function createTmpTableCode($tableName)
     {
         $key_prefix = time();
         return <<<EOL
-CREATE TABLE `goods_tmp` (
+CREATE TABLE `{$tableName}` (
 	`category_id` INT(11) UNSIGNED NOT NULL,
 	`shop_id` INT(11) NULL DEFAULT NULL,
 	`offer_id` VARCHAR(20) NULL DEFAULT NULL,
@@ -290,6 +267,7 @@ EOL;
 
     public function __destruct()
     {
+        Config::getInstance()->setBusyStatus(false);
         self::$dbh = null;
     }
 }

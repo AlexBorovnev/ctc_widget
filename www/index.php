@@ -3,6 +3,7 @@ use library\XmlLoadWidget;
 use library\TemporaryWidget;
 use library\DbLoadWidget;
 use library\ApiServer;
+use library\Config;
 
 define ('HOST', ($_SERVER['HTTPS'] == 'on') ? 'https' : 'http' . '://' . $_SERVER['HTTP_HOST'] . '/');
 
@@ -38,7 +39,12 @@ switch ($rout[0]) {
         }
         break;
     case 'admin':
-
+        if (Config::getInstance()->getBusyStatus() == true) {
+            echo "<h1>Database Update Now</h1>";
+        } else {
+            echo "<h1>COOL</h1>";
+        }
+        break;
     default:
         header("HTTP/1.1 404 Not Found");
         exit;
