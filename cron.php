@@ -1,21 +1,21 @@
 <?php
+require_once 'library/Config.php';
+use library\Config;
 class initBase
 {
     const BASE_TMP_NAME = 'base_tmp.xml';
     const BASE_NAME = 'base_db.xml';
-    const CONFIG_PATH = 'config.ini';
-    const CONFIG_LOCAL_PATH = 'config_local.ini';
 
     private $backupCreate = false;
     private $backupName = '';
     private $projectDir = __DIR__ ;
     private static $dbh = null;
-    private $config = array();
+    private static $config = array();
 
     public function __construct()
     {
         chdir($this->projectDir);
-        $this->config = array_merge(parse_ini_file($this->projectDir . '/'.  self::CONFIG_PATH, true), parse_ini_file($this->projectDir . '/'. self::CONFIG_LOCAL_PATH, true));
+        self::$config = Config::getInstance()->getConfig();
     }
 
     public function updateBase()
@@ -33,7 +33,7 @@ class initBase
 
     private function getBaseUrl()
     {
-        return $this->config['base_url'];
+        return self::$config['base_url'];
     }
 
     private function downloadBase($baseUrl, $shopName)
@@ -61,7 +61,7 @@ class initBase
     {
         if ($backupName = $this->getLastBackup($this->prependBackupFolder($shopName))) {
             copy(
-                $this->projectDir . '/' . $this->config['backup']['folder'] . $shopName . '/' . $backupName,
+                $this->projectDir . '/' . self::$config['backup']['folder'] . $shopName . '/' . $backupName,
                 self::BASE_NAME
             );
         }
@@ -77,10 +77,10 @@ class initBase
 
     private function prependBackupFolder($shopName)
     {
-        chdir($this->projectDir . '/' . $this->config['backup']['folder'] . $shopName);
+        chdir($this->projectDir . '/' . self::$config['backup']['folder'] . $shopName);
         $filesList = glob('*.xml');
-        if (count($filesList) > $this->config['backup']['max_backup_file']) {
-            foreach (array_slice($filesList, $this->config['backup']['max_backup_file']) as $fileName) {
+        if (count($filesList) > self::$config['backup']['max_backup_file']) {
+            foreach (array_slice($filesList, self::$config['backup']['max_backup_file']) as $fileName) {
                 unlink($fileName);
             }
         }
@@ -90,9 +90,9 @@ class initBase
 
     private function makeBackup($shopName)
     {
-        $this->backupName = $this->config['backup']['folder'] . $shopName . '/' . date('YmdHi') . '.xml';
-        if (!file_exists($this->projectDir . '/' . $this->config['backup']['folder'] . $shopName)) {
-            mkdir($this->projectDir . '/' . $this->config['backup']['folder'] . $shopName, 0777);
+        $this->backupName = self::$config['backup']['folder'] . $shopName . '/' . date('YmdHi') . '.xml';
+        if (!file_exists($this->projectDir . '/' . self::$config['backup']['folder'] . $shopName)) {
+            mkdir($this->projectDir . '/' . self::$config['backup']['folder'] . $shopName, 0777);
         }
         $this->prependBackupFolder($shopName);
         if (@copy(self::BASE_NAME, $this->backupName)) {
@@ -111,9 +111,9 @@ class initBase
             try {
                 self::$dbh = new PDO(sprintf(
                     "mysql:host=%s;dbname=%s;charset=UTF8",
-                    $this->config['db']['db_host'],
-                    $this->config['db']['db_name']
-                ), $this->config['db']['login'], $this->config['db']['password']);
+                    self::$config['db']['db_host'],
+                    self::$config['db']['db_name']
+                ), self::$config['db']['login'], self::$config['db']['password']);
                 self::$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $newData = simplexml_load_file(self::BASE_NAME);
                 $shopId = $this->getShopId($shopName, (string)$newData->shop->url);
@@ -211,21 +211,33 @@ class initBase
             "INSERT INTO goods_tmp (offer_id, category_id,shop_id, is_available, url, price, currency, picture, title, common_data) VALUES (:offer_id, :category_id, :shop_id, :is_available, :url, :price, :currency, :picture, :title, :common_data) ON DUPLICATE KEY UPDATE category_id=:category_id, is_available=:is_available, url=:url, price=:price, currency=:currency, picture=:picture, title=:title, common_data=:common_data"
         );
         foreach ($offers->children() as $offer) {
+            $data = $this->prepareCommonData($offer);
             $offerUpdate->execute(
                 array(
-                    'offer_id' => (string)$offer->attributes()->id,
-                    'category_id' => (int)$offer->categoryId,
+                    'offer_id' => $data['attributes']['id'],
+                    'category_id' => $data['categoryId'],
                     'shop_id' => (int)$shopId,
-                    'is_available' => (boolean)$offer->attributes()->available,
-                    'url' => (string)$offer->url,
-                    'price' => (string)$offer->price,
-                    'currency' => (string)$offer->currencyId,
-                    'picture' => (string)$offer->picture,
-                    'title' => (string)$offer->model,
-                    'common_data' => json_encode((array)$offer)
+                    'is_available' => (boolean)$data['attributes']['available'],
+                    'url' => $data['url'],
+                    'price' => $data['price'],
+                    'currency' => $data['currencyId'],
+                    'picture' => $data['picture'],
+                    'title' => $data['model'],
+                    'common_data' => serialize($this->prepareCommonData($offer))
                 )
             );
         }
+    }
+
+    private function prepareCommonData($data){
+        $params = array('param' => array(), 'attributes' => array());
+        foreach ($data->param as $value){
+            $params['param'][(string)$value->attributes()->name] = (string)$value;
+        }
+        foreach ($data->attributes() as $key => $value){
+            $params['attributes'][$key] = (string)$value;
+        }
+        return array_merge((array)$data, $params);
     }
 
     private function resetAvailableValue($shopId)
@@ -262,6 +274,7 @@ CREATE TABLE `goods_tmp` (
 	`is_available` INT(1) NULL DEFAULT NULL,
 	`title` VARCHAR(255) NULL DEFAULT NULL,
 	`updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	`color` VARCHAR(50) NULL DEFAULT NULL,
 	UNIQUE INDEX `offer_id` (`offer_id`, `shop_id`),
 	INDEX `category_id` (`category_id`, `shop_id`),
 	INDEX `shop_id` (`shop_id`),

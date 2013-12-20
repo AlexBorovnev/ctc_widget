@@ -1,20 +1,18 @@
 <?php
 namespace library;
-
+use library\Config;
 
 
 abstract class WidgetAbstract
 {
     protected $cache = null;
-    protected $config;
+    protected static $config;
     protected $prodEnv = false;
-    const CONFIG_PATH = '../../../config.ini';
-    const CONFIG_LOCAL_PATH = '../../../config_local.ini';
 
     public function __construct()
     {
-        $this->config = array_merge(parse_ini_file(__DIR__ . self::CONFIG_PATH, true), parse_ini_file(__DIR__ . self::CONFIG_LOCAL_PATH, true));
-        $this->prodEnv = $this->config['env']['prod'];
+        self::$config = Config::getInstance()->getConfig();
+        $this->prodEnv = self::$config['env']['prod'];
         $this->cache = new \Memcache();
         $this->cache->addServer('localhost', 11211);
     }

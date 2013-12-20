@@ -17,9 +17,9 @@ class DbLoadWidget extends WidgetAbstract
         parent::__construct();
         self::$dbh = new \PDO(sprintf(
             "mysql:host=%s;dbname=%s;charset=UTF8",
-            $this->config['db']['db_host'],
-            $this->config['db']['db_name']
-        ), $this->config['db']['login'], $this->config['db']['password']);
+            self::$config['db']['db_host'],
+            self::$config['db']['db_name']
+        ), self::$config['db']['login'], self::$config['db']['password']);
         self::$dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
     }
 
