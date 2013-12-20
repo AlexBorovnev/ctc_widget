@@ -5,7 +5,8 @@ use library\DbLoadWidget;
 use library\ApiServer;
 use library\Config;
 
-define ('HOST', ($_SERVER['HTTPS'] == 'on') ? 'https' : 'http' . '://' . $_SERVER['HTTP_HOST'] . '/');
+define ('KASTIL', '/sts.loc/www');
+define ('HOST', 'http://' . $_SERVER['HTTP_HOST'] . '/sts.loc/www/');
 
 function __autoload($class_name)
 {
@@ -13,7 +14,7 @@ function __autoload($class_name)
 }
 
 $widget = new TemporaryWidget();
-$rout = explode('/', strtok(trim($_SERVER['REQUEST_URI'], '/'), '?'));
+$rout = explode('/', strtok(trim(str_replace(KASTIL, '', $_SERVER['REQUEST_URI']), '/'), '?'));
 switch ($rout[0]) {
     case 'clear_widget_all':
         $widget->deleteAllWidget();
@@ -28,9 +29,6 @@ switch ($rout[0]) {
             $widgetsId = strip_tags($rout[1]);
             require_once('widget.php');
         }
-        break;
-    case 'picture':
-        header('Location: picture.php?' . $_SERVER['QUERY_STRING']);
         break;
     case 'handler':
         if ($_SERVER['REQUEST_METHOD'] == 'POST'){
