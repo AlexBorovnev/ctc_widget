@@ -2,25 +2,18 @@
 namespace library;
 
 use library\WidgetAbstract;
+use library\Config;
 
 class DbLoadWidget extends WidgetAbstract
 {
-    const RULE_TYPE_SINGLE = 2;
-    const RULE_TYPE_RANDOM = 1;
-
     /**
      * @var \PDO
      */
-    protected static $dbh = null;
+    protected $dbh = null;
     public function __construct()
     {
         parent::__construct();
-        self::$dbh = new \PDO(sprintf(
-            "mysql:host=%s;dbname=%s;charset=UTF8",
-            self::$config['db']['db_host'],
-            self::$config['db']['db_name']
-        ), self::$config['db']['login'], self::$config['db']['password']);
-        self::$dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $this->dbh = Config::getInstance()->getDbConnection();
     }
 
     protected function getOffers($widgetId)
@@ -40,7 +33,8 @@ class DbLoadWidget extends WidgetAbstract
                 if($offer = $this->getSingleItem($rule)){
                     return $offer;
                 }
-            case self::RULE_TYPE_RANDOM:
+                return false;
+            case self::RULE_TYPE_RULE:
                 return $this->getRandomItem($rule);
             default:
                 return array();
@@ -49,7 +43,7 @@ class DbLoadWidget extends WidgetAbstract
 
     protected function getRules($widgetId){
         if ($widget = $this->widgetExists($widgetId)){
-            $rulesQuery = self::$dbh->prepare('SELECT * FROM rules WHERE widget_id=:widget_id');
+            $rulesQuery = $this->dbh->prepare('SELECT * FROM rules WHERE widget_id=:widget_id');
             $rulesQuery->bindValue(':widget_id', $widgetId);
             $rulesQuery->execute();
             return $rulesQuery->fetchAll(\PDO::FETCH_ASSOC);
@@ -58,11 +52,11 @@ class DbLoadWidget extends WidgetAbstract
     }
 
     protected function getSingleItem($rule){
-        $getGingleItem = self::$dbh->prepare('SELECT * FROM goods WHERE offer_id=:offer_id AND shop_id=:shop_id AND is_available=1');
-        $getGingleItem->bindValue(':offer_id', $rule['source']);
-        $getGingleItem->bindValue(':shop_id', $rule['shop_id']);
-        $getGingleItem->execute();
-        return $getGingleItem->fetch(\PDO::FETCH_ASSOC);
+        $getSingleItem = $this->dbh->prepare('SELECT * FROM goods WHERE offer_id=:offer_id AND shop_id=:shop_id AND is_available=1');
+        $getSingleItem->bindValue(':offer_id', $rule['source']);
+        $getSingleItem->bindValue(':shop_id', $rule['shop_id']);
+        $getSingleItem->execute();
+        return $getSingleItem->fetch(\PDO::FETCH_ASSOC);
     }
 
     protected function getRandomItem(){
@@ -70,7 +64,7 @@ class DbLoadWidget extends WidgetAbstract
     }
 
     protected function widgetExists($widgetId){
-        $widgetQuery = self::$dbh->prepare('SELECT COUNT(*) AS rows_num, type_id, skin_id FROM widgets WHERE id=:widget_id');
+        $widgetQuery = $this->dbh->prepare('SELECT COUNT(*) AS rows_num, type_id, skin_id FROM widgets WHERE id=:widget_id');
         $widgetQuery->bindValue(':widget_id', $widgetId);
         $widgetQuery->execute();
         $widget = $widgetQuery->fetch(\PDO::FETCH_ASSOC);

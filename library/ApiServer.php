@@ -2,21 +2,17 @@
 namespace library;
 
 use library\Config;
+use library\DbLoadWidget;
 
 class ApiServer
 {
-    protected static $dbh;
-    protected static $config;
+    protected $dbh;
+    protected $config;
 
     public function __construct()
     {
-        self::$config = Config::getInstance()->getConfig();
-        self::$dbh = new \PDO(sprintf(
-            "mysql:host=%s;dbname=%s;charset=UTF8",
-            self::$config['db']['db_host'],
-            self::$config['db']['db_name']
-        ), self::$config['db']['login'], self::$config['db']['password']);
-        self::$dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $this->config = Config::getInstance()->getConfig();
+        $this->dbh = Config::getInstance()->getDbConnection();
     }
 
     public function run($data)
@@ -26,7 +22,7 @@ class ApiServer
         if (method_exists($this, $methodName)) {
             $this->sendResponse(array('data' => $this->{$methodName}($params)));
         } else {
-            $this->sendResponse(array('message' => 'Method doesn’t exists'), true, 2);
+            $this->sendResponse(array('message' => $this->config['messages'][2]), true, 2);
         }
     }
 
@@ -36,7 +32,7 @@ class ApiServer
             array_walk($data['params'], array($this, 'stripTags'));
             return $data['params'];
         } else {
-            $this->sendResponse(array('message' => 'Params is not array'), true, 4);
+            $this->sendResponse(array('message' => $this->config['messages'][4]), true, 4);
         }
     }
 
@@ -54,7 +50,7 @@ class ApiServer
         if (!empty($data['methodName'])) {
             return strip_tags(trim((string)$data['methodName']));
         } else {
-            $this->sendResponse(array('message' => 'Method name is empty'), true, 3);
+            $this->sendResponse(array('message' => $this->config['messages'][3]), true, 3);
         }
     }
 
@@ -70,12 +66,14 @@ class ApiServer
             switch ($params['required']) {
                 case true:
                     if (empty($data[$name]) || !$this->correctType($data[$name], $params['type'])) {
-                        $this->sendResponse(array('message' => 'Needed param is out'), true, 5);
+                        $this->sendResponse(array('message' => $this->config['messages'][5]), true, 5);
                     }
+                    break;
                 case false:
                     if (!empty($data[$name]) && !$this->correctType($data[$name], $params['type'])) {
-                        $this->sendResponse(array('message' => 'Needed param is out'), true, 5);
+                        $this->sendResponse(array('message' => $this->config['messages'][5]), true, 5);
                     }
+                    break;
             }
         }
     }
@@ -94,12 +92,12 @@ class ApiServer
 
     function __destruct()
     {
-        self::$dbh = null;
+        $this->dbh = null;
     }
 
     protected function getShopList()
     {
-        $shopsList = self::$dbh->prepare('SELECT * FROM shops');
+        $shopsList = $this->dbh->prepare('SELECT * FROM shops');
         $shopsList->execute();
         $shopsList = $shopsList->fetchAll(\PDO::FETCH_ASSOC);
         return array('list' => $shopsList, 'count' => count($shopsList));
@@ -109,7 +107,7 @@ class ApiServer
     {
         $this->checkNeededParam($data, array('shopId' => array('type' => 'array', 'required' => true)));
         $qMarks = $this->getQueryMark($data['shopId']);
-        $shopsList = self::$dbh->prepare("SELECT * FROM shops WHERE id IN ($qMarks)");
+        $shopsList = $this->dbh->prepare("SELECT * FROM shops WHERE id IN ($qMarks)");
         $shopsList->execute($data['shopId']);
         $shopsList = $shopsList->fetchAll(\PDO::FETCH_ASSOC);
         return array('list' => $shopsList, 'count' => count($shopsList));
@@ -135,7 +133,7 @@ class ApiServer
             $qMarks .= ' AND category_id IN (' . $this->getQueryMark($data['categoryId']) . ')';
             $qValue = array_merge($qValue, $data['categoryId']);
         }
-        $categoryList = self::$dbh->prepare("SELECT * FROM categories WHERE $qMarks");
+        $categoryList = $this->dbh->prepare("SELECT * FROM categories WHERE $qMarks");
         $categoryList->execute($qValue);
         $categoryList = $categoryList->fetchAll(\PDO::FETCH_ASSOC);
         return array('list' => $categoryList, 'count' => count($categoryList));
@@ -151,7 +149,7 @@ class ApiServer
             )
         );
         $qOfferMark = $this->getQueryMark($data['offerId']);
-        $offerList = self::$dbh->prepare(
+        $offerList = $this->dbh->prepare(
             "SELECT common_data FROM goods WHERE shop_id = ? AND offer_id IN ($qOfferMark)"
         );
         $offerList->execute(array_merge(array($data['shopId']), $data['offerId']));
@@ -181,7 +179,7 @@ class ApiServer
             $qMarks .= ' AND color IN (' . $this->getQueryMark($data['color']) . ')';
             $qValue = array_merge($qValue, $data['color']);
         }
-        $offerList = self::$dbh->prepare("SELECT common_data FROM goods WHERE $qMarks ORDER BY RAND() LIMIT 1000");
+        $offerList = $this->dbh->prepare("SELECT common_data FROM goods WHERE $qMarks ORDER BY RAND() LIMIT 1000");
         $offerList->execute($qValue);
         $offerList = $offerList->fetchAll(\PDO::FETCH_ASSOC);
         $commonData = array();
@@ -196,11 +194,141 @@ class ApiServer
         $tableWithWidgetInfo = array('widget_type', 'widget_skin');
         $infoList = array();
         foreach ($tableWithWidgetInfo as $tableName) {
-            $query = self::$dbh->prepare("SELECT * FROM {$tableName}");
+            $query = $this->dbh->prepare("SELECT * FROM {$tableName}");
             $query->execute();
             $infoList[$tableName] = $query->fetchAll(\PDO::FETCH_ASSOC);
         }
         return $infoList;
+    }
+
+    protected function setWidget($data)
+    {
+        $this->checkNeededParam(
+            $data,
+            array(
+                'shopId' => array('type' => 'string', 'required' => true),
+                'skinId' => array('type' => 'string', 'required' => true),
+                'typeId' => array('type' => 'string', 'required' => true),
+                'commonRule' => array('type' => 'array', 'required' => false),
+                'positions' => array('type' => 'array', 'required' => true),
+                'widgetId' => array('type' => 'string', 'required' => false)
+            )
+        );
+        foreach ($data['positions'] as $rule) {
+            $this->checkNeededParam(
+                $rule,
+                array(
+                    'type' => array('type' => 'string', 'required' => true),
+                    'params' => array('type' => 'array', 'required' => true)
+                )
+            );
+        }
+        try {
+            $this->dbh->beginTransaction();
+            $data['positions'] = array_slice($data['positions'], 0, $this->getMaxPositions($data['typeId']));
+            $widgetId = $this->widgetAdd($data);
+            $this->rulesAdd($data['shopId'], $widgetId, $data['positions']);
+            $this->dbh->commit();
+            return array('widgetId' => $widgetId);
+        } catch (\Exception $e) {
+            $this->dbh->rollback();
+            $this->sendResponse(array('message' => $this->config['messages'][6]), true, 6);
+        }
+    }
+
+    protected function rulesAdd($shopId, $widgetId, $rules)
+    {
+        foreach ($rules as $key => $rule) {
+            switch ($rule['type']) {
+                case DbLoadWidget::RULE_TYPE_SINGLE:
+                    $this->insertSingleItem($shopId, $widgetId, $rule['params'], $key);
+                    break;
+                case DbLoadWidget::RULE_TYPE_RULE:
+                    $this->insertRuleItem($shopId, $widgetId, $rule['params']);
+                    break;
+                default:
+                    throw new \Exception('Rule type undefined');
+            }
+        }
+    }
+
+    protected function getMaxPositions($typeId)
+    {
+        switch ($typeId) {
+            case DbLoadWidget::WIDGET_TYPE_BIG:
+                return DbLoadWidget::WIDGET_TYPE_BIG_POSITIONS;
+            case
+            DbLoadWidget::WIDGET_TYPE_SMALL:
+                return DbLoadWidget::WIDGET_TYPE_SMALL_POSITIONS;
+            default:
+                return DbLoadWidget::WIDGET_MAX_POSITIONS;
+        }
+    }
+
+    protected function insertSingleItem($shopId, $widgetId, $offerId, $position)
+    {
+        $singleRuleQuery = $this->dbh->prepare(
+            "INSERT INTO rules (shop_id, widget_id, rules_type, source, position) VALUES (:shop_id, :widget_id, :rules_type, :source, :position) ON DUPLICATE KEY UPDATE rules_type = :rules_type, source = :source"
+        );
+        $offerId = array_shift($offerId);
+        $singleRuleQuery->execute(
+            array(
+                ':shop_id' => $shopId,
+                ':widget_id' => $widgetId,
+                ':rules_type' => DbLoadWidget::RULE_TYPE_SINGLE,
+                ':source' => $offerId,
+                ':position' => $position
+            )
+        );
+    }
+
+    protected function insertRuleItem()
+    {
+
+    }
+
+    protected function widgetAdd($data)
+    {
+        $widgetAddQuery = "INSERT INTO widgets (type_id, shop_id, skin_id, position_count) VALUES (:type_id, :shop_id, :skin_id, :pos_count)";
+        $paramValue = array(
+            ':type_id' => $data['typeId'],
+            ':shop_id' => $data['shopId'],
+            ':skin_id' => $data['skinId'],
+            ':pos_count' => count($data['positions'])
+        );
+        if (!empty($data['widgetId'])) {
+            $widgetAddQuery = "UPDATE widgets SET type_id=:type_id, shop_id=:shop_id, skin_id=:skin_id, position_count=:pos_count WHERE id=:id";
+            $paramValue = array_merge($paramValue, array(':id' => $data['widgetId']));
+        }
+        $widgetAddQuery = $this->dbh->prepare($widgetAddQuery);
+        $widgetAddQuery->execute(
+            $paramValue
+        );
+        return $this->dbh->lastInsertId() ? : $data['widgetId'];
+    }
+
+    protected function getRulesTypeList()
+    {
+        $rulesList = $this->dbh->prepare('SELECT * FROM rules_type');
+        $rulesList->execute();
+        $rulesList = $rulesList->fetchAll(\PDO::FETCH_ASSOC);
+        return array('list' => $rulesList, 'count' => count($rulesList));
+    }
+
+    protected function getWidgetSkinList()
+    {
+        $widgetSkinList = $this->dbh->prepare('SELECT * FROM widget_skin');
+        $widgetSkinList->execute();
+        $widgetSkinList = $widgetSkinList->fetchAll(\PDO::FETCH_ASSOC);
+        return array('list' => $widgetSkinList, 'count' => count($widgetSkinList));
+    }
+
+    protected function getWidgetTypeList()
+    {
+        $widgetTypeList = $this->dbh->prepare('SELECT * FROM widget_type');
+        $widgetTypeList->execute();
+        $widgetTypeList = $widgetTypeList->fetchAll(\PDO::FETCH_ASSOC);
+        return array('list' => $widgetTypeList, 'count' => count($widgetTypeList));
     }
 
     protected function getQueryMark($data)

@@ -18,7 +18,7 @@ function getScripPath(){
     $path = implode('/', $rout);
     return ($path) ? $path . '/' : '';
 }
-$widget = new TemporaryWidget();
+$widget = new DbLoadWidget();
 $rout = explode('/', strtok(trim(str_replace(getScripPath(), '', $_SERVER['REQUEST_URI']), '/'), '?'));
 switch ($rout[0]) {
     case 'clear_widget_all':

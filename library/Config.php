@@ -7,6 +7,8 @@ class Config
     const CONFIG_LOCAL_PATH = '/../config_local.ini';
     protected static $instance = null;
     protected static $busy = false;
+    protected static $config = array();
+    protected static $dbh = null;
 
     private function __construct()
     {
@@ -22,10 +24,13 @@ class Config
 
     public static function getConfig()
     {
-        return array_merge(
-            parse_ini_file(__DIR__ . self::CONFIG_PATH, true),
-            parse_ini_file(__DIR__ . self::CONFIG_LOCAL_PATH, true)
-        );
+        if (!self::$config) {
+            self::$config = array_merge(
+                parse_ini_file(__DIR__ . self::CONFIG_PATH, true),
+                parse_ini_file(__DIR__ . self::CONFIG_LOCAL_PATH, true)
+            );
+        }
+        return self::$config;
     }
 
     public function setBusyStatus($status)
@@ -40,5 +45,19 @@ class Config
     public function getBusyStatus()
     {
         return (file_exists(__DIR__ . '/../busy')) ? true : false;
+    }
+
+    public function getDbConnection()
+    {
+        if (!self::$dbh) {
+            $config = self::getConfig();
+            self::$dbh = new \PDO(sprintf(
+                "mysql:host=%s;dbname=%s;charset=UTF8",
+                $config['db']['db_host'],
+                $config['db']['db_name']
+            ), $config['db']['login'], $config['db']['password']);
+            self::$dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        }
+        return self::$dbh;
     }
 }

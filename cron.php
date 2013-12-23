@@ -10,13 +10,13 @@ class initBase
     private $backupCreate = false;
     private $backupName = '';
     private $projectDir = __DIR__;
-    private static $dbh = null;
-    private static $config = array();
+    private $dbh = null;
+    private $config = array();
 
     public function __construct()
     {
         chdir($this->projectDir);
-        self::$config = Config::getInstance()->getConfig();
+        $this->config = Config::getInstance()->getConfig();
         Config::getInstance()->setBusyStatus(true);
     }
 
@@ -35,7 +35,7 @@ class initBase
 
     private function getBaseUrl()
     {
-        return self::$config['base_url'];
+        return $this->config['base_url'];
     }
 
     private function downloadBase($baseUrl, $shopName)
@@ -63,7 +63,7 @@ class initBase
     {
         if ($backupName = $this->getLastBackup($this->prependBackupFolder($shopName))) {
             copy(
-                $this->projectDir . '/' . self::$config['backup']['folder'] . $shopName . '/' . $backupName,
+                $this->projectDir . '/' . $this->config['backup']['folder'] . $shopName . '/' . $backupName,
                 self::BASE_NAME
             );
         }
@@ -72,18 +72,18 @@ class initBase
     private function getLastBackup($filesList)
     {
         if ($filesList) {
-            return array_pop($filesList);
+            return array_shift($filesList);
         }
         return false;
     }
 
     private function prependBackupFolder($shopName)
     {
-        chdir($this->projectDir . '/' . self::$config['backup']['folder'] . $shopName);
+        chdir($this->projectDir . '/' . $this->config['backup']['folder'] . $shopName);
         $filesList = glob('*.xml');
         rsort($filesList);
-        if (count($filesList) > self::$config['backup']['max_backup_file']) {
-            foreach (array_slice($filesList, self::$config['backup']['max_backup_file']) as $fileName) {
+        if (count($filesList) > $this->config['backup']['max_backup_file']) {
+            foreach (array_slice($filesList, $this->config['backup']['max_backup_file']) as $fileName) {
                 unlink($fileName);
             }
         }
@@ -93,9 +93,9 @@ class initBase
 
     private function makeBackup($shopName)
     {
-        $this->backupName = self::$config['backup']['folder'] . $shopName . '/' . date('YmdHi') . '.xml';
-        if (!file_exists($this->projectDir . '/' . self::$config['backup']['folder'] . $shopName)) {
-            mkdir($this->projectDir . '/' . self::$config['backup']['folder'] . $shopName, 0777);
+        $this->backupName = $this->config['backup']['folder'] . $shopName . '/' . date('YmdHi') . '.xml';
+        if (!file_exists($this->projectDir . '/' . $this->config['backup']['folder'] . $shopName)) {
+            mkdir($this->projectDir . '/' . $this->config['backup']['folder'] . $shopName, 0777);
         }
         $this->prependBackupFolder($shopName);
         if (@copy(self::BASE_NAME, $this->backupName)) {
@@ -112,29 +112,26 @@ class initBase
     {
         if (file_exists(self::BASE_NAME)) {
             try {
-                self::$dbh = new PDO(sprintf(
-                    "mysql:host=%s;dbname=%s;charset=UTF8",
-                    self::$config['db']['db_host'],
-                    self::$config['db']['db_name']
-                ), self::$config['db']['login'], self::$config['db']['password']);
-                self::$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                $this->dbh = Config::getInstance()->getDbConnection();
                 $newData = simplexml_load_file(self::BASE_NAME);
                 $shopId = $this->getShopId($shopName, (string)$newData->shop->url);
                 $this->addCurrency($shopId, $newData->shop->currencies);
                 $this->updateCategories($shopId, $newData->shop->categories);
                 $this->updateWithTmpTable($shopId, $newData->shop->offers);
-            } catch (PDOException $e) {
-                die("Error: " . $e->getMessage());
+            } catch (\Exception $e) {
+                $this->setupBackup($shopName);
             }
+        } else {
+            $this->setupBackup($shopName);
         }
     }
 
     private function addCurrency($shopId, $data = array())
     {
         $currencyList = array();
-        $currencyQuery = self::$dbh->prepare('DELETE FROM currency WHERE shop_id=:shop_id');
+        $currencyQuery = $this->dbh->prepare('DELETE FROM currency WHERE shop_id=:shop_id');
         $currencyQuery->execute(array(':shop_id' => $shopId));
-        $currencyQuery = self::$dbh->prepare(
+        $currencyQuery = $this->dbh->prepare(
             'INSERT INTO currency (currency_id, rate, shop_id) VALUES (:currency_id, :rate, :shop_id) ON DUPLICATE KEY UPDATE rate=:rate'
         );
         foreach ($data->currency as $value) {
@@ -152,7 +149,7 @@ class initBase
 
     private function getShopId($shopName, $url = '')
     {
-        $STH = self::$dbh->prepare('SELECT id from shops WHERE title = :shop_name LIMIT 1');
+        $STH = $this->dbh->prepare('SELECT id from shops WHERE title = :shop_name LIMIT 1');
         $STH->bindValue(':shop_name', $shopName);
         $STH->execute();
         if (!$shopId = $STH->fetch()) {
@@ -163,19 +160,19 @@ class initBase
 
     private function addShop($shopName, $url)
     {
-        $stmt = self::$dbh->prepare("INSERT INTO shops (title, url) values (:title, :url)");
+        $stmt = $this->dbh->prepare("INSERT INTO shops (title, url) values (:title, :url)");
         $stmt->bindValue(':title', $shopName);
         $stmt->bindValue(':url', $url);
         $stmt->execute();
-        return self::$dbh->lastInsertId();
+        return $this->dbh->lastInsertId();
     }
 
     private function updateCategories($shopId, $categories)
     {
-        $stmt = self::$dbh->prepare(
+        $stmt = $this->dbh->prepare(
             "INSERT LOW_PRIORITY INTO categories (category_id, shop_id,parent_id, title) VALUES (:category_id, :shop_id, :parent_id, :title) ON DUPLICATE KEY UPDATE parent_id=:parent_id, title=:title"
         );
-        self::$dbh->beginTransaction();
+        $this->dbh->beginTransaction();
         foreach ($categories->children() as $category) {
             $stmt->execute(
                 array(
@@ -186,25 +183,25 @@ class initBase
                 )
             );
         }
-        self::$dbh->commit();
+        $this->dbh->commit();
     }
 
     private function updateWithTmpTable($shopId, $offers)
     {
-        self::$dbh->beginTransaction();
+        $this->dbh->beginTransaction();
         $this->createTmpTable();
         $this->copyDataToTmpTable();
         $this->resetAvailableValue($shopId);
         $this->updateDataInTmpTable($shopId, $offers);
-        self::$dbh->prepare('DROP TABLE goods')->execute();
-        self::$dbh->prepare('RENAME TABLE goods_tmp TO goods')->execute();
-        self::$dbh->commit();
+        $this->dbh->prepare('DROP TABLE goods')->execute();
+        $this->dbh->prepare('RENAME TABLE goods_tmp TO goods')->execute();
+        $this->dbh->commit();
         return true;
     }
 
     private function updateDataInTmpTable($shopId, $offers)
     {
-        $offerUpdate = self::$dbh->prepare(
+        $offerUpdate = $this->dbh->prepare(
             "INSERT INTO goods_tmp (offer_id, category_id,shop_id, is_available, url, price, currency, picture, title, common_data, color) VALUES (:offer_id, :category_id, :shop_id, :is_available, :url, :price, :currency, :picture, :title, :common_data, :color) ON DUPLICATE KEY UPDATE category_id=:category_id, is_available=:is_available, url=:url, price=:price, currency=:currency, picture=:picture, title=:title, common_data=:common_data, color=:color"
         );
         foreach ($offers->children() as $offer) {
@@ -242,19 +239,19 @@ class initBase
 
     private function resetAvailableValue($shopId)
     {
-        $offerAvaliableReset = self::$dbh->prepare('UPDATE goods_tmp SET is_available = 0 WHERE shop_id=:shop_id');
+        $offerAvaliableReset = $this->dbh->prepare('UPDATE goods_tmp SET is_available = 0 WHERE shop_id=:shop_id');
         $offerAvaliableReset->bindValue(':shop_id', $shopId);
         $offerAvaliableReset->execute();
     }
 
     private function createTmpTable()
     {
-        self::$dbh->prepare($this->createTmpTableCode('goods_tmp'))->execute();
+        $this->dbh->prepare($this->createTmpTableCode('goods_tmp'))->execute();
     }
 
     private function copyDataToTmpTable()
     {
-        $copyDataInTmpTable = self::$dbh->prepare('INSERT INTO goods_tmp SELECT * FROM goods');
+        $copyDataInTmpTable = $this->dbh->prepare('INSERT INTO goods_tmp SELECT * FROM goods');
         $copyDataInTmpTable->execute();
     }
 
@@ -291,7 +288,7 @@ EOL;
     public function __destruct()
     {
         Config::getInstance()->setBusyStatus(false);
-        self::$dbh = null;
+        $this->dbh = null;
     }
 }
 
