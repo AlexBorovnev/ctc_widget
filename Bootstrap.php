@@ -2,6 +2,7 @@
 use library\DbLoadWidget;
 use library\ApiServer;
 use library\Config;
+use library\Common;
 
 define ('HOST', 'http://' . $_SERVER['HTTP_HOST'] . '/'.  getScripPath());
 
@@ -33,13 +34,21 @@ switch ($rout[0]) {
         }
         break;
     case 'admin':
+        session_start();
         if (Config::getInstance()->getBusyStatus() == true) {
             echo "<h1>Database Update Now</h1>";
         } else {
-            echo "<h1>COOL</h1>";
+            auth();
         }
         break;
     default:
         header("HTTP/1.1 404 Not Found");
         exit;
+}
+function auth(){
+    if (empty($_SESSION['user_id'])){
+        require_once 'view/auth.php';
+    } else{
+        require_once 'view/admin.html';
+    }
 }

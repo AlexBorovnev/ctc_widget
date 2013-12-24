@@ -41,15 +41,15 @@
 
         });
         <?php endif; ?>
-<!--        $(document).ready(function () {-->
-<!--            $.ajax({-->
-<!--                url: "--><?//=HOST?><!--handler",-->
-<!--                dataType: "json",-->
-<!--                data: {methodName: 'setWidget ', params: {commonRule: {categoryId: [7301000], color: ['Серый', 'Не указан']}, widgetId:3, typeId: 3,shopId: 1, skinId: 1, positions: [{type: 2, params: ['W13022617522', 'PW13082681899']},{type: 1, params: {categoryId: ['<p>', 7301000], color: ['Не указан']}},{type: 2, params: ['PW13082277290', 'PW13082681899']},{type: 2, params: ['W13031949003', 'PW13082681899']},{type: 2, params: ['W13031239838', 'PW13082681899']} ,{type: 2, params: ['W13012367146', 'PW13082681899']}]}},-->
-<!--                type: "POST"-->
-<!--        })-->
-<!--            .done(function(response){-->
-<!--                console.log(response);-->
-<!--            });-->
-<!--        });-->
+        $(document).ready(function () {
+            $.ajax({
+                url: "<?=HOST?>handler",
+                dataType: "json",
+                data: {methodName: 'setWidget ', params: {commonRule: {categoryId: [7301000], color: ['Серый', 'Не указан']}, typeId: 3,shopId: 1, skinId: 1, positions: [{type: 2, params: ['W13022617522', 'PW13082681899']},{type: 1, params: {categoryId: ['<p>', 7301000], color: ['Не указан']}},{type: 2, params: ['PW13082277290', 'PW13082681899']},{type: 2, params: ['W13031949003', 'PW13082681899']},{type: 2, params: ['W13031239838', 'PW13082681899']} ,{type: 2, params: ['W13012367146', 'PW13082681899']}]}},
+                type: "POST"
+        })
+            .done(function(response){
+                console.log(response);
+            });
+        });
 </script>
