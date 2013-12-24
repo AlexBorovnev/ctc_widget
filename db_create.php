@@ -13,9 +13,8 @@ function getQuery (){
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 -- Дамп структуры для таблица ctc.categories
-DROP TABLE IF EXISTS `categories`;
 CREATE TABLE IF NOT EXISTS `categories` (
-    `category_id` int(11) unsigned NOT NULL,
+  `category_id` int(11) unsigned NOT NULL,
   `shop_id` int(11) NOT NULL,
   `parent_id` int(11) DEFAULT NULL,
   `title` varchar(255) DEFAULT NULL,
@@ -26,14 +25,13 @@ CREATE TABLE IF NOT EXISTS `categories` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Дамп данных таблицы ctc.categories: ~-1 rows (приблизительно)
-        /*!40000 ALTER TABLE `categories` DISABLE KEYS */;
+/*!40000 ALTER TABLE `categories` DISABLE KEYS */;
 /*!40000 ALTER TABLE `categories` ENABLE KEYS */;
 
 
 -- Дамп структуры для таблица ctc.currency
-DROP TABLE IF EXISTS `currency`;
 CREATE TABLE IF NOT EXISTS `currency` (
-    `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `currency_id` varchar(50) NOT NULL DEFAULT '0',
   `rate` float NOT NULL DEFAULT '0',
   `shop_id` int(11) NOT NULL DEFAULT '0',
@@ -44,14 +42,13 @@ CREATE TABLE IF NOT EXISTS `currency` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Дамп данных таблицы ctc.currency: ~-1 rows (приблизительно)
-        /*!40000 ALTER TABLE `currency` DISABLE KEYS */;
+/*!40000 ALTER TABLE `currency` DISABLE KEYS */;
 /*!40000 ALTER TABLE `currency` ENABLE KEYS */;
 
 
 -- Дамп структуры для таблица ctc.goods
-DROP TABLE IF EXISTS `goods`;
 CREATE TABLE IF NOT EXISTS `goods` (
-    `category_id` int(11) unsigned NOT NULL,
+  `category_id` int(11) unsigned NOT NULL,
   `shop_id` int(11) DEFAULT NULL,
   `offer_id` varchar(20) DEFAULT NULL,
   `price` varchar(20) DEFAULT NULL,
@@ -66,19 +63,18 @@ CREATE TABLE IF NOT EXISTS `goods` (
   UNIQUE KEY `offer_id` (`offer_id`,`shop_id`),
   KEY `category_id` (`category_id`,`shop_id`),
   KEY `shop_id` (`shop_id`),
-  CONSTRAINT `FK_goods_categories_1387798637` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_goods_shops_1387798637` FOREIGN KEY (`shop_id`) REFERENCES `shops` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `FK_goods_categories_1387872064` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_goods_shops_1387872064` FOREIGN KEY (`shop_id`) REFERENCES `shops` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Дамп данных таблицы ctc.goods: ~-1 rows (приблизительно)
-        /*!40000 ALTER TABLE `goods` DISABLE KEYS */;
+/*!40000 ALTER TABLE `goods` DISABLE KEYS */;
 /*!40000 ALTER TABLE `goods` ENABLE KEYS */;
 
 
 -- Дамп структуры для таблица ctc.rules
-DROP TABLE IF EXISTS `rules`;
 CREATE TABLE IF NOT EXISTS `rules` (
-    `widget_id` int(10) unsigned NOT NULL,
+  `widget_id` int(10) unsigned NOT NULL,
   `shop_id` int(10) NOT NULL,
   `rules_type` int(10) NOT NULL,
   `source` varchar(255) DEFAULT NULL,
@@ -93,30 +89,28 @@ CREATE TABLE IF NOT EXISTS `rules` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Дамп данных таблицы ctc.rules: ~-1 rows (приблизительно)
-        /*!40000 ALTER TABLE `rules` DISABLE KEYS */;
+/*!40000 ALTER TABLE `rules` DISABLE KEYS */;
 /*!40000 ALTER TABLE `rules` ENABLE KEYS */;
 
 
 -- Дамп структуры для таблица ctc.rules_type
-DROP TABLE IF EXISTS `rules_type`;
 CREATE TABLE IF NOT EXISTS `rules_type` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `type` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Дамп данных таблицы ctc.rules_type: ~-1 rows (приблизительно)
-        /*!40000 ALTER TABLE `rules_type` DISABLE KEYS */;
+/*!40000 ALTER TABLE `rules_type` DISABLE KEYS */;
 INSERT INTO `rules_type` (`id`, `type`) VALUES
-    (1, 'rule'),
+	(1, 'rule'),
 	(2, 'single');
 /*!40000 ALTER TABLE `rules_type` ENABLE KEYS */;
 
 
 -- Дамп структуры для таблица ctc.shops
-DROP TABLE IF EXISTS `shops`;
 CREATE TABLE IF NOT EXISTS `shops` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(100) DEFAULT NULL,
   `url` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -124,32 +118,30 @@ CREATE TABLE IF NOT EXISTS `shops` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Дамп данных таблицы ctc.shops: ~-1 rows (приблизительно)
-        /*!40000 ALTER TABLE `shops` DISABLE KEYS */;
+/*!40000 ALTER TABLE `shops` DISABLE KEYS */;
 /*!40000 ALTER TABLE `shops` ENABLE KEYS */;
 
 
 -- Дамп структуры для таблица ctc.sites
-DROP TABLE IF EXISTS `sites`;
 CREATE TABLE IF NOT EXISTS `sites` (
-    `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `title` varchar(100) DEFAULT NULL,
   `url` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Дамп данных таблицы ctc.sites: ~-1 rows (приблизительно)
-        /*!40000 ALTER TABLE `sites` DISABLE KEYS */;
+/*!40000 ALTER TABLE `sites` DISABLE KEYS */;
 /*!40000 ALTER TABLE `sites` ENABLE KEYS */;
 
 
 -- Дамп структуры для таблица ctc.widgets
-DROP TABLE IF EXISTS `widgets`;
 CREATE TABLE IF NOT EXISTS `widgets` (
-    `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `type_id` int(11) DEFAULT NULL,
   `skin_id` int(11) DEFAULT NULL,
   `shop_id` int(11) NOT NULL,
-  `comon_rule` varchar(255) DEFAULT NULL,
+  `common_rule` text,
   `position_count` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_widgets_widget_type` (`type_id`),
@@ -161,45 +153,44 @@ CREATE TABLE IF NOT EXISTS `widgets` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Дамп данных таблицы ctc.widgets: ~-1 rows (приблизительно)
-        /*!40000 ALTER TABLE `widgets` DISABLE KEYS */;
+/*!40000 ALTER TABLE `widgets` DISABLE KEYS */;
 /*!40000 ALTER TABLE `widgets` ENABLE KEYS */;
 
 
 -- Дамп структуры для таблица ctc.widget_skin
-DROP TABLE IF EXISTS `widget_skin`;
 CREATE TABLE IF NOT EXISTS `widget_skin` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 
 -- Дамп данных таблицы ctc.widget_skin: ~-1 rows (приблизительно)
-        /*!40000 ALTER TABLE `widget_skin` DISABLE KEYS */;
+/*!40000 ALTER TABLE `widget_skin` DISABLE KEYS */;
 INSERT INTO `widget_skin` (`id`, `title`) VALUES
-    (1, 'СТС'),
+	(1, 'СТС'),
 	(2, 'Домашний'),
 	(3, 'Видеоморе');
 /*!40000 ALTER TABLE `widget_skin` ENABLE KEYS */;
 
 
 -- Дамп структуры для таблица ctc.widget_type
-DROP TABLE IF EXISTS `widget_type`;
 CREATE TABLE IF NOT EXISTS `widget_type` (
-    `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Дамп данных таблицы ctc.widget_type: ~-1 rows (приблизительно)
-        /*!40000 ALTER TABLE `widget_type` DISABLE KEYS */;
+/*!40000 ALTER TABLE `widget_type` DISABLE KEYS */;
 INSERT INTO `widget_type` (`id`, `title`) VALUES
-    (1, 'Маленький'),
+	(1, 'Маленький'),
 	(2, 'Большой'),
 	(3, 'Свободный');
 /*!40000 ALTER TABLE `widget_type` ENABLE KEYS */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+
 EOL;
 
 }
