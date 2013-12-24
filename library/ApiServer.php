@@ -3,16 +3,20 @@ namespace library;
 
 use library\Config;
 use library\DbLoadWidget;
+use library\Common;
 
 class ApiServer
 {
+    /**
+     * @var \PDO Config
+     */
     protected $dbh;
     protected $config;
 
-    public function __construct()
+    public function __construct(array $config, \PDO $connection)
     {
-        $this->config = Config::getInstance()->getConfig();
-        $this->dbh = Config::getInstance()->getDbConnection();
+        $this->config = $config;
+        $this->dbh = $connection;
     }
 
     public function run($data)
@@ -106,7 +110,7 @@ class ApiServer
     protected function getShop($data)
     {
         $this->checkNeededParam($data, array('shopId' => array('type' => 'array', 'required' => true)));
-        $qMarks = $this->getQueryMark($data['shopId']);
+        $qMarks = Common::getInstance()->getQueryMark($data['shopId']);
         $shopsList = $this->dbh->prepare("SELECT * FROM shops WHERE id IN ($qMarks)");
         $shopsList->execute($data['shopId']);
         $shopsList = $shopsList->fetchAll(\PDO::FETCH_ASSOC);
@@ -126,11 +130,11 @@ class ApiServer
         $qMarks = 'shop_id = ?';
         $qValue = array($data['shopId']);
         if (!empty($data['parentId'])) {
-            $qMarks .= ' AND parent_id IN (' . $this->getQueryMark($data['parentId']) . ')';
+            $qMarks .= ' AND parent_id IN (' . Common::getInstance()->getQueryMark($data['parentId']) . ')';
             $qValue = array_merge($qValue, $data['parentId']);
         }
         if (!empty($data['categoryId'])) {
-            $qMarks .= ' AND category_id IN (' . $this->getQueryMark($data['categoryId']) . ')';
+            $qMarks .= ' AND category_id IN (' . Common::getInstance()->getQueryMark($data['categoryId']) . ')';
             $qValue = array_merge($qValue, $data['categoryId']);
         }
         $categoryList = $this->dbh->prepare("SELECT * FROM categories WHERE $qMarks");
@@ -148,7 +152,7 @@ class ApiServer
                 'shopId' => array('type' => 'string', 'required' => true)
             )
         );
-        $qOfferMark = $this->getQueryMark($data['offerId']);
+        $qOfferMark = Common::getInstance()->getQueryMark($data['offerId']);
         $offerList = $this->dbh->prepare(
             "SELECT common_data FROM goods WHERE shop_id = ? AND offer_id IN ($qOfferMark)"
         );
@@ -173,10 +177,10 @@ class ApiServer
         );
         $qMarks = 'shop_id = ?';
         $qValue = array($data['shopId']);
-        $qMarks .= ' AND category_id IN (' . $this->getQueryMark($data['categoryId']) . ')';
+        $qMarks .= ' AND category_id IN (' . Common::getInstance()->getQueryMark($data['categoryId']) . ')';
         $qValue = array_merge($qValue, $data['categoryId']);
         if (!empty($data['color'])) {
-            $qMarks .= ' AND color IN (' . $this->getQueryMark($data['color']) . ')';
+            $qMarks .= ' AND color IN (' . Common::getInstance()->getQueryMark($data['color']) . ')';
             $qValue = array_merge($qValue, $data['color']);
         }
         $offerList = $this->dbh->prepare("SELECT common_data FROM goods WHERE $qMarks ORDER BY RAND() LIMIT 1000");
@@ -244,7 +248,7 @@ class ApiServer
                     $this->insertSingleItem($shopId, $widgetId, $rule['params'], $key);
                     break;
                 case DbLoadWidget::RULE_TYPE_RULE:
-                    $this->insertRuleItem($shopId, $widgetId, $rule['params']);
+                    $this->insertRuleItem($shopId, $widgetId, $rule['params'], $key);
                     break;
                 default:
                     throw new \Exception('Rule type undefined');
@@ -282,22 +286,44 @@ class ApiServer
         );
     }
 
-    protected function insertRuleItem()
+    protected function insertRuleItem($shopId, $widgetId, $rule, $position)
     {
+        $ruleQuery = $this->dbh->prepare(
+            "INSERT INTO rules (shop_id, widget_id, rules_type, source, position) VALUES (:shop_id, :widget_id, :rules_type, :source, :position) ON DUPLICATE KEY UPDATE rules_type = :rules_type, source = :source"
+        );
+        $ruleQuery->execute(
+            array(
+                ':shop_id' => $shopId,
+                ':widget_id' => $widgetId,
+                ':rules_type' => DbLoadWidget::RULE_TYPE_RULE,
+                ':source' => $this->prepareRule($rule),
+                ':position' => $position
+            )
+        );
+    }
 
+    protected function prepareRule($rule){
+        $preparedRule = array();
+        foreach ($rule as $filterName => $filter){
+            if (!empty($filter) && is_array($filter)){
+                $preparedRule[$filterName] = array_diff($filter, array(''));
+            }
+        }
+        return serialize($preparedRule);
     }
 
     protected function widgetAdd($data)
     {
-        $widgetAddQuery = "INSERT INTO widgets (type_id, shop_id, skin_id, position_count) VALUES (:type_id, :shop_id, :skin_id, :pos_count)";
+        $widgetAddQuery = "INSERT INTO widgets (type_id, shop_id, skin_id, position_count, common_rule) VALUES (:type_id, :shop_id, :skin_id, :pos_count, :common_rule)";
         $paramValue = array(
             ':type_id' => $data['typeId'],
             ':shop_id' => $data['shopId'],
             ':skin_id' => $data['skinId'],
-            ':pos_count' => count($data['positions'])
+            ':pos_count' => count($data['positions']),
+            ':common_rule' => $this->prepareCommonRule($data)
         );
         if (!empty($data['widgetId'])) {
-            $widgetAddQuery = "UPDATE widgets SET type_id=:type_id, shop_id=:shop_id, skin_id=:skin_id, position_count=:pos_count WHERE id=:id";
+            $widgetAddQuery = "UPDATE widgets SET type_id=:type_id, shop_id=:shop_id, skin_id=:skin_id, position_count=:pos_count, common_rule=:common_rule WHERE id=:id";
             $paramValue = array_merge($paramValue, array(':id' => $data['widgetId']));
         }
         $widgetAddQuery = $this->dbh->prepare($widgetAddQuery);
@@ -305,6 +331,22 @@ class ApiServer
             $paramValue
         );
         return $this->dbh->lastInsertId() ? : $data['widgetId'];
+    }
+
+    protected function prepareCommonRule($data){
+        if (empty($data['commonRule'])){
+            return null;
+        } else {
+            foreach ($data['commonRule'] as $filter => $value){
+                    $this->checkNeededParam(
+                        $data['commonRule'],
+                        array(
+                            $filter => array('type' => 'array', 'required' => true),
+                        )
+                    );
+                }
+            return serialize($data['commonRule']);
+            }
     }
 
     protected function getRulesTypeList()
@@ -330,10 +372,4 @@ class ApiServer
         $widgetTypeList = $widgetTypeList->fetchAll(\PDO::FETCH_ASSOC);
         return array('list' => $widgetTypeList, 'count' => count($widgetTypeList));
     }
-
-    protected function getQueryMark($data)
-    {
-        return str_repeat('?,', count($data) - 1) . '?';
-    }
-
 }

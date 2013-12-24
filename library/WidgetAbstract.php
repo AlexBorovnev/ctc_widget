@@ -20,43 +20,22 @@ abstract class WidgetAbstract
     const WIDGET_TYPE_BIG_POSITIONS = 2;
     const WIDGET_MAX_POSITIONS = 7;
 
-    protected $cache = null;
     protected $config;
     protected $prodEnv = false;
 
-    public function __construct()
+    protected $convertFilter = array('categoryId' => 'category_id', 'color' => 'color');
+
+    public function __construct(array $config)
     {
-        $this->config = Config::getInstance()->getConfig();
+        $this->config = $config;
         $this->prodEnv = $this->config['env']['prod'];
-        $this->cache = new \Memcache();
-        $this->cache->addServer('localhost', 11211);
     }
 
     abstract protected function getOffers($widgetId);
 
     public function getWidget($widgetsId)
     {
-        $widgetsId = explode(',', $widgetsId);
-        sort($widgetsId);
-        $key = implode($widgetsId);
-        if (!$this->prodEnv || $this->cache->get($key) === false) {
-            $widgetContent = $this->getWidgetContent($widgetsId);
-            if ($this->prodEnv && $widgetContent) {
-                $this->cache->add($key, serialize($widgetContent), false, 30*60);
-            }
-            return $widgetContent;
-        } else {
-            return unserialize($this->cache->get($key));
-        }
-    }
-
-    public function deleteWidget($widgetId)
-    {
-        $this->cache->delete($widgetId);
-    }
-
-    public function deleteAllWidget(){
-        $this->cache->flush();
+        return $this->getWidgetContent($widgetsId);
     }
 
     protected  function getWidgetContent($widgetsId)
@@ -74,7 +53,6 @@ abstract class WidgetAbstract
                 'url' => $offer['url'],
                 'id' => $offer['offer_id']
             );
-            $this->addPictureInCache($pictureSrc, $offer['picture']);
         }
         return $widgetsContent;
     }
@@ -82,14 +60,6 @@ abstract class WidgetAbstract
     protected function getPrice($value)
     {
         list($intValue, $floatValue) = explode('.', $value);
-
         return array('intValue' => $intValue ? : '0', 'floatValue' => $floatValue ? : '00');
-    }
-
-    protected function addPictureInCache($key, $url)
-    {
-        if ($this->cache->get($key) === false) {
-            $this->cache->add($key, @file_get_contents($url));
-        }
     }
 }
