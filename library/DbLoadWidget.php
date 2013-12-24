@@ -21,7 +21,7 @@ class DbLoadWidget extends WidgetAbstract
     protected function getOffers($widgetId)
     {
         $offers = array();
-        foreach ($this->getRules($widgetId[0]) as $rule) {
+        foreach ($this->getRules($widgetId) as $rule) {
             if ($offer = $this->getOfferByRule($rule)) {
                 $offers[] = $offer;
             }
@@ -54,7 +54,7 @@ class DbLoadWidget extends WidgetAbstract
         $getSingleItem = $this->dbh->prepare(
             'SELECT * FROM goods WHERE offer_id=:offer_id AND shop_id=:shop_id AND is_available=1'
         );
-        $getSingleItem->bindValue(':offer_id', $rule['source']);
+        $getSingleItem->bindValue(':offer_id', unserialize($rule['source']));
         $getSingleItem->bindValue(':shop_id', $rule['shop_id']);
         $getSingleItem->execute();
         $offerData = $getSingleItem->fetch(\PDO::FETCH_ASSOC);

@@ -282,7 +282,7 @@ class ApiServer
                 ':shop_id' => $shopId,
                 ':widget_id' => $widgetId,
                 ':rules_type' => DbLoadWidget::RULE_TYPE_SINGLE,
-                ':source' => $offerId,
+                ':source' => serialize($offerId),
                 ':position' => $position
             )
         );
@@ -304,10 +304,11 @@ class ApiServer
         );
     }
 
-    protected function prepareRule($rule){
+    protected function prepareRule($rule)
+    {
         $preparedRule = array();
-        foreach ($rule as $filterName => $filter){
-            if (!empty($filter) && is_array($filter)){
+        foreach ($rule as $filterName => $filter) {
+            if (!empty($filter) && is_array($filter)) {
                 $preparedRule[$filterName] = array_diff($filter, array(''));
             }
         }
@@ -322,7 +323,7 @@ class ApiServer
             ':shop_id' => $data['shopId'],
             ':skin_id' => $data['skinId'],
             ':pos_count' => count($data['positions']),
-            ':common_rule' => $this->prepareCommonRule($data)
+            ':common_rule' => $this->prepareCommonRule($data, $data['typeId'])
         );
         if (!empty($data['widgetId'])) {
             $widgetAddQuery = "UPDATE widgets SET type_id=:type_id, shop_id=:shop_id, skin_id=:skin_id, position_count=:pos_count, common_rule=:common_rule WHERE id=:id";
@@ -335,20 +336,33 @@ class ApiServer
         return $this->dbh->lastInsertId() ? : $data['widgetId'];
     }
 
-    protected function prepareCommonRule($data){
-        if (empty($data['commonRule'])){
-            return null;
-        } else {
-            foreach ($data['commonRule'] as $filter => $value){
-                    $this->checkNeededParam(
-                        $data['commonRule'],
-                        array(
-                            $filter => array('type' => 'array', 'required' => true),
-                        )
-                    );
+    protected function prepareCommonRule($data, $typeId)
+    {
+        switch ($typeId) {
+            case DbLoadWidget::WIDGET_TYPE_SMALL:
+            case DbLoadWidget::WIDGET_TYPE_BIG:
+                if (empty($data['commonRule'])) {
+                    $this->sendResponse(array('message' => $this->config['messages'][5]), true, 5);
                 }
-            return serialize($data['commonRule']);
-            }
+                break;
+            case DbLoadWidget::WIDGET_TYPE_FREE:
+                return null;
+            default:
+                $this->sendResponse(array('message' => $this->config['messages'][5]), true, 5);
+        }
+        return serialize($data['commonRule']);
+    }
+
+    protected function checkCommonRule($rule)
+    {
+        foreach ($rule as $filter => $value) {
+            $this->checkNeededParam(
+                $rule,
+                array(
+                    $filter => array('type' => 'array', 'required' => true),
+                )
+            );
+        }
     }
 
     protected function getRulesTypeList()
@@ -373,5 +387,31 @@ class ApiServer
         $widgetTypeList->execute();
         $widgetTypeList = $widgetTypeList->fetchAll(\PDO::FETCH_ASSOC);
         return array('list' => $widgetTypeList, 'count' => count($widgetTypeList));
+    }
+
+    protected function getWidgetList($data)
+    {
+        $this->checkNeededParam(
+            $data,
+            array(
+                'shopId' => array('type' => 'string', 'required' => true)
+            )
+        );
+        $responseList = array();
+        $widgetsListQuery = $this->dbh->prepare(
+            "SELECT r.widget_id, r.rules_type, r.source, r.position, w.common_rule, w.type_id, w.skin_id FROM rules r JOIN widgets w ON w.id=r.widget_id WHERE r.shop_id=:shop_id"
+        );
+        $widgetsListQuery->execute(array(':shop_id' => $data['shopId']));
+        foreach ($widgetsListQuery->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            $responseList[$row['widget_id']]['positions'][$row['position']] = array(
+                'rule_type' => $row['rules_type'],
+                'source' => unserialize($row['source'])
+            );
+            $responseList[$row['widget_id']] = array_merge(
+                $responseList[$row['widget_id']],
+                array('skinId' => $row['skin_id'], 'typeId' => $row['type_id'], 'commonRule' => unserialize($row['common_rule']))
+            );
+        }
+        return array('list' => $responseList, 'count' => count($responseList));
     }
 }
