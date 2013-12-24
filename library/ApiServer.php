@@ -32,7 +32,9 @@ class ApiServer
 
     protected function getParams($data)
     {
-        if (!empty($data['params']) && is_array($data['params'])) {
+        if (empty($data['params'])) {
+            return array();
+        } elseif (!empty($data['params']) && is_array($data['params'])) {
             array_walk($data['params'], array($this, 'stripTags'));
             return $data['params'];
         } else {
