@@ -45,7 +45,7 @@
             $.ajax({
                 url: "<?=HOST?>handler",
                 dataType: "json",
-                data: {methodName: 'getWidgetList', params: {typeId: 3,shopId: 3, skinId: 1, positions: [{type: 1, params: ['W13022617522', 'PW13082681899']},{type: 1, params: {categoryId: ['<p>', 7301000], color: ['Не указан']}},{type: 2, params: ['PW13082277290', 'PW13082681899']},{type: 2, params: ['W13031949003', 'PW13082681899']},{type: 2, params: ['W13031239838', 'PW13082681899']} ,{type: 2, params: ['W13012367146', 'PW13082681899']}]}},
+                data: {methodName: 'getColorList', params: {typeId: 3,shopId: 3, skinId: 1, positions: [{type: 1, params: ['W13022617522', 'PW13082681899']},{type: 1, params: {categoryId: [99999], color: ['Не указан']}},{type: 2, params: ['PW13082277290', 'PW13082681899']},{type: 2, params: ['W13031949003', 'PW13082681899']},{type: 2, params: ['W13031239838', 'PW13082681899']} ,{type: 2, params: ['W13012367146', 'PW13082681899']}]}},
                 type: "POST"
         })
             .done(function(response){
