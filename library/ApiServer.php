@@ -414,4 +414,28 @@ class ApiServer
         }
         return array('list' => $responseList, 'count' => count($responseList));
     }
+
+    protected function getColorList()
+    {
+        $colorList = array(
+            'Бежевый',
+            'Белый',
+            'Голубой',
+            'Желтый',
+            'Зеленый',
+            'Золотой',
+            'Коричневый',
+            'Красный',
+            'Мультицвет',
+            'Не указан',
+            'Оранжевый',
+            'Розовый',
+            'Серебряный',
+            'Серый',
+            'Синий',
+            'Фиолетовый',
+            'Черный'
+        );
+        return array('list' => $colorList, 'count' => count($colorList));
+    }
 }
