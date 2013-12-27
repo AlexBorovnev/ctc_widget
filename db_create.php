@@ -11,6 +11,7 @@ try{
 
 function getQuery (){
     return <<<EOL
+
 CREATE TABLE IF NOT EXISTS `categories` (
   `category_id` int(11) unsigned NOT NULL,
   `shop_id` int(11) NOT NULL,
@@ -18,8 +19,8 @@ CREATE TABLE IF NOT EXISTS `categories` (
   `title` varchar(255) DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY `category_id` (`category_id`,`shop_id`),
-  KEY `FK_categories_shops` (`shop_id`),
-  CONSTRAINT `FK_categories_shops` FOREIGN KEY (`shop_id`) REFERENCES `shops` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `FK_categories_shops_1388127620` (`shop_id`),
+  CONSTRAINT `FK_categories_shops_1388127620` FOREIGN KEY (`shop_id`) REFERENCES `shops` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `currency` (
