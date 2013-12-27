@@ -127,7 +127,7 @@ padding: 0;
 	
 }
 
-.new_widget{
+.new-widget{
 	border-left: 1px solid #999;
 	width: 800px;
 	float: left;
@@ -154,7 +154,7 @@ h4, h4 *{
 	font-weight: bold;
 	color: #2e6e9e;
 	padding-left: 5px;
-	margin-bottom: 10px;
+/*	margin-bottom: 10px;*/
 	
 }
 
@@ -483,8 +483,7 @@ h4, h4 *{
 }
 
 .block .preview{
-	width: 100%;
-	text-align: center;
+	
 /*	border-left: 1px solid #999;*/
 }
 
@@ -571,8 +570,9 @@ hr{
 	padding: 5px;
 	border-right: 1px solid #999;
 	padding-bottom: 5px;
-	min-height: 600px;
-	max-height: 600px;
+	/*min-height: 400px;
+	*/
+	max-height: 425px;
 	overflow-x: hidden;
 	overflow-y: auto;
 }
@@ -604,8 +604,8 @@ ol.offerHolder{
 	border: 1px solid #cc0835;
 }
 
-.preivewPic{
-	width: 100%;
+.previewPic{
+	width: 140px;
 	
 }
 
@@ -615,4 +615,123 @@ ol.offerHolder{
 
 .b{
 	font-weight: bold;
+}
+
+.tabTemplate{
+	display: none;
+}
+a.disabledBtn{
+	border: 1px solid #CFCFCF !important;
+}
+.disabledBtn span{
+	background-color: #DBDBDB;
+	color: #8B8B8B;
+}
+a.disabledBtn:hover{
+	text-decoration: none !important;
+}
+.positionTpl{
+	margin: 10px 0;
+}
+
+.color-item.active{
+	border: 1px solid #999;
+}
+
+.widget{
+/*	border:1px solid #2A83C2;*/
+/*	display: none;*/
+}
+
+.widget > .header{
+	/*font-size: 14px;
+	padding: 5px;
+	border-bottom: 1px solid #2A83C2;*/ 
+}
+
+.widget > .body{
+/*	padding: 5px;*/
+}
+.block.widget .block-header{
+	padding: 5px;
+}
+.block.widget .block-content{
+	padding: 5px;
+}
+
+.position{
+	
+	
+	
+border: 1px solid #999;
+border-radius: 5px;
+margin: 10px 0;
+box-shadow: 0px 1px 3px #999;
+	
+}
+.position > .header{
+	border-bottom: 1px solid #a6c9e2;
+	padding: 5px;
+}
+.position > .body{
+	padding: 5px;
+}
+.preparedWidget{
+	display: none;
+}
+
+.colorHolder ul li{
+	float: left;
+	margin: 5px;
+	cursor: pointer;
+	color: #2e6e9e;
+}
+.colorHolder ul li.active{
+	font-weight: bold;
+}
+.colorHolder ul li:hover{
+	text-decoration: underline;
+}
+.treeHolder{
+	max-height: 400px;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+.positionHolder{
+	border-top: 2px solid #999;
+	margin: 10px 0px;
+	padding: 10px 0px;
+}
+.ruleHolder, .categoryOfferHolder{
+	display: none;
+}
+.Content.active{
+	font-weight: bold;
+}
+
+.categoryHolder, .colorHolder{
+	width: 300px;
+	float: left;
+}
+
+.positions > div{
+	margin: 10px 0;
+	border-bottom: 1px solid #ccc;
+	padding-bottom: 15px;
+}
+.positions > div .header{
+	margin-bottom: 20px;
+	
+}
+
+.savePosition{
+	margin-top: 20px;
+}
+
+.saved{
+	color: #2e6e9e;
+	font-weight: bold;
+	font-size: 13px;
+	padding: 5px;
 }
