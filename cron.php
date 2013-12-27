@@ -7,10 +7,12 @@ class initBase
     const BASE_TMP_NAME = 'base_tmp.xml';
     const BASE_NAME = 'base_db.xml';
 
-    private $backupCreate = false;
     private $backupName = '';
     private $projectDir = __DIR__;
-    private $dbh = null;
+    /**
+     * @var \PDO
+     */
+    private $dbh;
     private $config = array();
 
     public function __construct()

@@ -102,10 +102,6 @@ CREATE TABLE IF NOT EXISTS `users` (
   UNIQUE KEY `id` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO `users` (`id`, `login`, `password`, `user_name`) VALUES
-	(1, 'admin', '21232f297a57a5a743894a0e4a801fc3', '0'),
-	(2, 'alex', '534b44a19bf18d20b71ecc4eb77c572f', '0');
-
 CREATE TABLE IF NOT EXISTS `widgets` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `type_id` int(11) DEFAULT NULL,
