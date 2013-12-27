@@ -30,7 +30,9 @@ class DbLoadWidget extends WidgetAbstract
                 $offers[] = $offer;
             }
         }
-        $offers = $this->getAdditionalOfferIfNeeded($offers, $rule['common_rule'], $rule['type_id'], count($offers), $rule['shop_id']);
+        if (isset($rule)){
+            $offers = $this->getAdditionalOfferIfNeeded($offers, $rule['common_rule'], $rule['type_id'], count($offers), $rule['shop_id']);
+        }
         return $offers;
     }
 
