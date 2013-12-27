@@ -4,6 +4,10 @@ namespace library;
 use library\WidgetAbstract;
 use library\Config;
 use library\Common;
+use model\Categories;
+use model\Goods;
+use model\Rules;
+use model\Widgets;
 
 class DbLoadWidget extends WidgetAbstract
 {
@@ -26,15 +30,37 @@ class DbLoadWidget extends WidgetAbstract
                 $offers[] = $offer;
             }
         }
+        $offers = $this->getAdditionalOfferIfNeeded($offers, $rule['common_rule'], $rule['type_id'], count($offers), $rule['shop_id']);
+        return $offers;
+    }
+
+    protected function getAdditionalOfferIfNeeded($offers, $rule, $typeId, $countOffers, $shopId)
+    {
+        $delta = 0;
+        switch ($typeId) {
+            case Widgets::WIDGET_TYPE_SMALL:
+                $delta = Widgets::WIDGET_TYPE_SMALL_POSITIONS - $countOffers;
+                break;
+            case Widgets::WIDGET_TYPE_BIG:
+                $delta = Widgets::WIDGET_TYPE_BIG_POSITIONS - $countOffers;
+                break;
+        }
+        if ($delta < 0) {
+            array_splice($offers, $delta);
+        } elseif ($delta > 0) {
+            for ($i = 0; $i < $delta; $i++) {
+                $offers[] = $this->getRandomItem($shopId, $rule);
+            }
+        }
         return $offers;
     }
 
     protected function getOfferByRule($rule)
     {
         switch ($rule['rules_type']) {
-            case self::RULE_TYPE_SINGLE:
-                return $this->getSingleItem($rule);
-            case self::RULE_TYPE_RULE:
+            case Rules::RULE_TYPE_SINGLE:
+                return $this->getSingleItem($rule['shop_id'], $rule);
+            case Rules::RULE_TYPE_RULE:
                 return $this->getRandomItem($rule['shop_id'], $rule['source']);
             default:
                 return array();
@@ -43,47 +69,25 @@ class DbLoadWidget extends WidgetAbstract
 
     protected function getRules($widgetId)
     {
-        $rulesQuery = $this->dbh->prepare(
-            'SELECT * FROM rules r JOIN widgets w ON w.id=r.widget_id WHERE widget_id=:widget_id'
-        );
-        $rulesQuery->bindValue(':widget_id', $widgetId);
-        $rulesQuery->execute();
-        return $rulesQuery->fetchAll(\PDO::FETCH_ASSOC);
+        $rulesModel = new Rules($this->dbh);
+        return $rulesModel->getWidgetRules($widgetId);
     }
 
-    protected function getSingleItem($rule)
+    protected function getSingleItem($shopId, $rule)
     {
-        $getSingleItem = $this->dbh->prepare(
-            'SELECT * FROM goods WHERE offer_id=:offer_id AND shop_id=:shop_id AND is_available=1'
-        );
-        $getSingleItem->bindValue(':offer_id', unserialize($rule['source']));
-        $getSingleItem->bindValue(':shop_id', $rule['shop_id']);
-        $getSingleItem->execute();
-        $offerData = $getSingleItem->fetch(\PDO::FETCH_ASSOC);
+        $goodsModel = new Goods($this->dbh);
+        $offerData = $goodsModel->getSingleOffer(array('offerId' => $rule['source'], 'shopId' => $shopId));
         if (!$offerData) {
-            $offerData = $this->getRandomItem($rule['shop_id'], $rule['common_rule']);
+            $offerData = $this->getRandomItem($shopId, $rule['common_rule']);
         }
         return $offerData;
     }
 
     protected function getRandomItem($shopId, $rule = array())
     {
-        $queryString = '';
-        $queryValue = array();
         $rule = is_string($rule) ? unserialize($rule) : $rule;
-        foreach ($rule as $filter => $value) {
-            if (isset($this->convertFilter[$filter]) && !empty($value)) {
-                $queryString .= " AND {$this->convertFilter[$filter]} IN (" . Common::getInstance()->getQueryMark(
-                        $value
-                    ) . ')';
-                $queryValue = array_merge($queryValue, $value);
-            }
-        }
-        $offerQuery = $this->dbh->prepare(
-            'SELECT * FROM goods WHERE shop_id=?' . $queryString . 'ORDER BY RAND() LIMIT 1'
-        );
-        $offerQuery->execute(array_merge(array($shopId), $queryValue));
-        $offer = $offerQuery->fetch(\PDO::FETCH_ASSOC);
+        $goodsModel = new Goods($this->dbh);
+        $offer = $goodsModel->getRandomItem($shopId, $rule);
         if (!$offer) {
             $offer = $this->getRandomItem($shopId, $this->repeatAttemptWithParentCategory($shopId, $rule));
         }
@@ -95,37 +99,13 @@ class DbLoadWidget extends WidgetAbstract
     protected function repeatAttemptWithParentCategory($shopId, $rule)
     {
         if (!empty($rule['categoryId'])) {
-            $parentListForCategoriesQuery = $this->dbh->prepare(
-                'SELECT parent_id FROM categories WHERE shop_id=? AND category_id IN (' . Common::getInstance(
-                )->getQueryMark($rule['categoryId']) . ') GROUP BY parent_id'
-            );
-            $parentListForCategoriesQuery->execute(array_merge(array($shopId), $rule['categoryId']));
-            $parentList = array();
-            while (false !== $parentId = $parentListForCategoriesQuery->fetchColumn()) {
-                $parentList[] = $parentId;
-            }
-            $categoryList = $this->getParentCategory($shopId, $parentList);
+            $categoryModel = new Categories($this->dbh);
+            $categoryList = $categoryModel->getCategoriesWithParentDependency($shopId, $rule);
             if (array_diff($categoryList, $rule['categoryId'])) {
                 $rule['categoryId'] = $categoryList;
                 return $rule;
             }
         }
         return $rule;
-    }
-
-    protected function getParentCategory($shopId, $parentList)
-    {
-        $categoryList = $parentList;
-        if (!empty($parentList)) {
-            $categoryFromParentListQuery = $this->dbh->prepare(
-                'SELECT category_id FROM categories WHERE shop_id=? AND parent_id IN (' . Common::getInstance(
-                )->getQueryMark($parentList) . ') GROUP BY category_id'
-            );
-            $categoryFromParentListQuery->execute(array_merge(array($shopId), $parentList));
-            while ($categoryId = $categoryFromParentListQuery->fetchColumn()) {
-                $categoryList = array_merge($categoryList, $this->getParentCategory($shopId, array($categoryId)));
-            }
-        }
-        return $categoryList;
     }
 }

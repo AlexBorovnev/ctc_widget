@@ -14,11 +14,6 @@ class Common{
         return self::$instance;
     }
 
-    public static function getQueryMark($data)
-    {
-        return str_repeat('?,', count($data) - 1) . '?';
-    }
-
     public static function getUserId($login, $password){
         $authQuery = Config::getInstance()->getDbConnection()->prepare("SELECT id, user_name FROM users WHERE login=:login AND password=MD5(:password)");
         $authQuery->execute(array(':login' => $login, ':password' => $password));
