@@ -16,17 +16,17 @@ class Categories extends AbstractModel
 
     public function getCategoriesList($data)
     {
-        $qMarks = 'shop_id = ?';
+        $qMarks = '';
         $qValue = array($data['shopId']);
         if (!empty($data['parentId'])) {
-            $qMarks .= ' AND parent_id IN (' . $this->getQueryMark($data['parentId']) . ')';
+            $qMarks .= ' AND c.parent_id IN (' . $this->getQueryMark($data['parentId']) . ')';
             $qValue = array_merge($qValue, $data['parentId']);
         }
         if (!empty($data['categoryId'])) {
-            $qMarks .= ' AND category_id IN (' . $this->getQueryMark($data['categoryId']) . ')';
+            $qMarks .= ' AND c.category_id IN (' . $this->getQueryMark($data['categoryId']) . ')';
             $qValue = array_merge($qValue, $data['categoryId']);
         }
-        $categoryList = $this->dbh->prepare("SELECT * FROM categories WHERE $qMarks");
+        $categoryList = $this->dbh->prepare("SELECT c.category_id, c.shop_id, c.title, c.parent_id FROM categories c LEFT JOIN goods g ON g.category_id=c.category_id AND g.shop_id=c.shop_id WHERE  (g.is_available=1 OR c.category_id IN (SELECT parent_id AS category_id FROM categories GROUP BY parent_id)) AND c.shop_id=? $qMarks GROUP BY c.category_id");
         $categoryList->execute($qValue);
         return $categoryList->fetchAll(\PDO::FETCH_ASSOC);
     }
