@@ -7,14 +7,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST['login']) && !empty($_P
 endif;
 ?>
 <?php if (empty($_SESSION['user_id'])):?>
-<form name="auth_form" action="admin" method="post">
+<form name="auth_form" action="<?=HOST?>admin" method="post">
     <label for="login">Login:</label>
     <input type="text" name="login" id="login" placeholder="Your login"/>
     <label for="password">Password:</label>
     <input type="password" name="password" id="password" placeholder="Your password"/>
     <input type="submit" name="btn_send" value="Login" />
 </form>
-<?php else:
-    require_once 'admin.php';
-    endif;
-?>
+<?php exit; endif;?>

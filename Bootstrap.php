@@ -3,6 +3,8 @@ use library\DbLoadWidget;
 use library\ApiServer;
 use library\Config;
 use library\Common;
+use model\Shops;
+use model\Widgets;
 
 define ('HOST', 'http://' . $_SERVER['HTTP_HOST'] . '/'.  getScripPath());
 
@@ -35,10 +37,13 @@ switch ($rout[0]) {
         break;
     case 'admin':
         session_start();
+        auth();
         if (Config::getInstance()->getBusyStatus() == true) {
             echo "<h1>Database Update Now</h1>";
         } else {
-            auth();
+            $pageName = empty($rout[1]) ? '' : $rout[1];
+            $pageParam = empty($rout[2]) ? '' : $rout[2];
+            showAdminPage($pageName, $pageParam);
         }
         break;
     default:
@@ -47,4 +52,25 @@ switch ($rout[0]) {
 }
 function auth(){
     require_once 'view/auth.php';
+}
+function showAdminPage($page = '', $param = 1){
+    switch ($page){
+        case '':
+            require_once 'view/admin.php';
+            break;
+        case 'shop':
+            showShopPage($param);
+            break;
+        default:
+            header("HTTP/1.1 404 Not Found");
+            exit;
+    }
+}
+
+function showShopPage($shopId){
+    $shopsModel = new Shops(Config::getInstance()->getDbConnection());
+    $widgetsModel = new Widgets(Config::getInstance()->getDbConnection());
+    $shopsList = $shopsModel->getAll();
+    $widgetsList = $widgetsModel->getWidgetList(array('shopId' => $shopId));
+    require_once 'view/shop.php';
 }
