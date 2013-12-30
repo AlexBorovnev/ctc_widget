@@ -56,7 +56,7 @@ class Goods extends AbstractModel
             }
         }
         $offerQuery = $this->dbh->prepare(
-            'SELECT * FROM goods WHERE shop_id=?' . $queryString . 'ORDER BY RAND() LIMIT 1'
+            'SELECT * FROM goods WHERE shop_id=? AND is_available=1' . $queryString . 'ORDER BY RAND() LIMIT 1'
         );
         $offerQuery->execute(array_merge(array($shopId), $queryValue));
         return $offerQuery->fetch(\PDO::FETCH_ASSOC);
