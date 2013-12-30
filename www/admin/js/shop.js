@@ -39,7 +39,7 @@ function _shop(data){
 		var params = [];
 		for(var i in selectedOffers){
 			var offer = selectedOffers[i];
-			var tpl = {'type': '1', 'params': [offer.attributes.id]}
+			var tpl = {'type': '2', 'params': [offer.attributes.id]}
 			params.push(tpl);
 		}
 		return params;
@@ -82,7 +82,7 @@ function _shop(data){
 		$shop.on('click', ".saveWidget", function(e){
 			e.preventDefault();
 			var data = {};
-			if(widgetType == 3){
+			if(widgetType == 3){//free
 				data = {
 					'shopId': self.id,
 					'skinId': self.getSkinType(),
@@ -237,6 +237,7 @@ function _shop(data){
 			toastr.info("Позиция сохранена");
 		});
 	}
+	
 	this.initTemplates = function(list){
 		var $tree = buildTree('myTree', list);
 //			$(".treeTpl").append($tree);
