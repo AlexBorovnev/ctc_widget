@@ -292,12 +292,12 @@ h4, h4 *{
 }
 /* открытое поддерево */
 .ExpandOpen .Expand {  
-    background: url(../img/minus.png) transparent 50% 50% no-repeat;  
+    background: url(../images/minus.png) transparent 50% 50% no-repeat;  
 }
 
 /* закрытое поддерево */
 .ExpandClosed .Expand {
-    background: url(../img/plus.png)  transparent 50% 50% no-repeat;  
+    background: url(../images/plus.png)  transparent 50% 50% no-repeat;  
 }
 
 /* лист */
@@ -370,7 +370,7 @@ h4, h4 *{
 }
 
 .slider .arrow-left{
-	background: transparent url("../img/arrow-left.png") 0% 0% no-repeat;
+	background: transparent url("../images/arrow-left.png") 0% 0% no-repeat;
 	display: block;
 	width: 18px;
 	height: 18px;
@@ -381,7 +381,7 @@ h4, h4 *{
 	cursor: pointer;
 }
 .slider .arrow-right{
-	background: transparent url("../img/arrow-right.png") 0% 0% no-repeat;
+	background: transparent url("../images/arrow-right.png") 0% 0% no-repeat;
 	display: block;
 	width: 18px;
 	height: 18px;
