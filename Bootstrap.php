@@ -45,7 +45,7 @@ switch ($rout[0]) {
             echo "<h1>Database Update Now</h1>";
         } else {
             $pageName = empty($rout[1]) ? '' : $rout[1];
-            $pageParam = empty($rout[2]) ? '' : $rout[2];
+            $pageParam = empty($rout[2]) ? '1' : $rout[2];
             showAdminPage($pageName, $pageParam);
         }
         break;

@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `rules` (
   `widget_id` int(10) unsigned NOT NULL,
   `shop_id` int(10) NOT NULL,
   `rules_type` int(10) NOT NULL,
-  `source` varchar(255) DEFAULT NULL,
+  `source` text DEFAULT NULL,
   `position` int(11) DEFAULT NULL,
   UNIQUE KEY `widget_id` (`widget_id`,`position`,`shop_id`),
   KEY `FK_rules_widgets` (`widget_id`),
