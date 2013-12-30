@@ -295,6 +295,9 @@ class ApiServer
                 }
                 break;
             case Widgets::WIDGET_TYPE_FREE:
+                if (empty($data['positions'])){
+                    $this->sendResponse(array('message' => $this->config['messages'][5]), true, 5);
+                }
                 return null;
             default:
                 $this->sendResponse(array('message' => $this->config['messages'][5]), true, 5);
