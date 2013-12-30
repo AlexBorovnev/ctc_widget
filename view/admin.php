@@ -53,37 +53,37 @@
 		<div class="hidden">
 			<div class="categoryTpl">
 				<div class="grid13">
-					<h4>Выбор категории</h4>
+					<h4>Р’С‹Р±РѕСЂ РєР°С‚РµРіРѕСЂРёРё</h4>
 					<div class="treeHolder"></div>
 				</div>
 			</div>
 			<div class="categoryOfferTpl">
 
 				<div class="grid13">
-					<h4>Выбор категории</h4>
+					<h4>Р’С‹Р±РѕСЂ РєР°С‚РµРіРѕСЂРёРё</h4>
 					<div class="treeHolder"></div>
 				</div>
 				<div class="grid13">
-					<h4>Выбор товара</h4>
+					<h4>Р’С‹Р±РѕСЂ С‚РѕРІР°СЂР°</h4>
 					<ol class="offerHolder">
 
 					</ol>
 				</div>
 				<div class="grid13">
-					<h4>Предпросмотр товара</h4>
+					<h4>РџСЂРµРґРїСЂРѕСЃРјРѕС‚СЂ С‚РѕРІР°СЂР°</h4>
 					<div class="preview">
 						<div class="previewPic">
 							<img src="./images/preview.png" />
 						</div>
 						<div class="offerInfo">
 						</div>
-						<a href="#" class="btn addProduct">Выбрать</a>
+						<a href="#" class="btn addProduct">Р’С‹Р±СЂР°С‚СЊ</a>
 					</div>
 				</div>
 			</div>
 
 			<div class="colorTpl clearfix">
-				<h4>Выбор цвета</h4>
+				<h4>Р’С‹Р±РѕСЂ С†РІРµС‚Р°</h4>
 			</div>
 
 
@@ -97,15 +97,15 @@
 			</div>
 			
 			<div class="freePositionTpl">
-				<div class="header"><h4><span class="positionNum"></span> позиция</h4></div>
+				<div class="header"><h4><span class="positionNum"></span> РїРѕР·РёС†РёСЏ</h4></div>
 				<div class="body clearfix">
-					<a href="#" class="btn choseProduct">Выбрать товар</a>
-					<a href="#" class="btn createRule">Создать правило</a>
+					<a href="#" class="btn choseProduct">Р’С‹Р±СЂР°С‚СЊ С‚РѕРІР°СЂ</a>
+					<a href="#" class="btn createRule">РЎРѕР·РґР°С‚СЊ РїСЂР°РІРёР»Рѕ</a>
 					<div class="categoryOfferHolder clearfix"></div>
 					<div class="ruleHolder clearfix"></div>
 					<div class="clearfix">
-						<a href="#" class="btn savePosition">Сохранить позицию</a>
-						<span class="saved hidden">Сохранено</span>
+						<a href="#" class="btn savePosition">РЎРѕС…СЂР°РЅРёС‚СЊ РїРѕР·РёС†РёСЋ</a>
+						<span class="saved hidden">РЎРѕС…СЂР°РЅРµРЅРѕ</span>
 					</div>
 				</div>
 			</div>
@@ -120,27 +120,27 @@
 
 			</div>
 			<div class="block choose-product chooseProduct chooseProductTpl clearfix hidden">
-				<div class="block-header"><span>Выбор товара</span><div class="close">X</div></div>
+				<div class="block-header"><span>Р’С‹Р±РѕСЂ С‚РѕРІР°СЂР°</span><div class="close">X</div></div>
 				<div class="block-content clearfix">
 					<div class="grid13">
-						<h4>Выбор категории</h4>
+						<h4>Р’С‹Р±РѕСЂ РєР°С‚РµРіРѕСЂРёРё</h4>
 						<div class="treeHolder"></div>
 					</div>
 					<div class="grid13">
-						<h4>Выбор товара</h4>
+						<h4>Р’С‹Р±РѕСЂ С‚РѕРІР°СЂР°</h4>
 						<ol class="offerHolder">
 
 						</ol>
 					</div>
 					<div class="grid13">
-						<h4>Предпросмотр товара</h4>
+						<h4>РџСЂРµРґРїСЂРѕСЃРјРѕС‚СЂ С‚РѕРІР°СЂР°</h4>
 						<div class="preview">
 							<div class="previewPic">
 								<img src="./images/preview.png" />
 							</div>
 							<div class="offerInfo">
 							</div>
-							<a href="#" class="btn addProduct">Выбрать</a>
+							<a href="#" class="btn addProduct">Р’С‹Р±СЂР°С‚СЊ</a>
 						</div>
 					</div>
 				</div>
@@ -153,7 +153,7 @@
 			<div class="tabTpl">
 				<div class="wrap">
 					<div class="widgets">
-						<a href="#" class="btn add-widget">+ виджет</a>
+						<a href="#" class="btn add-widget">+ РІРёРґР¶РµС‚</a>
 						<div>
 							<ul class="widget-list">
 
@@ -164,61 +164,61 @@
 				</div>
 			</div>
 			<div class="positionTpl">
-				<div class="header"><h4><span class="positionNum"></span> позиция</h4></div>
+				<div class="header"><h4><span class="positionNum"></span> РїРѕР·РёС†РёСЏ</h4></div>
 				<div class="body">
-					<a href="#" class="btn choseProduct">Выбрать товар</a>
+					<a href="#" class="btn choseProduct">Р’С‹Р±СЂР°С‚СЊ С‚РѕРІР°СЂ</a>
 					<div class="categoryOfferHolder"></div>
 				</div>
 			</div>
 			
 			<div class="block smallWidget smallWidgetTpl widget">
-				<div class="block-header">Маленький виджет</div>
+				<div class="block-header">РњР°Р»РµРЅСЊРєРёР№ РІРёРґР¶РµС‚</div>
 				<div class="block-content">
-					<a href="#" class="btn createRule">Создать правило</a>
+					<a href="#" class="btn createRule">РЎРѕР·РґР°С‚СЊ РїСЂР°РІРёР»Рѕ</a>
 					<div class="ruleHolder"></div>
 					<div class="positionHolder clearfix"  data-position-num="1"></div>
 				</div>
 			</div>
 			<div class="block bigWidget bigWidgetTpl widget">
-				<div class="block-header">Большой виджет</div>
+				<div class="block-header">Р‘РѕР»СЊС€РѕР№ РІРёРґР¶РµС‚</div>
 				<div class="block-content">
-					<a href="#" class="btn createRule">Создать правило</a>
+					<a href="#" class="btn createRule">РЎРѕР·РґР°С‚СЊ РїСЂР°РІРёР»Рѕ</a>
 					<div class="ruleHolder"></div>
 					<div class="positionHolder clearfix positionHolder1" data-position-num="1"></div>
 					<div class="positionHolder clearfix positionHolder2" data-position-num="2"></div>
 				</div>
 			</div>
 			<div class="block widget freeWidget freeWidgetTpl">
-				<div class="block-header">Свободный виджет</div>
+				<div class="block-header">РЎРІРѕР±РѕРґРЅС‹Р№ РІРёРґР¶РµС‚</div>
 				<div class="block-content">
 					
 					<div class="positions">
 						
 					</div>
-					<a href="#" class="btn addPosition">Добавить позицию</a>
+					<a href="#" class="btn addPosition">Р”РѕР±Р°РІРёС‚СЊ РїРѕР·РёС†РёСЋ</a>
 					
 				</div>
 			</div>
 			<div class="new-widget newWidgetTpl clearfix">
-				<h3>Создание нового виджета</h3>
+				<h3>РЎРѕР·РґР°РЅРёРµ РЅРѕРІРѕРіРѕ РІРёРґР¶РµС‚Р°</h3>
 
 				<div class="clearfix">
 
 					<div class="input-block">
-						<span class="prepend">Тип: </span>
-						<select class="widgetTypeList" data-placeholder="Выберите значение">
+						<span class="prepend">РўРёРї: </span>
+						<select class="widgetTypeList" data-placeholder="Р’С‹Р±РµСЂРёС‚Рµ Р·РЅР°С‡РµРЅРёРµ">
 
 						</select> 
 					</div>
 					<div class="input-block">
-						<span class="prepend">Скин: </span>
-						<select class="widgetSkinList" data-placeholder="Выберите значение">
+						<span class="prepend">РЎРєРёРЅ: </span>
+						<select class="widgetSkinList" data-placeholder="Р’С‹Р±РµСЂРёС‚Рµ Р·РЅР°С‡РµРЅРёРµ">
 
 						</select>
 					</div>
 					<p>&nbsp;</p>
 				</div>
-				<a href="#" class="btn prepareWidget">Создать виджет</a>
+				<a href="#" class="btn prepareWidget">РЎРѕР·РґР°С‚СЊ РІРёРґР¶РµС‚</a>
 				<div class="widgetHolder">
 				</div>
 				<div class="positions clearfix"></div>
@@ -231,21 +231,21 @@
 				<div class="tut"></div>
 
 				<div class="block clearfix preparedWidget">
-					<div class="block-header">Виджет</div>
+					<div class="block-header">Р’РёРґР¶РµС‚</div>
 					<div class="block-content clearfix">
-						<div style="margin: 5px"><a class="btn generateWidgetPreview" href="# ">Предпросмотр виджета</a></div>		
-						<div style="margin: 5px;"><a href="#" class="btn saveWidget">Сохранить виджет</a></div>
+						<div style="margin: 5px"><a class="btn generateWidgetPreview" href="# ">РџСЂРµРґРїСЂРѕСЃРјРѕС‚СЂ РІРёРґР¶РµС‚Р°</a></div>		
+						<div style="margin: 5px;"><a href="#" class="btn saveWidget">РЎРѕС…СЂР°РЅРёС‚СЊ РІРёРґР¶РµС‚</a></div>
 						<div class="widgetInfo"> 
 
 							<div class="desc hidden">
-								<div>Выбрано товаров: <span class="widgetCount">0</span></div>
-								<div>Тип: <span class="widgetType"></span></div>
-								<div>Скин: <span class="widgetSkin"></span></div>
+								<div>Р’С‹Р±СЂР°РЅРѕ С‚РѕРІР°СЂРѕРІ: <span class="widgetCount">0</span></div>
+								<div>РўРёРї: <span class="widgetType"></span></div>
+								<div>РЎРєРёРЅ: <span class="widgetSkin"></span></div>
 
 								<div class="input-block">
-									<span class="prepend">Код для вставки:&nbsp;&nbsp;</span> 
+									<span class="prepend">РљРѕРґ РґР»СЏ РІСЃС‚Р°РІРєРё:&nbsp;&nbsp;</span> 
 									<div class="fl"><input type="text" class="custom fl widgetUrl" /></div>
-									<div class="fl"><input type="button" value="Скопировать" onclick="clipBoard('.widgetUrl')" /></div>
+									<div class="fl"><input type="button" value="РЎРєРѕРїРёСЂРѕРІР°С‚СЊ" onclick="clipBoard('.widgetUrl')" /></div>
 								</div>
 							</div>
 						</div>
