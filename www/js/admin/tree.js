@@ -1,3 +1,65 @@
+function buildTree(treeId, cats){
+	var $tpl = $("<div class=\""+treeId+" tree\" onclick=\"tree_toggle(arguments[0])\"></div>");
+	var $ul = $("<ul class=\"Container\" ></ul>")
+
+	for(var i in cats){
+		var cat = cats[i];
+		$ul.append(buildNode(cat));
+	}
+	$tpl.append($ul);
+	return $tpl;
+	//<li class="Node IsRoot
+}
+
+
+function buildNode(item){
+	var $tpl = $("<li></li>");
+
+	$tpl.addClass('Node');
+	$tpl.addClass('ExpandLeaf');
+
+	var $content = $('<div class="Content">'+item.title+'</div>');
+	if(item.pid == 0){
+		$tpl.addClass('IsRoot')
+		var subCats = [];
+		if(item.childs != undefined){
+			for(var i in item.childs){
+				var cid = item.childs[i].cid;
+				subCats.push(cid);
+			}
+		}
+		if(subCats.length > 0)
+			$content.data('childs', subCats);
+	}
+
+	$tpl.data('pid', item.pid);
+	$tpl.data('cid', item.cid);
+
+	$tpl.append('<div class="Expand"></div>');
+	$tpl.append($content);
+
+	if(item.childs != undefined){
+		$tpl.removeClass('ExpandLeaf');
+		$tpl.addClass('ExpandClosed');
+		var innerContainer = $('<ul class="Container"></ul>');
+		for(var i in item.childs){
+			var childItem = item.childs[i];
+			var innerNode = buildNode(childItem);	
+
+			innerContainer.append(innerNode);
+		}
+
+
+		$tpl.append(innerContainer);
+		//		$tpl.addClass('ExpandClosed');
+
+	}
+
+	return $tpl;
+}
+
+
+
 //tree handler
 
 function tree_toggle(event) {

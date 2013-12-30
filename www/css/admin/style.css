@@ -247,12 +247,12 @@ h4, h4 *{
 }
 /* открытое поддерево */
 .ExpandOpen .Expand {  
-    background: url(../../../www/images/minus.png) transparent 50% 50% no-repeat;  
+    background: url(../../images/minus.png) transparent 50% 50% no-repeat;  
 }
 
 /* закрытое поддерево */
 .ExpandClosed .Expand {
-    background: url(../../../www/images/plus.png)  transparent 50% 50% no-repeat;  
+    background: url(../../images/plus.png)  transparent 50% 50% no-repeat;  
 }
 
 /* лист */
@@ -301,7 +301,7 @@ h4, h4 *{
 }
 
 .slider .arrow-left{
-	background: transparent url("../../../www/images/prev_arrow.png") 0% 0% no-repeat;
+	background: transparent url("../../images/prev_arrow.png") 0% 0% no-repeat;
 	width: 45px;
 	height: 58px;
 	position: absolute;
@@ -314,7 +314,7 @@ h4, h4 *{
 	z-index: 100;
 }
 .slider .arrow-right{
-	background: transparent url("../../../www/images/next_arrow.png") 0% 0% no-repeat;
+	background: transparent url("../../images/next_arrow.png") 0% 0% no-repeat;
 	width: 45px;
 	height: 58px;
 	position: absolute;

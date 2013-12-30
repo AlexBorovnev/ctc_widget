@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
+	
 		<meta http-equiv="Expires" content="Fri, Jan 01 1900 00:00:00 GMT">
 		<meta http-equiv="Pragma" content="no-cache">
 		<meta http-equiv="Cache-Control" content="no-cache">
@@ -18,7 +19,7 @@
 		<link rel="stylesheet" type="text/css" href="<?=HOST?>css/admin/redmond/jquery-ui-1.10.3.custom.css">
 		<link rel="stylesheet" type="text/css" href="<?=HOST?>css/admin/chosen.min.css">
 		<link rel="stylesheet" type="text/css" href="<?=HOST?>css/admin/toastr.min.css">
-		<link rel="stylesheet" type="text/css" href="<?=HOST?>css/admin/style.css">
+		<link rel="stylesheet" type="text/css" href="<?=HOST?>css/admin/style.css?<?=REV?>">
 
 
 		<script type="text/javascript" src="<?=HOST?>js/admin/jquery-1.9.1.js"></script>
@@ -29,14 +30,14 @@
 
 
 
-		<script type="text/javascript" src="<?=HOST?>js/admin/tree.js"></script>
+		<script type="text/javascript" src="<?=HOST?>js/admin/tree.js?<?=REV?>"></script>
 
-		<script type="text/javascript" src="<?=HOST?>js/admin/shop.js"></script>
-		<script type="text/javascript" src="<?=HOST?>js/admin/widget.js"></script>
-		<script type="text/javascript" src="<?=HOST?>js/admin/offer.js"></script>
-		<script type="text/javascript" src="<?=HOST?>js/admin/main2.js"></script>
-		<script type="text/javascript" src="<?=HOST?>js/admin/main.js"></script>
-		<script type="text/javascript" src="<?=HOST?>js/admin/system.js"></script>
+		<script type="text/javascript" src="<?=HOST?>js/admin/shop.js?<?=REV?>"></script>
+		<script type="text/javascript" src="<?=HOST?>js/admin/widget.js?<?=REV?>"></script>
+		<script type="text/javascript" src="<?=HOST?>js/admin/offer.js?<?=REV?>"></script>
+		<script type="text/javascript" src="<?=HOST?>js/admin/main2.js?<?=REV?>"></script>
+		<script type="text/javascript" src="<?=HOST?>js/admin/main.js?<?=REV?>"></script>
+		<script type="text/javascript" src="<?=HOST?>js/admin/system.js?<?=REV?>"></script>
 	</head>
 	<body>
 		<div class="wrapper clearfix">

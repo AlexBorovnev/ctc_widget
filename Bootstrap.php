@@ -7,6 +7,8 @@ use model\Shops;
 use model\Widgets;
 
 define ('HOST', 'http://' . $_SERVER['HTTP_HOST'] . '/'.  getScripPath());
+define ('REV', time());
+
 
 function __autoload($class_name)
 {
