@@ -62,4 +62,10 @@ class Categories extends AbstractModel
         }
         return $categoryList;
     }
+
+    public function getChildCategories($categoryId, $shopId){
+        $childCategoryQuery = $this->dbh->prepare("SELECT category_id FROM categories WHERE parent_id=? AND shop_id=?");
+        $childCategoryQuery->execute($categoryId, $shopId);
+        return $childCategoryQuery->fetch(\PDO::FETCH_ASSOC);
+    }
 }

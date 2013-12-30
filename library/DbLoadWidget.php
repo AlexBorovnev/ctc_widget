@@ -30,16 +30,15 @@ class DbLoadWidget extends WidgetAbstract
                 $offers[] = $offer;
             }
         }
-        if (isset($rule) && isset($rule['common_rule'])){
-            $offers = $this->getAdditionalOfferIfNeeded($offers, $rule['common_rule'], $rule['type_id'], count($offers), $rule['shop_id']);
-        }
+        $widgetModel = new Widgets($this->dbh);
+        $offers = $this->getAdditionalOfferIfNeeded($offers, $widgetModel->getCommonRule($widgetId), count($offers));
         return $offers;
     }
 
-    protected function getAdditionalOfferIfNeeded($offers, $rule, $typeId, $countOffers, $shopId)
+    protected function getAdditionalOfferIfNeeded($offers, $rule, $countOffers)
     {
         $delta = 0;
-        switch ($typeId) {
+        switch ($rule['type_id']) {
             case Widgets::WIDGET_TYPE_SMALL:
                 $delta = Widgets::WIDGET_TYPE_SMALL_POSITIONS - $countOffers;
                 break;
@@ -51,7 +50,7 @@ class DbLoadWidget extends WidgetAbstract
             array_splice($offers, $delta);
         } elseif ($delta > 0) {
             for ($i = 0; $i < $delta; $i++) {
-                $offers[] = $this->getRandomItem($shopId, $rule);
+                $offers[] = $this->getRandomItem($rule['shop_id'], $rule['common_rule']);
             }
         }
         return $offers;

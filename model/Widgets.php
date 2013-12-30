@@ -87,4 +87,11 @@ class Widgets extends AbstractModel
         }
         return $infoList;
     }
+
+    public function getCommonRule($widgetId)
+    {
+        $commonRuleQuery = $this->dbh->prepare("SELECT common_rule, type_id, shop_id FROM widgets WHERE id=?");
+        $commonRuleQuery->execute(array($widgetId));
+        return $commonRuleQuery->fetch(\PDO::FETCH_ASSOC);
+    }
 }

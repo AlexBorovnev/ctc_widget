@@ -46,9 +46,5 @@ switch ($rout[0]) {
         exit;
 }
 function auth(){
-    if (empty($_SESSION['user_id'])){
-        require_once 'view/auth.php';
-    } else{
-        require_once 'view/admin.html';
-    }
+    require_once 'view/auth.php';
 }

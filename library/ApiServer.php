@@ -186,10 +186,13 @@ class ApiServer
                 'skinId' => array('type' => 'string', 'required' => true),
                 'typeId' => array('type' => 'string', 'required' => true),
                 'commonRule' => array('type' => 'array', 'required' => false),
-                'positions' => array('type' => 'array', 'required' => true),
+                'positions' => array('type' => 'array', 'required' => false),
                 'widgetId' => array('type' => 'string', 'required' => false)
             )
         );
+        if (empty($data['positions'])){
+            $data['positions'] = array();
+        }
         foreach ($data['positions'] as $rule) {
             $this->checkNeededParam(
                 $rule,
