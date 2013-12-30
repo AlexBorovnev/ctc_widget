@@ -5,6 +5,7 @@ use library\Config;
 use library\Common;
 use model\Shops;
 use model\Widgets;
+use view\View;
 
 define ('HOST', 'http://' . $_SERVER['HTTP_HOST'] . '/'.  getScripPath());
 define ('REV', time());
@@ -58,11 +59,15 @@ function auth(){
 function showAdminPage($page = '', $param = 1){
     switch ($page){
         case '':
-            require_once 'view/admin.php';
+            showMainAdminPage();
             break;
         case 'shop':
             showShopPage($param);
             break;
+        case 'add':
+        	
+        	View::getInstance()->render('add_widget.php');
+        break;
         default:
             header("HTTP/1.1 404 Not Found");
             exit;
@@ -70,9 +75,36 @@ function showAdminPage($page = '', $param = 1){
 }
 
 function showShopPage($shopId){
-    $shopsModel = new Shops(Config::getInstance()->getDbConnection());
+//    $shopsModel = new Shops(Config::getInstance()->getDbConnection());
     $widgetsModel = new Widgets(Config::getInstance()->getDbConnection());
-    $shopsList = $shopsModel->getAll();
+//    $shopsList = $shopsModel->getAll();
     $widgetsList = $widgetsModel->getWidgetList(array('shopId' => $shopId));
-    require_once 'view/shop.php';
+    
+    $typeList = array();
+    foreach($widgetsModel->getTypeList() as $elem)
+		$typeList[$elem['id']] = $elem['title'];
+    
+    
+    $skinList = array();
+    foreach($widgetsModel->getSkinList() as $elem)
+		$skinList[$elem['id']] = $elem['title'];
+    
+    $view = View::getInstance();
+    $view->typeList = $typeList;
+    $view->skinList = $skinList;
+//    $view->shopsList = $shopsList;
+    $view->widgetsList = $widgetsList;
+    $view->shopId = $shopId;
+    View::getInstance()->render('shop.php');
+    
 }
+
+function showMainAdminPage(){
+	$shopsModel = new Shops(Config::getInstance()->getDbConnection());
+	$shopsList = $shopsModel->getAll();
+	
+	$view = View::getInstance();
+	$view->shopsList = $shopsList;
+	$view->render('admin.php');
+}
+

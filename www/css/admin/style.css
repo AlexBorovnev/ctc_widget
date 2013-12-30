@@ -607,3 +607,29 @@ a.disabledBtn:hover{
 	font-size: 13px;
 	padding: 5px;
 }
+
+.tbl{
+	width: 100%;
+	border: none;
+}
+
+.tbl tr td{
+	padding: 5px;
+	text-align: center;
+	border-right: 1px solid #999;
+	border-bottom: 1px solid #999;
+}
+.tbl tr td:first-child{
+	border-left: 1px solid #999;
+}
+.tbl tr:first-child td{
+	border-top: 1px solid #999;
+}
+
+.tbl .t400{
+	width: 400px;
+}
+
+.widgetTable{
+	margin-bottom: 20px;
+}
