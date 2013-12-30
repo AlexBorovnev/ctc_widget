@@ -5,6 +5,8 @@ use library\Config;
 use library\Common;
 
 define ('HOST', 'http://' . $_SERVER['HTTP_HOST'] . '/'.  getScripPath());
+define ('REV', time());
+
 
 function __autoload($class_name)
 {

@@ -5,7 +5,7 @@ var categories = [];
 var widgetTypes = [];
 var widgetSkins = [];
 var api;
-var serverHost = '../handler'; //for server use	
+var serverHost = '/handler'; //for server use	
 
 var _offers = [];
 var _colorList = [];

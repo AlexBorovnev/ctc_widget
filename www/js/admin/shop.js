@@ -52,6 +52,7 @@ function _shop(data){
 		var rule = {};
 		rule.color = selectedColors;
 		rule.categoryId = selectedCategories;
+		
 		return rule;
 	}
 	this.initEvents = function(){
@@ -119,14 +120,35 @@ function _shop(data){
 			var cid = $(this).parent().data('cid'),
 			pid = $(this).parent().data('pid');
 
+			var childs = $(this).data('childs');
+			
+				
+			
             $(this).toggleClass('active')
             if($(this).hasClass('active')){
-				selectedCategories.push(cid);
+				if(childs.length > 0){
+					var i = childs.length;
+					while(i--){
+						selectedCategories.push(childs[i]);
+					}
+					}
+				else
+					selectedCategories.push(cid);
             }
             else{
-				var ind = selectedCategories.indexOf(cid);
-				if(ind != -1)
-					selectedCategories.splice(ind, 1);
+            	if(childs.length > 0){
+            		var i = childs.length;
+					while(i--){
+						var ind = selectedCategories.indexOf(childs[i]);
+						selectedCategories.splice(ind, 1);
+					}	
+            	}
+            	else{
+					var ind = selectedCategories.indexOf(cid);
+					if(ind != -1)
+						selectedCategories.splice(ind, 1);
+				}
+					
             }
             
 			//if(pid != 0){
@@ -143,7 +165,7 @@ function _shop(data){
 			var cid = $(this).parent().data('cid');
 			var pid = $(this).parent().data('pid');
             var $holder = $(this).parents('.categoryOfferHolder');
-			$holder.find(".previewPic img").attr('src', './img/preview.png');
+			$holder.find(".previewPic img").attr('src', '../images/preview.png');
 			$holder.find(".offerInfo").empty();
 
 			if(pid != 0){
@@ -204,7 +226,16 @@ function _shop(data){
 				var catIds = [];
 				var colors = [];
 				$categories.each(function(){
-					catIds.push($(this).parent().data('cid'));
+					var childs = $(this).data('childs');
+					if(childs.length > 0){
+						var i = childs.length;
+						while(i--){
+							catIds.push(childs[i]);
+						}
+						console.log(catIds);
+					}
+					else
+						catIds.push($(this).parent().data('cid'));
 				});
 				
 				$colors.each(function(){
