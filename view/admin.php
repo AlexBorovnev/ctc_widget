@@ -73,7 +73,7 @@
 					<h4>Предпросмотр товара</h4>
 					<div class="preview">
 						<div class="previewPic">
-							<img src="./images/preview.png" />
+							<img src="../images/preview.png" />
 						</div>
 						<div class="offerInfo">
 						</div>
@@ -136,7 +136,7 @@
 						<h4>Предпросмотр товара</h4>
 						<div class="preview">
 							<div class="previewPic">
-								<img src="./images/preview.png" />
+								<img src="../images/preview.png" />
 							</div>
 							<div class="offerInfo">
 							</div>
