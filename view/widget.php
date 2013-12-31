@@ -1,55 +1,109 @@
+<!DOCTYPE html>
+<html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="description" content="">
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1/jquery-ui.min.js"></script>
-    <script src="<?=HOST?>js/jquery.movingboxes.js"></script>
-    <link href="<?=HOST?>css/style.css" rel="stylesheet">
-    <link href="<?=HOST?>css/movingboxes.css" rel="stylesheet">
+
+	<meta http-equiv="Expires" content="Fri, Jan 01 1900 00:00:00 GMT">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Cache-Control" content="no-cache">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="Lang" content="en">
+
+	<meta name="author" content="">
+	<meta name="description" content="">
+	<meta name="keywords" content="">
+
+	<title>Виджет</title>
+
+
+
+	<link rel="stylesheet" type="text/css" href="<?=HOST?>css/admin/redmond/jquery-ui-1.10.3.custom.css">
+	<link rel="stylesheet" type="text/css" href="<?=HOST?>css/widget/style.css?<?=REV?>">
+
+	<script type="text/javascript" src="<?=HOST?>js/admin/jquery-1.9.1.js"></script>
+	<script type="text/javascript" src="<?=HOST?>js/admin/jquery.carouFredSel-6.2.1-packed.js"></script>
+
 </head>
 <body>
-<div class="logo">
-    <span><img src="<?=HOST?>images/logo.png" alt=""></span>
-</div>
-<div id="promo_slider" class="promo_slider">
-    <?php foreach ($widgets as $key => $widget):?>
-        <div class="<?php if (count($widgets) <= 3) echo 'widget';?> widget_<?= $widget['id'] ?>">
-            <a href="<?= $widget['url']; ?>"><img class="offer_img"
-                                                  src="<?= $widget['picture']; ?>"
-                                                  alt="" ></a>
-            <div>
-                <span class="price_text">
-                    <span class="int_val"><?= $widget['price']['viewPrice']['intValue'] ?></span>
-                    <span class="float_val"><?= $widget['price']['viewPrice']['floatValue'] ?></span>
-                    руб
-                </span>
-            </div>
-            <a class="button_sell" href="<?= $widget['url']; ?>"><img src="<?=HOST?>images/sell_button.png" alt=""></a>
-        </div>
-    <?php endforeach; ?>
-</div>
+	<?php
+		$copyright = "OOO «Приват Трэйд»,111033, г.Москва, ул. Самокатная, д.1, стр.21; ОГРН 1087746760397";
+	?>
+	<div class="logo">
+		<span><img src="<?=HOST?>images/logo.png" alt=""></span>
+	</div>
+	<div class="slider">
+		<div class="arrow-left"></div>
+		<div class="arrow-right"></div>
+		<ul>
+
+			<?php  //$widgets = $widget->getWidget($widgetsId);
+				foreach ($this->widgets as $key => $widget):?>
+				
+				<li class="w <?php if (count($widgets) <= 3) echo 'widget';?> widget_<?= $widget['id'] ?>">
+					<div class="pic">
+						<a href="<?= $widget['url']; ?>" target="_blank"><img class="offer_img"
+								src="<?=$widget['picture']?>"
+								alt="" ></a>
+						<div class="desc">
+							<?= $widget['common_data']['model'] . ' ' . $widget['common_data']['vendor'] ?> 
+						</div>
+					</div>
+					<div>
+						<span class="price_text">
+							<span class="int_val"><?= $widget['price']['viewPrice']['intValue'] ?></span>
+							<span class="float_val"><?= $widget['price']['viewPrice']['floatValue'] ?></span>
+							руб
+						</span>
+
+					</div>
+					<div class="btn"><a class="button_sell" href="<?= $widget['url']; ?>" target="_blank">Купить</a></div>
+				</li>
+				<?php endforeach; ?>
+		</ul>
+	</div>
+	<div class="copyright"><?=$copyright?></div>
 </body>
 <script>
-        <?php if (count($widgets) > 3):?>
-        $('.promo_slider').movingBoxes({
-            startPanel: 3,      // start with this panel
-            reducedSize: 1,       // non-current panel size: 80% of panel size
-            fixedHeight: true,
-            hashTags: false,
-            width: 1000    // overall width of movingBoxes (not including navigation arrows)
-            //panelWidth   : 0.3    // current panel width
 
-        });
-        <?php endif; ?>
-<!--        $(document).ready(function () {-->
-<!--            $.ajax({-->
-<!--                url: "--><?//=HOST?><!--handler",-->
-<!--                dataType: "json",-->
-<!--                data: {methodName: 'setWidget', params: {shopId: 3, skinId: 2, commonRule: {color: ['Не указан'], categoryId: ['1001400']},typeId: 1, positions: [{type: 2, params: ['W13020688555', 'PW13080152847']}]}},-->
-<!--                type: "POST"-->
-<!--        })-->
-<!--            .done(function(response){-->
-<!--                console.log(response);-->
-<!--            });-->
-<!--        });-->
+	$(function(){     
+			var $arrowLeft = $(".slider .arrow-left"),
+			$arrowRight = $(".slider .arrow-right");
+
+			var $carousel = $(".slider ul").carouFredSel({
+					circular: false,
+					infinite: false,
+					align: "center", 
+					width: "100%",
+					auto: false,
+					scroll : {
+						items: 1, 
+						onBefore: function(){
+						},
+						onEnd: function(direction){
+
+
+						}
+					},
+
+					prev	: {
+						button	: ".arrow-left",
+						key		: "left",
+						onEnd: function(){
+							$arrowLeft.hide();
+						},
+						onAfter: function(){
+							$arrowRight.show();
+						},
+					},
+					next	: {
+						button	: ".arrow-right",
+						key		: "right",
+						onAfter: function(){
+							$arrowLeft.show();
+						},
+						onEnd: function(){
+							$arrowRight.hide();
+						}
+					}
+			});
+	});
 </script>

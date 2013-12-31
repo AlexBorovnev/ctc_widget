@@ -19,7 +19,7 @@
 		            <td><?= $this->typeList[$widget['typeId']] ?></td>
 		            <td><?= $this->skinList[$widget['skinId']] ?></td>
 		            <td>
-		            	<a href="#">Предпросмотр</a><br>
+		            	<a href="<?=makeLink('widget_id/' . $id)?>">Предпросмотр</a><br>
 		            	<a href="#">Редактирование</a><br>
 		            	<a href="#">Удалить</a>
 		            </td>

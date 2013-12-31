@@ -29,7 +29,9 @@ switch ($rout[0]) {
         if (!empty($rout[1])) {
             $widgetsId = strip_tags($rout[1]);
             $widgets = $widget->getWidget($widgetsId);
-            require_once('view/widget.php');
+            $view = View::getInstance();
+            $view->widgets = $widgets;
+            $view->simpleRender('widget.php');
         }
         break;
     case 'handler':

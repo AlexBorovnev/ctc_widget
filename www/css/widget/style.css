@@ -1,0 +1,151 @@
+html, body{
+margin: 0;
+}
+body{
+	background-color: #fff;
+}
+.price_text{
+    color: #cc0835;
+    text-align: center;
+    margin: 0 auto;
+    display: block;
+	font-family: Tahoma;
+}
+
+.int_val {
+    font-weight: 800;
+    font-size: 30px;
+}
+
+.float_val {
+    vertical-align: baseline;
+    position: relative;
+    bottom: 10px;
+}
+
+.button_sell img{
+    margin: 0 auto;
+    display: block;
+}
+
+.widget {
+    float: left;
+    width: 250px;
+    margin: 20px;
+    padding: 10px;
+/*    border: 1px solid #cc0835;*/
+}
+
+.w .pic .desc{
+	min-height: 16px;
+	text-align: left;
+	padding: 8px;
+	font-size: 14px;
+	line-height: 14px;
+	font-family: Tahoma;
+}
+
+.offer_img{
+    width:240px;
+    height:320px;
+}
+
+.logo{
+	margin-left: 12px;
+}
+
+.slider{
+	width: 100%;
+	position: relative;
+	overflow: hidden;
+/*	padding: 0 20px;*/
+}
+.slider ul{
+	overflow: hidden;
+	padding-left: 0;
+}
+.slider ul li{
+	list-style: none;
+	display: block;
+	float: left;
+	margin: 0 10px;
+	width: 242px !important;
+	background-color: #fff;
+	
+}
+.slider ul li .pic{
+	border: 1px solid #cc0835;
+	min-height: 367px;
+}
+
+.slider .arrow-left{
+	background: transparent url("../../images/prev_arrow.png") 0% 0% no-repeat;
+	width: 32px;
+	height: 32px;
+	position: absolute;
+	top: 50%;
+	left: 12px;
+	margin-top: -29px; /* if you change the arrow images, you may have to adjust this (1/2 height of arrow image) */
+	cursor: pointer;
+	text-decoration: none;
+	outline: 0;
+	border: 0;
+	z-index: 100;
+}
+.slider .arrow-right{
+	background: transparent url("../../images/next_arrow.png") 0% 0% no-repeat;
+	width: 32px;
+	height: 32px;
+	position: absolute;
+	top: 50%;
+	margin-top: -29px; /* if you change the arrow images, you may have to adjust this (1/2 height of arrow image) */
+	cursor: pointer;
+	text-decoration: none;
+	outline: 0;
+	border: 0;
+	right: 12px;
+	z-index: 100;
+}
+
+
+.btn{
+	width: 189px;
+	border-radius: 20px;
+	-webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+	background-color: #f55c78;
+	height: 40px;
+	text-align: center;
+	margin:0 auto;
+	behavior: url("./css/PIE.htc");
+}
+
+.btn a{
+	display: block;
+	width: 100%;
+	height: 100%;
+	font-size: 24px;
+	line-height: 40px;
+	color: #fff;
+	text-decoration: none;
+}
+.btn a:active{
+	position: relative;
+	top: 1px;
+}
+
+.w > div{
+	margin-bottom: 10px;
+}
+
+.w a img{
+	border: none;
+}
+
+.copyright{
+	float: right;
+	color: #ccc;
+	font-size: 11px;
+	margin: 0 5%;
+	font-family: "Times New Roman";
+}

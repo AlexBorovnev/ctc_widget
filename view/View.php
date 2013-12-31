@@ -28,4 +28,9 @@ namespace View;
 		echo ob_get_clean();
 
 	}
+	function simpleRender($tpl){
+		ob_start();
+		require_once($tpl);
+		echo ob_get_clean();
+	}
 }
