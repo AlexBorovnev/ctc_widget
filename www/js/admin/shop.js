@@ -227,7 +227,7 @@ function _shop(data){
 				var colors = [];
 				$categories.each(function(){
 					var childs = $(this).data('childs');
-					if(childs.length > 0){
+					if(childs != undefined && childs.length > 0){
 						var i = childs.length;
 						while(i--){
 							catIds.push(childs[i]);
