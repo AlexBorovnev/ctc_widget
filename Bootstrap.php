@@ -108,3 +108,8 @@ function showMainAdminPage(){
 	$view->render('admin.php');
 }
 
+function makeLink($localPath){
+	if($localPath[0] == '/')
+		$localPath = substr($localPath, 1);
+	return HOST . $localPath;
+}

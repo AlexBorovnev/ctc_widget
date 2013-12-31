@@ -3,7 +3,7 @@
 		<div class="block-header">Магазин <?=$this->shopId?></div>
 		<div class="block-content">
 			<h4>Список виджетов</h4>
-			
+			<div ><a href="<?=makeLink('/admin/add')?>" class="btn">Добавить новый</a></div>
 			<table class="tbl t400 widgetTable">
 		    <thead>
 		    <tr>
@@ -26,10 +26,10 @@
 		        </tr>
 		    <? endforeach; ?>
 		</table>	
-		<div ><a href="/admin/add" class="btn">Добавить новый</a></div>
+		
 		</div>
 	</div>
 	<div>
-		<a href="/admin">Назад</a>
+		<a href="<?=makeLink("/admin")?>">Назад</a>
 	</div>
 </div>
