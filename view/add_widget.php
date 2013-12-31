@@ -9,7 +9,7 @@
 
 
 <div class="wrapper clearfix">
-	<a href="/admin">Назад</a>
+	<a href="<?=makeLink("/admin")?>">Назад</a>
 	<div id="tabs">
 		<ul class="tabList">
 
@@ -203,7 +203,7 @@
 		<div class="block clearfix preparedWidget">
 			<div class="block-header">Виджет</div>
 			<div class="block-content clearfix">
-				<div style="margin: 5px"><a class="btn generateWidgetPreview" href="# ">Предпросмотр виджета</a></div>		
+				<!--div style="margin: 5px"><a class="btn generateWidgetPreview" href="# ">Предпросмотр виджета</a></div-->		
 				<div style="margin: 5px;"><a href="#" class="btn saveWidget">Сохранить виджет</a></div>
 				<div class="widgetInfo"> 
 

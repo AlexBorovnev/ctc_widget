@@ -6,24 +6,25 @@ function _shop(data){
 	this.widgets = [];
 	
 	//var id, title, url;
-	var self = this;
+	var self = this,
+	$categoryTpl,
+	$categoryOfferTpl,
+	$rule,
+	$position,
+	$freePosition,
+	$smallWidget,
+	$bigWidget,
+	$freeWidget,
+	$preparedWidget,
 	
-	var $categoryTpl;
-	var $categoryOfferTpl;
-	var $rule;
-	var $position;
-	var $freePosition;
-	var $smallWidget;
-	var $bigWidget;
-	var $freeWidget;
-	var $preparedWidget;
+	posNum = 1,
+	selectedOffers = [],
+	selectedCategories = [],
+	selectedColors = [],
+	positions = [],
+	widgetType = 0,
+	widgetId = 0;
 	
-	var posNum = 1;
-	var selectedOffers = [];
-	var selectedCategories = [];
-	var selectedColors = [];
-	var positions = [];            
-	var widgetType = 0;
 	this.addPosition = function(position){
 		positions.push(position);
 		console.log(positions);
@@ -55,31 +56,20 @@ function _shop(data){
 		
 		return rule;
 	}
+	this.widgetPreview = function(){
+		var host = "http://146.185.169.28/sts.loc/www/widget_id/" + widgetId;
+		var iframe = "<iframe src=\""+host+" \" width=\"100%\" height=\"600px\"></iframe>";
+		$shop.find(".widgetPreview").find('iframe').slideUp(function(){$(this).remove});
+		$shop.find(".widgetPreview").append(iframe);
+		
+		$wInfo = $shop.find('.widgetInfo');                                 	
+	    $wInfo.find(".desc.hidden").removeClass('hidden');
+		$wInfo.find(".widgetUrl").val(host);
+		$wInfo.find(".widgetType").html($(".widgetTypeList option:selected").html());
+		$wInfo.find(".widgetSkin").html($(".widgetSkinList option:selected").html());
+		$wInfo.find(".widgetCount").html(selectedOffers.length);
+	}
 	this.initEvents = function(){
-		$shop.on('click', ".generateWidgetPreview", function(e){
-			e.preventDefault();
-			
-			
-			var idArray = selectedOffers.map(function(item){return item.attributes.id});
-			if(idArray.length == 0){
-				toastr.error('Необходимо выбрать товар');
-				return;
-			}
-			var host = "http://146.185.169.28/test.loc/www/?widget_id=";
-			host += idArray.join(',');
-
-			
-			var iframe = "<iframe src=\""+host+" \" width=\"100%\" height=\"600px\"></iframe>";
-			$shop.find(".widgetPreview").find('iframe').slideUp(function(){$(this).remove});
-			$shop.find(".widgetPreview").append(iframe);
-			
-			$wInfo = $shop.find('.widgetInfo');                                 	
-	        $wInfo.find(".desc.hidden").removeClass('hidden');
-			$wInfo.find(".widgetUrl").val(host);
-			$wInfo.find(".widgetType").html($(".widgetTypeList option:selected").html());
-			$wInfo.find(".widgetSkin").html($(".widgetSkinList option:selected").html());
-			$wInfo.find(".widgetCount").html(selectedOffers.length);
-		});
 		$shop.on('click', ".saveWidget", function(e){
 			e.preventDefault();
 			var data = {};
@@ -105,6 +95,8 @@ function _shop(data){
 			api.call('setWidget', data, function(response){
 				console.log(response);
 				toastr.info('Виджет сохранен, id = ' + response.widgetId);
+				widgetId = response.widgetId;
+				self.widgetPreview();
 			});
 			
 		});
