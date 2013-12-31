@@ -126,17 +126,17 @@ function _shop(data){
 			
             $(this).toggleClass('active')
             if($(this).hasClass('active')){
-				if(childs.length > 0){
+				if(childs != undefined && childs.length > 0){
 					var i = childs.length;
 					while(i--){
 						selectedCategories.push(childs[i]);
 					}
-					}
+				}
 				else
 					selectedCategories.push(cid);
             }
             else{
-            	if(childs.length > 0){
+            	if(childs != undefined && childs.length > 0){
             		var i = childs.length;
 					while(i--){
 						var ind = selectedCategories.indexOf(childs[i]);
