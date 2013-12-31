@@ -36,7 +36,8 @@ abstract class WidgetAbstract
                     'viewPrice' => $this->getPrice($offer['price'])
                 ),
                 'url' => $offer['url'],
-                'id' => $offer['offer_id']
+                'id' => $offer['offer_id'],
+                'common_data' => unserialize($offer['common_data'])
             );
         }
         return $widgetsContent;

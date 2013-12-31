@@ -6,3 +6,6 @@ base_tmp.xml
 base_db.xml
 www/cron.php
 busy
+composer.phar
+composer.json
+composer.lock
