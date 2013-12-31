@@ -6,7 +6,7 @@
 		<div class="block-content">
 			<ul>
 				<?php foreach($this->shopsList as $shop):?>
-					<li><a href="/admin/shop/<?=$shop['id']?>"><?=$shop['title']?></a></li>
+					<li><a href="<?=makeLink("/admin/shop/".$shop['id'])?>"><?=$shop['title']?></a></li>
 					<?php endforeach;?>
 			</ul>		
 		</div>
