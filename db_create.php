@@ -158,6 +158,7 @@ CREATE TABLE IF NOT EXISTS `widgets` (
   `shop_id` int(11) NOT NULL,
   `common_rule` text,
   `position_count` int(11) NOT NULL,
+  `click_cnt` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `FK_widgets_widget_type` (`type_id`),
   KEY `FK_widgets_widget_skin` (`skin_id`),
