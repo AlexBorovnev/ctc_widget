@@ -80,7 +80,7 @@ function showShopPage($shopId){
 //    $shopsModel = new Shops(Config::getInstance()->getDbConnection());
     $widgetsModel = new Widgets(Config::getInstance()->getDbConnection());
 //    $shopsList = $shopsModel->getAll();
-    $widgetsList = $widgetsModel->getWidgetListTmp(array('shopId' => $shopId));
+    $widgetsList = $widgetsModel->getWidgetList(array('shopId' => $shopId));
     
     $typeList = array();
     foreach($widgetsModel->getTypeList() as $elem)
