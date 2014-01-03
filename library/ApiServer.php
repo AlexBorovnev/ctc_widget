@@ -357,4 +357,16 @@ class ApiServer
         $colorList = $goodsModel->getColorList();
         return array('list' => $colorList, 'count' => count($colorList));
     }
+
+    protected function referrerAdd($data)
+    {
+        $this->checkNeededParam(
+            $data,
+            array(
+                'widgetId' => array('type' => 'string', 'required' => true)
+            )
+        );
+        $widgetModel = new Widgets($this->dbh);
+        $widgetModel->clickAdd($data['widgetId']);
+    }
 }

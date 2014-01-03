@@ -31,6 +31,7 @@ switch ($rout[0]) {
             $widgets = $widget->getWidget($widgetsId);
             $view = View::getInstance();
             $view->widgets = $widgets;
+            $view->widgetId = $widgetsId;
             $view->simpleRender('widget.php');
         }
         break;

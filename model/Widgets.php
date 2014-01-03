@@ -55,7 +55,9 @@ class Widgets extends AbstractModel
     public function getWidgetList($data)
     {
         $responseList = array();
-        $widgetsListQuery = $this->dbh->prepare("SELECT w.id, r.rules_type, r.source, r.position, w.common_rule, w.type_id, w.skin_id FROM widgets w LEFT JOIN rules r ON w.id=r.widget_id WHERE w.shop_id=?");
+        $widgetsListQuery = $this->dbh->prepare(
+            "SELECT w.id, r.rules_type, r.source, r.position, w.common_rule, w.type_id, w.skin_id FROM widgets w LEFT JOIN rules r ON w.id=r.widget_id WHERE w.shop_id=?"
+        );
         $widgetsListQuery->execute(array($data['shopId']));
         foreach ($widgetsListQuery->fetchAll(\PDO::FETCH_ASSOC) as $row) {
             $responseList[$row['id']]['positions'][$row['position']] = array(
@@ -91,5 +93,12 @@ class Widgets extends AbstractModel
         $commonRuleQuery = $this->dbh->prepare("SELECT common_rule, type_id, shop_id FROM widgets WHERE id=?");
         $commonRuleQuery->execute(array($widgetId));
         return $commonRuleQuery->fetch(\PDO::FETCH_ASSOC);
+    }
+
+    public function clickAdd($widgetId)
+    {
+        $clickAddQuery = $this->dbh->prepare("UPDATE widgets SET click_cnt=click_cnt+1 WHERE id=?");
+        $clickAddQuery->execute(array($widgetId));
+        return true;
     }
 }

@@ -40,7 +40,7 @@
 				
 				<li class="w <?php if (count($this->widgets) <= 3) echo 'widget';?> widget_<?= $widget['id'] ?>">
 					<div class="pic">
-						<a href="<?= $widget['url']; ?>" target="_blank"><img class="offer_img"
+						<a href="<?= $widget['url']; ?>" target="_blank" class="refer_link"><img class="offer_img"
 								src="<?=$widget['picture']?>"
 								alt="" ></a>
 						<div class="desc">
@@ -55,7 +55,7 @@
 						</span>
 
 					</div>
-					<div class="btn"><a class="button_sell" href="<?= $widget['url']; ?>" target="_blank">Купить</a></div>
+					<div class="btn"><a class="refer_link button_sell" href="<?= $widget['url']; ?>" target="_blank">Купить</a></div>
 				</li>
 				<?php endforeach; ?>
 		</ul>
@@ -64,7 +64,15 @@
 </body>
 <script>
 
-	$(function(){     
+	$(function(){
+        $('.refer_link').click(function(){
+            $.ajax({
+                type: 'POST',
+                url: '<?=HOST?>/handler',
+                data: {methodName: 'referrerAdd', params: {'widgetId': <?=$this->widgetId?>}},
+			dataType: "json"
+            });
+        })
 			var $arrowLeft = $(".slider .arrow-left"),
 			$arrowRight = $(".slider .arrow-right");
 
