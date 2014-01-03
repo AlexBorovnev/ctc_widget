@@ -29,7 +29,17 @@
 		
 		</div>
 	</div>
-	<div>
+    <div class="pagenation">
+        <?php $cnt = $this->pageCount;
+        for ($i = 1; $i <= $cnt; $i++) {
+            if ($this->currentPage == $i){
+                echo "<span>" . $i . "</span>";
+                continue;
+            }
+            echo "<a href=" . makeLink("admin/shop/" . $this->shopId . "/" . $i) . ">" . $i . "</a>";
+        }?>
+    </div>
+    <div>
 		<a href="<?=makeLink("/admin")?>">Назад</a>
 	</div>
 </div>

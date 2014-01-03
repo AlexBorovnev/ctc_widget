@@ -633,3 +633,7 @@ a.disabledBtn:hover{
 .widgetTable{
 	margin: 20px 0;
 }
+
+.pagenation a{
+    padding:5px;
+}

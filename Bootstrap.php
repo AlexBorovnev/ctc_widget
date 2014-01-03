@@ -49,7 +49,8 @@ switch ($rout[0]) {
         } else {
             $pageName = empty($rout[1]) ? '' : $rout[1];
             $pageParam = empty($rout[2]) ? '1' : $rout[2];
-            showAdminPage($pageName, $pageParam);
+            $pageNum = empty($rout[3]) ? '1' : $rout[3];
+            showAdminPage($pageName, $pageParam, $pageNum);
         }
         break;
     default:
@@ -59,13 +60,13 @@ switch ($rout[0]) {
 function auth(){
     require_once 'view/auth.php';
 }
-function showAdminPage($page = '', $param = 1){
+function showAdminPage($page = '', $param = 1, $pageNum = 1){
     switch ($page){
         case '':
             showMainAdminPage();
             break;
         case 'shop':
-            showShopPage($param);
+            showShopPage($param, $pageNum);
             break;
         case 'add':
         	
@@ -77,11 +78,12 @@ function showAdminPage($page = '', $param = 1){
     }
 }
 
-function showShopPage($shopId){
+function showShopPage($shopId, $page){
 //    $shopsModel = new Shops(Config::getInstance()->getDbConnection());
     $widgetsModel = new Widgets(Config::getInstance()->getDbConnection());
 //    $shopsList = $shopsModel->getAll();
-    $widgetsList = $widgetsModel->getWidgetList(array('shopId' => $shopId));
+    $pageCount = $widgetsModel->getWidgetsPage($shopId);
+    $widgetsList = $widgetsModel->getWidgetList(array('shopId' => $shopId), $page);
     
     $typeList = array();
     foreach($widgetsModel->getTypeList() as $elem)
@@ -93,8 +95,10 @@ function showShopPage($shopId){
 		$skinList[$elem['id']] = $elem['title'];
     
     $view = View::getInstance();
+    $view->pageCount = $pageCount;
     $view->typeList = $typeList;
     $view->skinList = $skinList;
+    $view->currentPage = $page;
 //    $view->shopsList = $shopsList;
     $view->widgetsList = $widgetsList;
     $view->shopId = $shopId;
