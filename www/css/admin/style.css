@@ -637,3 +637,7 @@ a.disabledBtn:hover{
 .pagenation a{
     padding:5px;
 }
+
+.pagenation span{
+    padding:5px;
+}
