@@ -94,4 +94,26 @@ class Widgets extends AbstractModel
         $commonRuleQuery->execute(array($widgetId));
         return $commonRuleQuery->fetch(\PDO::FETCH_ASSOC);
     }
+
+    public function getWidgetListTmp($data){
+        $widgetsListQuery = $this->dbh->prepare("SELECT w.id, r.rules_type, r.source, r.position, w.common_rule, w.type_id, w.skin_id FROM widgets w LEFT JOIN rules r ON w.id=r.widget_id WHERE w.shop_id=?");
+        $responseList = array();
+        $widgetsListQuery->execute(array($data['shopId']));
+        foreach ($widgetsListQuery->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            $responseList[$row['id']]['positions'][$row['position']] = array(
+                'rule_type' => $row['rules_type'],
+                'source' => unserialize($row['source'])
+            );
+            $responseList[$row['id']] = array_merge(
+                $responseList[$row['id']],
+                array(
+                    'skinId' => $row['skin_id'],
+                    'typeId' => $row['type_id'],
+                    'commonRule' => unserialize($row['common_rule'])
+                )
+            );
+        }
+        return $responseList;
+    }
+
 }
