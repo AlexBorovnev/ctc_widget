@@ -7,7 +7,6 @@ function _widgetType(obj){
 	
 	$container.bind('change', function(){
 		var title = $(this).find('option:selected').html()
-		console.log(title);
 		$(".widgetType").html();
 	})
 }
@@ -114,7 +113,6 @@ function buildCategoryList(categories){
 		return;
 	}
 
-//	console.log('total:' + categories.list.length);
 	var cats = {};
 	for(var i in categories.list){
 		var c = categories.list[i];
@@ -138,7 +136,5 @@ function buildCategoryList(categories){
 		}
 
 	}
-	//console.log(cats);
-//	console.log('total after: ' + recursiveCount(cats));
 	return cats;
 }

@@ -43,8 +43,7 @@ function getOfferList(cid, shopId, $holder){
 	
 	api.call('getOfferList', {'shopId': shopId, 'categoryId' : [cid]}, function(response){	
 
-		console.log(response);
-		
+
 		if(response.list.length == 0){
 			$holder.find(".offerHolder").before('<div class="noOffers">товаров нет</div>');
 			return;
@@ -68,10 +67,8 @@ function buildOfferList(offers, $holder){
 //	var offers = widget.offers;
 	var $ul = $holder.find("ol.offerHolder");
 
-	console.log(offers);
 	for(var i in offers){
 
-		//		console.log(jQuery.parseJson(offers[i].commod_data));
 		var $li = $('<li class="offerItem">'+ offers[i].vendor +" "+ offers[i].vendorCode +'</li>');
 		$li.data('offer', offers[i]);
 		$ul.append($li);
@@ -82,7 +79,6 @@ function buildOfferList(offers, $holder){
 		$(this).addClass('active');
 
 		var offer = $(this).data('offer');
-		console.log(offer);
 		$holder.find('.previewPic img').attr('src', offer.picture);
 		var $info = $("<div></div>")
 

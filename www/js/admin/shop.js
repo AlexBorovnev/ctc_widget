@@ -27,7 +27,6 @@ function _shop(data){
 	
 	this.addPosition = function(position){
 		positions.push(position);
-		console.log(positions);
 	}
 	this.getWidgetType = function(){
 		return $shop.find(".widgetTypeList").val();
@@ -91,9 +90,7 @@ function _shop(data){
 				};	
 			}
 			
-			console.log(data);
 			api.call('setWidget', data, function(response){
-				console.log(response);
 				toastr.info('Виджет сохранен, id = ' + response.widgetId);
 				widgetId = response.widgetId;
 				self.widgetPreview();
@@ -102,9 +99,10 @@ function _shop(data){
 		});
 		$shop.on('click', ".addProduct ", function(e){
 			e.preventDefault();
-			var offer = $('.offerItem.active').data('offer');
-			selectedOffers.push(offer);
-			console.log(selectedOffers);
+            selectedOffers = [];console.log($('.offerItem.active'));
+            $('.offerItem.active').each(function(){
+                selectedOffers.push($(this).data('offer'));
+            })
 			toastr.info('Товар выбран');
 		})
 		$shop.on('click', ".categoryHolder .Content", function(){
@@ -224,7 +222,6 @@ function _shop(data){
 						while(i--){
 							catIds.push(childs[i]);
 						}
-						console.log(catIds);
 					}
 					else
 						catIds.push($(this).parent().data('cid'));
@@ -238,8 +235,6 @@ function _shop(data){
 					toastr.error('необходимо выбрать правило');
 					return;
 				}
-				console.log(catIds);
-				console.log(colors);
 				var params = {};
 				if(catIds.length > 0){
 					params['categoryId'] = catIds;
@@ -352,11 +347,6 @@ function _shop(data){
 			$shop.find('.widgets').after($w);
 			$shop.find('.widget-list').append('<li class="lastWidget"><a href="#">новый виджет</a></a>');
 			$(".widgetTypeList").chosen(chosenOpts)//.change(function (evt) {
-//				console.log(123123123);
-//				var html = $(this).find('option:selected').html();
-//				console.log(html);
-//      			
-//      		});
 			$(".widgetSkinList").chosen(chosenOpts);
 			
 			var widget = new _widget($w, self);
@@ -377,7 +367,6 @@ function _shop(data){
 	this.getWidgetList= function(){
 		$shop = self.$shop;
 		api.call('getWidgetList', {'shopId': self.id}, function(response){
-			console.log(response);
 			//for(var i in response.list){
 //				var w = response.list[i];//widget
 //				var id = i;
@@ -386,19 +375,19 @@ function _shop(data){
 //				$shop.find('.widget-list').append('<li><a href="#" data-id="'+id+'">Виджет '+id+'</a></a>');
 //				$(".widgetTypeList").chosen(chosenOpts);
 //				$(".widgetSkinList").chosen(chosenOpts);
-//				
+//
 //				var widget = new _widget($w, self);
-//				
+//
 //				getCategoryList(self.id, widget);
-//				
+//
 //			}
 //			$(".widget-list li a").bind('click', function(e){
 //				e.preventDefault();
-//				
+//
 //				var id = $(this).data("id");
 //				$shop.find(".new-widget").hide();
 //				$shop.find(".widget" + id).show();
-//				
+//
 //			});
 		});
 		

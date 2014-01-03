@@ -29,7 +29,6 @@ $(function(){
 			widgetTypes.push(new _widgetType(response.list[i]));
 		}
 		
-//		console.log(widgetTypes);
 	});
 	
 	api.call('getWidgetSkinList', {}, function(response){
@@ -37,7 +36,6 @@ $(function(){
 			widgetSkins.push(new _widgetSkin(response.list[i]));
 		}
 		
-//		console.log(widgetTypes);
 	});
 	
 	api.call('getColorList', {}, function(response){

@@ -6,7 +6,6 @@ function prepareLocalEnvironmet(){
 	
 	if(document.cookie == 'server=local')
 		serverHost = 'api.php';
-	console.log('server host: ', serverHost);	
 }
 function recursiveCount(list){
 	var count = 0;
@@ -38,7 +37,6 @@ function _api(host){
 			response = response.replace(/<[^<]+?>(.+)?/g, '');
 			response = jQuery.parseJSON(response);
 			
-			console.log('%cAPI CALL: ', "color: blue;font-size: 14px;", data, response);
 			if(!response.error){
 				callback(response.data.data);
 				return;

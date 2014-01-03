@@ -65,7 +65,6 @@ function _widget($w, shop){
 		};
 		
 		api.call('setWidget', data, function(response){
-			console.log(response);
 			toastr.info('Виджет сохранен, id = ' + response.widgetId);
 			self.shop.$shop.find('.lastWidget').removeClass('lastWidget').find('a').html('Виджет ' + response.widgetId);
 		});

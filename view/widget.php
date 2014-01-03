@@ -38,7 +38,7 @@
 			<?php  //$widgets = $widget->getWidget($widgetsId);
 				foreach ($this->widgets as $key => $widget):?>
 				
-				<li class="w <?php if (count($widgets) <= 3) echo 'widget';?> widget_<?= $widget['id'] ?>">
+				<li class="w <?php if (count($this->widgets) <= 3) echo 'widget';?> widget_<?= $widget['id'] ?>">
 					<div class="pic">
 						<a href="<?= $widget['url']; ?>" target="_blank"><img class="offer_img"
 								src="<?=$widget['picture']?>"
