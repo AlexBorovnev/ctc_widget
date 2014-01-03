@@ -366,7 +366,7 @@ function _shop(data){
 
 	this.getWidgetList= function(){
 		$shop = self.$shop;
-		api.call('getWidgetList', {'shopId': self.id}, function(response){
+		api.call('getWidgetList', {'shopId': self.id}, function(response){console.log(response);
 			//for(var i in response.list){
 //				var w = response.list[i];//widget
 //				var id = i;
