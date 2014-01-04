@@ -1,3 +1,4 @@
+<script type="text/javascript" src="<?=HOST?>js/admin/system.js?<?=REV?>"></script>
 <div class="wrapper">
 	<div class="block">
 		<div class="block-header">Магазин <?=$this->shopId?></div>
@@ -14,14 +15,14 @@
 		    </tr>
 		    </thead>
 		    <?php foreach ($this->widgetsList as $id => $widget): ?>
-		        <tr>
+		        <tr data="<?=$id?>">
 		            <td><a href="#"><?= $id; ?></a></td>
 		            <td><?= $this->typeList[$widget['typeId']] ?></td>
 		            <td><?= $this->skinList[$widget['skinId']] ?></td>
 		            <td>
 		            	<a href="<?=makeLink('widget_id/' . $id)?>" target="_blank">Предпросмотр</a><br>
 		            	<a href="#">Редактирование</a><br>
-		            	<a href="#">Удалить</a>
+		            	<a class="dev_delete_widget" data="<?=$id?>" href="#">Удалить</a>
 		            </td>
 		        </tr>
 		    <? endforeach; ?>
@@ -43,3 +44,17 @@
 		<a href="<?=makeLink("/admin")?>">Назад</a>
 	</div>
 </div>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('.dev_delete_widget').click(function(){
+            var id = $(this).attr('data'),
+                message = "Вы уверены, что хотите удалить виджет?";
+            if (confirm(message)){
+                api = new _api('<?=HOST?>' + '/handler');
+                api.call('deleteWidget', {widgetId: id}, function (response){
+                    $('tr[data='+id+']').remove();
+                })
+            }
+        })
+    })
+</script>

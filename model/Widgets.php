@@ -118,4 +118,10 @@ class Widgets extends AbstractModel
         $countPageQuery->execute(array($shopId));
         return (int)($countPageQuery->rowCount() / self::WIDGET_PER_PAGE) + 1;
     }
+
+    public function deleteWidget($widgetId){
+        $deleteWidgetQuery = $this->dbh->prepare("DELETE FROM widgets WHERE id=?");
+        $deleteWidgetQuery->execute(array($widgetId));
+        return true;
+    }
 }

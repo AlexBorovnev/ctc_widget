@@ -368,5 +368,18 @@ class ApiServer
         );
         $widgetModel = new Widgets($this->dbh);
         $widgetModel->clickAdd($data['widgetId']);
+        return true;
+    }
+
+    protected function deleteWidget($data){
+        $this->checkNeededParam(
+            $data,
+            array(
+                'widgetId' => array('type' => 'string', 'required' => true)
+            )
+        );
+        $widgetModel = new Widgets($this->dbh);
+        $widgetModel->deleteWidget($data['widgetId']);
+        return true;
     }
 }
