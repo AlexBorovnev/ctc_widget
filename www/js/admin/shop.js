@@ -99,7 +99,7 @@ function _shop(data){
 		});
 		$shop.on('click', ".addProduct ", function(e){
 			e.preventDefault();
-            selectedOffers = [];console.log($('.offerItem.active'));
+            selectedOffers = [];
             $('.offerItem.active').each(function(){
                 selectedOffers.push($(this).data('offer'));
             })
@@ -366,7 +366,7 @@ function _shop(data){
 
 	this.getWidgetList= function(){
 		$shop = self.$shop;
-		api.call('getWidgetList', {'shopId': self.id}, function(response){console.log(response);
+		api.call('getWidgetList', {'shopId': self.id}, function(response){
 			//for(var i in response.list){
 //				var w = response.list[i];//widget
 //				var id = i;

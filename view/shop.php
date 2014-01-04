@@ -53,6 +53,7 @@
                 api = new _api('<?=HOST?>' + '/handler');
                 api.call('deleteWidget', {widgetId: id}, function (response){
                     $('tr[data='+id+']').remove();
+                    window.location.reload();
                 })
             }
         })
