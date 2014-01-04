@@ -54,17 +54,14 @@ class Widgets extends AbstractModel
         return $widgetTypeList->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public function getWidgetList($data, $pageNum = 1)
+    public function getWidgetList($data)
     {
         $responseList = array();
-        $offset = ($pageNum - 1) * self::WIDGET_PER_PAGE;
         try {
             $widgetsListQuery = $this->dbh->prepare(
-                "SELECT w.id, r.rules_type, r.source, r.position, w.common_rule, w.type_id, w.skin_id FROM widgets w LEFT JOIN rules r ON w.id=r.widget_id WHERE w.shop_id=:shop_id LIMIT :offset,:limit "
+                "SELECT w.id, r.rules_type, r.source, r.position, w.common_rule, w.type_id, w.skin_id FROM widgets w LEFT JOIN rules r ON w.id=r.widget_id WHERE w.shop_id=:shop_id"
             );
             $widgetsListQuery->bindValue(':shop_id', $data['shopId']);
-            $widgetsListQuery->bindValue(':offset', $offset, \PDO::PARAM_INT);
-            $widgetsListQuery->bindValue(':limit', self::WIDGET_PER_PAGE, \PDO::PARAM_INT);
             $widgetsListQuery->execute();
             foreach ($widgetsListQuery->fetchAll(\PDO::FETCH_ASSOC) as $row) {
                 $responseList[$row['id']]['positions'][$row['position']] = array(
@@ -116,12 +113,39 @@ class Widgets extends AbstractModel
     {
         $countPageQuery = $this->dbh->prepare("SELECT id FROM widgets WHERE shop_id=?");
         $countPageQuery->execute(array($shopId));
-        return (int)($countPageQuery->rowCount() / self::WIDGET_PER_PAGE) + 1;
+        $rowCount = $countPageQuery->rowCount();
+        return ((int)($rowCount / self::WIDGET_PER_PAGE)) + (($rowCount % self::WIDGET_PER_PAGE) ? 1 : 0);
     }
 
-    public function deleteWidget($widgetId){
+    public function deleteWidget($widgetId)
+    {
         $deleteWidgetQuery = $this->dbh->prepare("DELETE FROM widgets WHERE id=?");
         $deleteWidgetQuery->execute(array($widgetId));
         return true;
+    }
+
+    public function getCommonWidgetInfo ($data, $pageNum)
+    {
+        $responseList = array();
+        $offset = ($pageNum - 1) * self::WIDGET_PER_PAGE;
+        try {
+            $widgetsListQuery = $this->dbh->prepare(
+                "SELECT w.id, w.type_id, w.skin_id FROM widgets w LEFT JOIN rules r ON w.id=r.widget_id WHERE w.shop_id=:shop_id GROUP BY w.id LIMIT :offset,:limit "
+            );
+            $widgetsListQuery->bindValue(':shop_id', $data['shopId']);
+            $widgetsListQuery->bindValue(':offset', $offset, \PDO::PARAM_INT);
+            $widgetsListQuery->bindValue(':limit', self::WIDGET_PER_PAGE, \PDO::PARAM_INT);
+            $widgetsListQuery->execute();
+            foreach ($widgetsListQuery->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+                $responseList[$row['id']] =
+                    array(
+                        'skinId' => $row['skin_id'],
+                        'typeId' => $row['type_id']
+                    );
+            }
+        } catch (\PDOException $e) {
+            return array();
+        }
+        return $responseList;
     }
 }

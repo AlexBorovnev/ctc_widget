@@ -83,7 +83,7 @@ function showShopPage($shopId, $page){
     $widgetsModel = new Widgets(Config::getInstance()->getDbConnection());
 //    $shopsList = $shopsModel->getAll();
     $pageCount = $widgetsModel->getWidgetsPage($shopId);
-    $widgetsList = $widgetsModel->getWidgetList(array('shopId' => $shopId), $page);
+    $widgetsList = $widgetsModel->getCommonWidgetInfo(array('shopId' => $shopId), $page);
     
     $typeList = array();
     foreach($widgetsModel->getTypeList() as $elem)
