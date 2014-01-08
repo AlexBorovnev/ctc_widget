@@ -68,4 +68,10 @@ class Categories extends AbstractModel
         $childCategoryQuery->execute($categoryId, $shopId);
         return $childCategoryQuery->fetch(\PDO::FETCH_ASSOC);
     }
+
+    public function getCategoryByOffer($shopId, $offerId){
+        $categoryQuery = $this->dbh->prepare("SELECT category_id FROM widgets WHERE offer_id=? AND shop_id=?");
+        $categoryQuery->execute(array($offerId, $shopId));
+        return $categoryQuery->fetch(\PDO::FETCH_ASSOC);
+    }
 }

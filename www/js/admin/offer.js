@@ -39,7 +39,7 @@ function constructOffer(data){
 	return offer;		
 }
 
-function getOfferList(cid, shopId, $holder){
+function getOfferList(cid, shopId, $holder, currItem){
 	
 	api.call('getOfferList', {'shopId': shopId, 'categoryId' : [cid]}, function(response){	
 
@@ -57,12 +57,12 @@ function getOfferList(cid, shopId, $holder){
 		}
 
 
-		buildOfferList(offers, $holder);
-		
+		buildOfferList(offers, $holder, currItem);
+
 	});
 }
 
-function buildOfferList(offers, $holder){
+function buildOfferList(offers, $holder, currItem){
 	//var $w = widget.$w;
 //	var offers = widget.offers;
 	var $ul = $holder.find("ol.offerHolder");
@@ -71,6 +71,9 @@ function buildOfferList(offers, $holder){
 
 		var $li = $('<li class="offerItem">'+ offers[i].vendor +" "+ offers[i].vendorCode +'</li>');
 		$li.data('offer', offers[i]);
+        if(offers[i].attributes.id == currItem){
+            $li.addClass('active');
+        }
 		$ul.append($li);
 	}
 	$holder.find('.offerItem').unbind('click');

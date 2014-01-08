@@ -151,7 +151,6 @@ function _shop(data){
 //			}
 		});
 		$shop.on('click', ".categoryOfferHolder .Content", function(){
-
 			var cid = $(this).parent().data('cid');
 			var pid = $(this).parent().data('pid');
             var $holder = $(this).parents('.categoryOfferHolder');

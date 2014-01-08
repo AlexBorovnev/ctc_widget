@@ -13,8 +13,7 @@ var selectedColors = [];
 
 
 $(function(){  
-	
-	
+
 
 	api = new _api(serverHost);
 
@@ -23,7 +22,7 @@ $(function(){
 			shops.push(new _shop(response.list[i]));
 		}
 	});
-	
+
 	api.call('getWidgetTypeList', {}, function(response){
 		for(var i in response.list){
 			widgetTypes.push(new _widgetType(response.list[i]));

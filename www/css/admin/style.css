@@ -641,3 +641,7 @@ a.disabledBtn:hover{
 .pagenation span{
     padding:5px;
 }
+
+.editor.ruleHolder{
+    display:block;
+}

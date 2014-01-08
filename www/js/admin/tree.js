@@ -58,8 +58,6 @@ function buildNode(item){
 	return $tpl;
 }
 
-
-
 //tree handler
 
 function tree_toggle(event) {

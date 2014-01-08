@@ -21,8 +21,8 @@
 		            <td><?= $this->skinList[$widget['skinId']] ?></td>
 		            <td>
 		            	<a href="<?=makeLink('widget_id/' . $id)?>" target="_blank">Предпросмотр</a><br>
-		            	<a href="#">Редактирование</a><br>
-		            	<a class="dev_delete_widget" data="<?=$id?>" href="#">Удалить</a>
+		            	<a class="dev_delete_widget" data="<?=$id?>" href="#">Удалить</a><br>
+		            	<a href="<?=makeLink('admin/edit/' . $id)?>">Редактирование</a><br>
 		            </td>
 		        </tr>
 		    <? endforeach; ?>

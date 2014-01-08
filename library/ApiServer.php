@@ -190,7 +190,7 @@ class ApiServer
                 'widgetId' => array('type' => 'string', 'required' => false)
             )
         );
-        if (empty($data['positions'])){
+        if (empty($data['positions'])) {
             $data['positions'] = array();
         }
         foreach ($data['positions'] as $rule) {
@@ -295,7 +295,7 @@ class ApiServer
                 }
                 break;
             case Widgets::WIDGET_TYPE_FREE:
-                if (empty($data['positions'])){
+                if (empty($data['positions'])) {
                     $this->sendResponse(array('message' => $this->config['messages'][5]), true, 5);
                 }
                 return null;
