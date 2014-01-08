@@ -29,6 +29,9 @@ function getScripPath()
 $widget = new DbLoadWidget(Config::getInstance()->getConfig(), Config::getInstance()->getDbConnection());
 $rout = explode('/', strtok(trim(str_replace(getScripPath(), '', $_SERVER['REQUEST_URI']), '/'), '?'));
 switch ($rout[0]) {
+	case '':
+		showAdminPage();
+	break;
     case 'widget_id':
         if (!empty($rout[1])) {
             $widgetsId = strip_tags($rout[1]);

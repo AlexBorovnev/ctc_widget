@@ -141,7 +141,7 @@
 		</div>
 	</div>
 
-	<div class="block smallWidget smallWidgetTpl widget">
+	<div class="block inner smallWidget smallWidgetTpl widget">
 		<div class="block-header">Маленький виджет</div>
 		<div class="block-content">
 			<a href="#" class="btn createRule">Создать правило</a>
@@ -149,7 +149,7 @@
 			<div class="positionHolder clearfix"  data-position-num="1"></div>
 		</div>
 	</div>
-	<div class="block bigWidget bigWidgetTpl widget">
+	<div class="block inner bigWidget bigWidgetTpl widget">
 		<div class="block-header">Большой виджет</div>
 		<div class="block-content">
 			<a href="#" class="btn createRule">Создать правило</a>
@@ -158,7 +158,7 @@
 			<div class="positionHolder clearfix positionHolder2" data-position-num="2"></div>
 		</div>
 	</div>
-	<div class="block widget freeWidget freeWidgetTpl">
+	<div class="block inner widget freeWidget freeWidgetTpl">
 		<div class="block-header">Свободный виджет</div>
 		<div class="block-content">
 
@@ -200,7 +200,7 @@
 
 		<div class="tut"></div>
 
-		<div class="block clearfix preparedWidget">
+		<div class="block inner clearfix preparedWidget">
 			<div class="block-header">Виджет</div>
 			<div class="block-content clearfix">
 				<!--div style="margin: 5px"><a class="btn generateWidgetPreview" href="# ">Предпросмотр виджета</a></div-->		
