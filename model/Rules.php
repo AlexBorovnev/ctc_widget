@@ -63,6 +63,7 @@ class Rules extends AbstractModel
         }
         $outputList = array_merge(
             array(
+                'widgetId' => $rule['id'],
                 'typeId' => $rule['type_id'],
                 'skinId' => $rule['skin_id'],
                 'shopId' => $rule['shop_id'],

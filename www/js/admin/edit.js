@@ -47,22 +47,35 @@ var initEditor = {
         if (obj.commonRule) {
             this.initCommonRuleSection($catTree);
         }
+        this.initColor();
         this.initTreeForSinglePosition($catTree);
         this.initEvents('.block-content');
 
+    },
+    initColor: function(color){
+        for (var i in color){
+            $('.dev-editor-color[data-color-name="' + color[i] + '"]').addClass('active');
+        }
     },
     initTreeForSinglePosition: function (catTree) {
         var base = this;
         for (var i in base.obj.positions) {
             $('.dev-block-' + i + ' .treeHolder').append(catTree.clone(true));
             $('.dev-block-' + i + ' .treeHolder li').each(function () {
-                if (base.obj.positions[i].source.category_id != undefined && $(this).data('cid') == base.obj.positions[i].source.category_id) {
+                if (base.obj.positions[i].source.category_id != undefined && ($(this).data('cid') == base.obj.positions[i].source.category_id)) {
                     $(this).find('.Content').addClass('b');
                     $(this).parent().parent().removeClass('ExpandClosed').addClass('ExpandOpen');
                     getOfferList($(this).data('cid'), base.obj.shopId, $(this).parents('.dev-block-' + i), base.obj.positions[i].source.offer_id);
                     return false;
+                } else if (base.obj.positions[i].source.categoryId != undefined && (base.obj.positions[i].source.categoryId.indexOf($(this).data('cid')) != -1)){
+                    $(this).find('.Content').addClass('b');
+                    $(this).parent().parent().removeClass('ExpandClosed').addClass('ExpandOpen');
+                    return false;
                 }
             })
+            if (base.obj.positions[i].source.color != undefined){
+                base.initColor(base.obj.positions[i].source.color);
+            }
         }
     },
 
@@ -70,16 +83,16 @@ var initEditor = {
     initCommonRuleSection: function (catTree) {
         var base = this;
         $('.ruleHolder').append(catTree.clone(true));
-        if (base.obj.commonRule.categoryId){
-            $('.ruleHolder li').each(function(){
-                if(base.obj.commonRule.categoryId.indexOf($(this).data('cid')) != -1 ){
+        if (base.obj.commonRule.categoryId) {
+            $('.ruleHolder li').each(function () {
+                if (base.obj.commonRule.categoryId.indexOf($(this).data('cid')) != -1) {
                     $(this).find('.Content').addClass('b');
                     $(this).parent().parent().removeClass('ExpandClosed').addClass('ExpandOpen');
                 }
             })
         }
-        if (base.obj.commonRule.color){
-            $('.dev-editor-color[data-color-name="'+base.obj.commonRule.color+'"]').addClass('active');
+        if (base.obj.commonRule.color) {
+            this.initColor([base.obj.commonRule.color]);
         }
     },
 
@@ -91,13 +104,14 @@ var initEditor = {
             var $holder = $(this).parents(selector);
             $holder.find(".previewPic img").attr('src', '../../images/preview.png');
             $holder.find(".offerInfo").empty();
-
             if (pid != 0) {
                 $holder.find(".Content").removeClass('b');
                 $(this).addClass('b');
-                $holder.find(".noOffers").remove();
-                $holder.find(".offerHolder li").remove();
-                getOfferList(cid, base.obj.shopId, $holder);
+                if ($(this).parents('.ruleHolder').length == 0) {
+                    $holder.find(".noOffers").remove();
+                    $holder.find(".offerHolder li").remove();
+                    getOfferList(cid, base.obj.shopId, $holder);
+                }
             }
             else {
                 $(this).prev().trigger('click');
@@ -106,45 +120,89 @@ var initEditor = {
                 tree_toggle(event);
             }
         });
-        $(selector + ' .treeHolder').on('click', ".saveWidget", function(e){
+        $(selector + ' .preparedWidget').on('click', ".saveWidget", function (e) {
             e.preventDefault();
             var data = {};
-            if(widgetType == 3){//free
+            if ($(':hidden[name="type_id"]').val() == 3) {//free
                 data = {
-                    'shopId': base.shopId,
+                    'shopId': base.obj.shopId,
                     'skinId': $('[name=skin_id]').val(),
                     'typeId': $('[name=type_id]').val(),
-                    'positions': positions
+                    'positions': base.getPositions(),
+                    'widgetId': $('[name=widget_id]').val()
                 }
             }
-            else{
+            else {
                 data = {
-                    'shopId': base.shopId,
-                    'skinId': self.getSkinType(),
-                    'typeId': self.getWidgetType(),
-                    'commonRule': self.getCommonRule(),
-                    'positions': self.getPositions()
+                    'shopId': base.obj.shopId,
+                    'skinId': $('[name=skin_id]').val(),
+                    'typeId': $('[name=type_id]').val(),
+                    'commonRule': base.getCommonRule(),
+                    'positions': base.getPositions(),
+                    'widgetId': $('[name=widget_id]').val()
                 };
             }
-
-            api.call('setWidget', data, function(response){
+            api.call('setWidget', data, function (response) {
                 toastr.info('Виджет сохранен, id = ' + response.widgetId);
                 widgetId = response.widgetId;
-                self.widgetPreview();
+                //self.widgetPreview();
             });
 
         });
-        $(selector + ' .colorHolder').on('click', '.dev-editor-color', function(){
+        $(selector + ' .colorHolder').on('click', '.dev-editor-color', function () {
             $(this).toggleClass('active');
-            if($(this).hasClass('active')){
+            if ($(this).hasClass('active')) {
                 selectedColors.push($(this).data('colorName'));
             }
-            else{
+            else {
                 var ind = selectedColors.indexOf($(this).data('colorName'));
-                if(ind != -1)
+                if (ind != -1)
                     selectedColors.slice(ind, 1);
             }
         })
+    },
+    getPositions: function(){
+        var positions = [],
+            base = this;
+        $('.dev-positions').each(function(){
+            var position = $(this).find('[name="item_position"]').val(),
+                type = $(this).find('[name="rule_type"]').val();
+            positions[position] = {type: type, params: base.getSource(position, type)};
+        });console.log(positions);
+        return positions;
+    },
+    getCommonRule: function(){
+        return this.getRule('.commonRule');
+    },
+    getSource: function (position, type){
+        var params = [];
+        if (type == 1){
+            return this.getRule('.dev-block-'+ position);
+        }else if (type == 2){
+            var offer = $('.dev-block-'+ position).find('.offerItem.active').data('offer');
+            return new Array(offer['attributes']['id']);
+        }
+        return params;
+    },
+    getRule: function (selector){
+        var colors = $(selector).find('.dev-editor-color.active'),
+            categories = $(selector).find('li .Content.b'),
+            colorsValue = [],
+            categoriesValue = [],
+            params = {};
+        colors.each(function(){
+            colorsValue.push($(this).data('colorName'));
+        });
+        categories.each(function(){
+            categoriesValue.push($(this).parent().data('cid'));
+        });
+        if (colorsValue){
+            params.color = colorsValue;
+        };
+        if (categoriesValue){
+            params.categoryId = categoriesValue;
+        };console.log(params);
+        return params;
     }
 
 }
