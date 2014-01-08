@@ -15,8 +15,9 @@ function _widgetSkin(obj){
 	var $container = $(".widgetSkinList");
 	$container.append("<option value=\""+obj.id+"\">"+obj.title+"</option>")  
 }
-function buildColorList(){
+function buildColorList(colorList){
 	var $ul =  $("<ul></ul>");
+    _colorList = colorList || _colorList;
 	for(var i in _colorList){
 		var colorName = _colorList[i];
 		var color = "#";
@@ -58,7 +59,7 @@ function buildColorList(){
 		}
 		
 //		if(color == 'MULTICOLOR')
-	 	$ul.append('<li class="color" data-color-name="'+colorName+'" data-color="'+color+'">'+colorName+'</li>')
+	 	$ul.append('<li class="color dev-editor-color" data-color-name="'+colorName+'" data-color="'+color+'">'+colorName+'</li>')
 	 	
 	}
 	

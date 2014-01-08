@@ -8,6 +8,7 @@ use model\Widgets;
 use view\View;
 use model\Rules;
 use model\Categories;
+use model\Goods;
 
 define ('HOST', 'http://' . $_SERVER['HTTP_HOST'] . '/' . getScripPath());
 define ('REV', time());
@@ -86,6 +87,9 @@ function showAdminPage($page = '', $param = 1, $pageNum = 1){
             $categoriesModel = new Categories(Config::getInstance()->getDbConnection());
             $categoriesList = $categoriesModel->getCategoriesList(array('shopId' => $view->widget['shopId']));
             $view->categories = array('list' => $categoriesList, 'count' => count($categoriesList));
+            $goodsModel = new Goods(Config::getInstance()->getDbConnection());
+            $colorList = $goodsModel->getColorList();;
+            $view->colors =  $colorList;
             $view->render('edit_widget.php');
             break;
         default:

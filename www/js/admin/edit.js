@@ -7,76 +7,11 @@ function _widgetType(obj) {
 
 function _widgetSkin(obj) {
 }
-function buildColorList() {
-    var $ul = $("<ul></ul>");
-    for (var i in _colorList) {
-        var colorName = _colorList[i];
-        var color = "#";
-        switch (colorName) {
-            case 'Бежевый':
-                color += "F5F5DC";
-                break;
-            case 'Белый':
-                color += "FFF";
-                break;
-            case 'Голубой':
-                color += "00BFFF";
-                break;
-            case 'Желтый':
-                color += "FFFF00";
-                break;
-            case 'Зеленый':
-                color += "00FF00";
-                break;
-            case 'Золотой':
-                color += "FFD700";
-                break;
-            case 'Коричневый':
-                color += "964B00";
-                break;
-            case 'Красный':
-                color += "FF0000";
-                break;
-            case 'Мультицвет':
-                color += "MULTICOLOR";
-                break;
-            case 'Не указан':
-                color += "";
-                break;
-            case 'Оранжевый':
-                color += "FF4F00";
-                break;
-            case 'Розовый':
-                color += "FFC0CB";
-                break;
-            case 'Серебряный':
-                color += "C0C0C0";
-                break;
-            case 'Серый':
-                color += "808080";
-                break;
-            case 'Синий':
-                color += "3A75C4";
-                break;
-            case 'Фиолетовый':
-                color += "8B00FF";
-                break;
-            case 'Черный':
-                color += "000";
-                break;
-        }
-
-//		if(color == 'MULTICOLOR')
-        $ul.append('<li class="color" data-color-name="' + colorName + '" data-color="' + color + '">' + colorName + '</li>')
-
-    }
-    return $ul;
-}
 
 function getCategoryList(shopId, cb) {
     api.call('getCategoryList', {shopId: shopId}, cb);
 }
-function buildCategoryList(categories) {console.log(categories);
+function buildCategoryList(categories) {
     if (categories.length == 0) {
         toastr.error('нет категорий для отображения');
         return;
@@ -106,12 +41,13 @@ function buildCategoryList(categories) {console.log(categories);
 var initEditor = {
     obj: {},
     init: function (obj) {
-        var $tree = buildTree('myTree', obj.categoryList);
+        var $catTree = buildTree('myTree', obj.workList.categoryList);
+        $('.colorHolder').append(obj.workList.colorList);
         this.obj = obj;
         if (obj.commonRule) {
-            this.initCommonRuleSection($tree);
+            this.initCommonRuleSection($catTree);
         }
-        this.initTreeForSinglePosition($tree);
+        this.initTreeForSinglePosition($catTree);
         this.initEvents('.block-content');
 
     },
@@ -143,7 +79,7 @@ var initEditor = {
             })
         }
         if (base.obj.commonRule.color){
-
+            $('.dev-editor-color[data-color-name="'+base.obj.commonRule.color+'"]').addClass('active');
         }
     },
 
@@ -184,8 +120,8 @@ var initEditor = {
             else{
                 data = {
                     'shopId': base.shopId,
-                    'skinId': $('[name=skin_id]').val(),
-                    'typeId': $('[name=type_id]').val(),
+                    'skinId': self.getSkinType(),
+                    'typeId': self.getWidgetType(),
                     'commonRule': self.getCommonRule(),
                     'positions': self.getPositions()
                 };
@@ -198,6 +134,17 @@ var initEditor = {
             });
 
         });
+        $(selector + ' .colorHolder').on('click', '.dev-editor-color', function(){
+            $(this).toggleClass('active');
+            if($(this).hasClass('active')){
+                selectedColors.push($(this).data('colorName'));
+            }
+            else{
+                var ind = selectedColors.indexOf($(this).data('colorName'));
+                if(ind != -1)
+                    selectedColors.slice(ind, 1);
+            }
+        })
     }
 
 }
