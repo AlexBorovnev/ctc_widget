@@ -52,9 +52,9 @@ var initEditor = {
         this.initEvents('.block-content');
 
     },
-    initColor: function(color){
+    initColor: function(selector, color){
         for (var i in color){
-            $('.dev-editor-color[data-color-name="' + color[i] + '"]').addClass('active');
+            $(selector+'[data-color-name="' + color[i] + '"]').addClass('active');
         }
     },
     initTreeForSinglePosition: function (catTree) {
@@ -70,11 +70,10 @@ var initEditor = {
                 } else if (base.obj.positions[i].source.categoryId != undefined && (base.obj.positions[i].source.categoryId.indexOf($(this).data('cid')) != -1)){
                     $(this).find('.Content').addClass('b');
                     $(this).parent().parent().removeClass('ExpandClosed').addClass('ExpandOpen');
-                    return false;
                 }
             })
             if (base.obj.positions[i].source.color != undefined){
-                base.initColor(base.obj.positions[i].source.color);
+                base.initColor('.dev-block-' + i +' .dev-editor-color', base.obj.positions[i].source.color);
             }
         }
     },
@@ -92,7 +91,7 @@ var initEditor = {
             })
         }
         if (base.obj.commonRule.color) {
-            this.initColor([base.obj.commonRule.color]);
+            this.initColor('.dev-editor-color', base.obj.commonRule.color);
         }
     },
 
@@ -101,15 +100,17 @@ var initEditor = {
         $(selector + ' .ruleHolder').on('click', ".Content", function () {
             var cid = $(this).parent().data('cid');
             var pid = $(this).parent().data('pid');
-            var $holder = $(this).parents('.ruleHolder');
             if (pid != 0) {
                 $(this).toggleClass('b');
             }
             else {
                 $(this).prev().trigger('click');
-                var event = {};
-                event.target = $(this).prev()[0];
-                tree_toggle(event);
+                $(this).toggleClass('b');
+                if ($(this).hasClass('b')){
+                    $(this).parent().find('li .Content').addClass('b');
+                } else {
+                    $(this).parent().find('li .Content').removeClass('b');
+                }
             }
         });
         $(selector + ' .itemHolder').on('click', ".Content", function () {
