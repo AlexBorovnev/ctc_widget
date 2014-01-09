@@ -52,7 +52,8 @@ function _shop(data){
 		var rule = {};
 		rule.color = selectedColors;
 		rule.categoryId = selectedCategories;
-		
+		if(rule.color.length == 0 && rule.categoryId.length == 0)
+            return [];
 		return rule;
 	}
 	this.widgetPreview = function(){
@@ -67,12 +68,20 @@ function _shop(data){
 		$wInfo.find(".widgetType").html($(".widgetTypeList option:selected").html());
 		$wInfo.find(".widgetSkin").html($(".widgetSkinList option:selected").html());
 		$wInfo.find(".widgetCount").html(selectedOffers.length);
+        $wInfo.find('.widgetTitle').html(self.wTitle);
 	}
 	this.initEvents = function(){
 		$shop.on('click', ".saveWidget", function(e){
 			e.preventDefault();
 			var data = {};
 			if(widgetType == 3){//free
+                
+                if(positions.length == 0)
+                {
+                    toastr.error('Необходимо создать как минимум 1 позицию');
+                    return;
+                }
+            
 				data = {
 					'shopId': self.id,
 					'title' : self.wTitle,
@@ -82,6 +91,7 @@ function _shop(data){
 				}						
 			}
 			else{
+                
 				data = {
 					'shopId': self.id,
 					'title' : self.wTitle,
@@ -90,6 +100,10 @@ function _shop(data){
 					'commonRule': self.getCommonRule(),
 					'positions': self.getPositions()
 				};	
+                if (data.commonRule.length == 0){
+                    toastr.error('Необходимо выбрать правило');
+                    return;
+                }
 			}
 			
 			api.call('setWidget', data, function(response){
@@ -105,16 +119,18 @@ function _shop(data){
             $('.offerItem.active').each(function(){
                 selectedOffers.push($(this).data('offer'));
             })
-			toastr.info('Товар выбран');
+            
+            if(selectedOffers.length == 0)
+                toastr.error('Выберите товар');
+            else
+                toastr.info('Товар выбран');
 		})
 		$shop.on('click', ".categoryHolder .Content", function(){
 
 			var cid = $(this).parent().data('cid'),
 			pid = $(this).parent().data('pid');
 
-			var childs = $(this).data('childs');
-			
-				
+			var childs = $(this).data('childs');	
 			
             $(this).toggleClass('active')
             if($(this).hasClass('active')){
@@ -296,12 +312,13 @@ function _shop(data){
 			
 			var $curWidget;
 			$shop.find('.prepareWidget').click(function(){
-				var title = $shop.find('#widgetTitle').val();
-				if(title.length == 0){
+				var $title = $shop.find('#widgetTitle');
+				if($title.val().length == 0){
 					toastr.error('Введите название виджета что бы продолжить');
+                    $title.focus();
 					return;
 				}
-				self.wTitle = title;
+				self.wTitle = $title.val();
 				var type = $shop.find(".widgetTypeList").val();
 				widgetType = type;
 				if(type == 1){//small
@@ -316,6 +333,10 @@ function _shop(data){
 				$shop.find('.widgetHolder').append($curWidget.clone(true));
 				$shop.find('.preparedWidget').show();
 				$(this).hide();
+                
+                //$shop.find(".widgetSkinList").attr('disabled', true).trigger("liszt:updated");
+//                $("#select").prop('disabled',true).trigger("liszt:updated");
+//                $shop.find(".widgetSkinList").prop('disabled', true).trigger("liszt:updated");
 			});	
 			this.initEvents();
 	}

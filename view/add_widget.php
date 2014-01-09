@@ -218,7 +218,8 @@ $(function(){
 				<div class="widgetInfo"> 
 
 					<div class="desc hidden">
-						<div>Выбрано товаров: <span class="widgetCount">0</span></div>
+                        <div>Название виджета: <span class="widgetTitle"></span></div>
+						<!--div>Выбрано товаров: <span class="widgetCount"></span></div-->
 						<div>Тип: <span class="widgetType"></span></div>
 						<div>Скин: <span class="widgetSkin"></span></div>
 

@@ -691,3 +691,7 @@ a.disabledBtn:hover{
 	border-radius: 3px;
 	font-family: Tahoma;
 }
+.ui-tabs .ui-tabs-nav li.ui-tabs-active {
+    margin-bottom: 4px;
+    padding-bottom: 0px;
+}
