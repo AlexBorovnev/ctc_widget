@@ -27,7 +27,7 @@ class Widgets extends AbstractModel
             ':skin_id' => $data['skinId'],
             ':pos_count' => $data['positions'],
             ':common_rule' => $data['commonRule'],
-            ':title' => empty($data['title']) ? null : $data['title']
+            ':title' => $data['title']
         );
         if (!empty($data['widgetId'])) {
             $rulesModel = new Rules($this->dbh);

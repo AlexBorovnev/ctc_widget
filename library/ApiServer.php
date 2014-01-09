@@ -26,6 +26,9 @@ class ApiServer
 
     public function run($data)
     {
+        if (Config::getInstance()->getBusyStatus() == true){
+            $this->sendResponse(array('message' => $this->config['messages'][7]), true, 7);
+        }
         $methodName = $this->getMethodName($data);
         $params = $this->getParams($data);
         if (method_exists($this, $methodName)) {
@@ -281,6 +284,7 @@ class ApiServer
                 'skinId' => $data['skinId'],
                 'positions' => count($data['positions']),
                 'commonRule' => $data['commonRule'],
+                'title' => empty($data['title']) ? null : $data['title'],
                 'widgetId' => empty($data['widgetId']) ? null : $data['widgetId']
             )
         );
