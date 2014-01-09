@@ -121,7 +121,7 @@ padding: 0;
 }
 
 .new-widget{
-	border-left: 1px solid #999;
+/*	border-left: 1px solid #999;*/
 	width: 800px;
 	float: left;
 	padding: 10px;
@@ -492,7 +492,7 @@ ol.offerHolder{
 
 .previewPic img{
 	width: 100%;
-	height: 100%;
+/*	height: 100%;*/
 	border: 1px solid #cc0835;
 }
 
@@ -628,6 +628,11 @@ a.disabledBtn:hover{
 	border: none;
 }
 
+.tbl thead tr td{
+	font-weight: bold;
+	color: #2e6e9e;
+}
+
 .tbl tr td{
 	padding: 5px;
 	text-align: center;
@@ -649,8 +654,28 @@ a.disabledBtn:hover{
 	margin: 20px 0;
 }
 
+.pagenation ul li{
+	float: left;
+	border: 1px solid #999;
+	width: 32px;
+  	height: 32px;
+	text-align: center;
+	line-height: 32px;
+	display: block;
+	margin: 2px;
+}
+.pagenation ul li.active{
+	font-weight: bold;
+	color: #2e6e9e;
+	font-size: 14px;
+	border: 1px solid #666;
+}
 .pagenation a{
-    padding:5px;
+  line-height: 32px;  
+  display: block;
+  width: 32px;
+  height: 32px;
+  
 }
 
 .pagenation span{
@@ -659,4 +684,10 @@ a.disabledBtn:hover{
 
 .editor.ruleHolder{
     display:block;
+}
+#widgetTitle{
+	border: 1px solid #999;
+	padding: 0 4px;
+	border-radius: 3px;
+	font-family: Tahoma;
 }

@@ -9,7 +9,7 @@ endif;
 ?>
 <?php if (empty($_SESSION['user_id'])): ?>
     <head>
-    <title>Sign In</title>
+    <title>Вход</title>
     <script type="text/javascript" src="<?= HOST ?>js/admin/jquery-1.9.1.js"></script>
     <link rel="stylesheet" type="text/css" href="<?= HOST ?>css/bootstrap.min.css?<?= REV ?>">
         <style type="text/css">
@@ -31,11 +31,11 @@ endif;
                 -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
                 -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
                 box-shadow: 0 1px 2px rgba(0,0,0,.05);
-                background: url(images/sts_logo.png) no-repeat center;
-                -moz-background-size: 100% auto;
-                -webkit-background-size: 100% auto;
-                -o-background-size: 100% auto;
-                background-size: 100% auto;
+                background: url(/images/sts_logo.png) no-repeat center;
+                -moz-background-size: 340px auto;
+                -webkit-background-size: 340px auto;
+                -o-background-size: 340px auto;
+                background-size: 340px auto;
 
             }
             .form-signin .form-signin-heading,
@@ -54,12 +54,12 @@ endif;
     </head>
     <div class="container">
         <form class="form-signin" name="auth_form" action="<?= HOST ?>admin" method="post">
-            <h3 class="form-signin-heading">Please sign in</h3>
-            <label for="login">Login:</label>
-            <input type="text" class="input-block-level" name="login" id="login" placeholder="Your login"/>
-            <label for="password">Password:</label>
-            <input class="input-block-level" type="password" name="password" id="password" placeholder="Your password"/>
-            <input type="submit" class="btn btn-large btn-primary" name="btn_send" value="Login"/>
+            <h3 class="form-signin-heading">Вход в систему</h3>
+            
+            <input type="text" class="input-block-level" name="login" id="login" placeholder="Логин"/>
+            
+            <input class="input-block-level" type="password" name="password" id="password" placeholder="Пароль"/>
+            <input type="submit" class="btn btn-large btn-primary" name="btn_send" value="Вход"/>
         </form>
     </div>
     <?php exit; endif; ?>

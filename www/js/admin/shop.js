@@ -4,26 +4,26 @@ function _shop(data){
 	this.url = data.url;
 	this.$shop = '';
 	this.widgets = [];
-	
+	this.wTitle = '';
 	//var id, title, url;
 	var self = this,
-	$categoryTpl,
-	$categoryOfferTpl,
-	$rule,
-	$position,
-	$freePosition,
-	$smallWidget,
-	$bigWidget,
-	$freeWidget,
-	$preparedWidget,
-	
-	posNum = 1,
-	selectedOffers = [],
-	selectedCategories = [],
-	selectedColors = [],
-	positions = [],
-	widgetType = 0,
-	widgetId = 0;
+		$categoryTpl,
+		$categoryOfferTpl,
+		$rule,
+		$position,
+		$freePosition,
+		$smallWidget,
+		$bigWidget,
+		$freeWidget,
+		$preparedWidget,
+		
+		posNum = 1,
+		selectedOffers = [],
+		selectedCategories = [],
+		selectedColors = [],
+		positions = [],
+		widgetType = 0,
+		widgetId = 0;
 	
 	this.addPosition = function(position){
 		positions.push(position);
@@ -75,6 +75,7 @@ function _shop(data){
 			if(widgetType == 3){//free
 				data = {
 					'shopId': self.id,
+					'title' : self.wTitle,
 					'skinId': self.getSkinType(),
 					'typeId': self.getWidgetType(),
 					'positions': positions
@@ -83,6 +84,7 @@ function _shop(data){
 			else{
 				data = {
 					'shopId': self.id,
+					'title' : self.wTitle,
 					'skinId': self.getSkinType(),
 					'typeId': self.getWidgetType(),
 					'commonRule': self.getCommonRule(),
@@ -140,21 +142,15 @@ function _shop(data){
 				}
 					
             }
-            
-			//if(pid != 0){
-//			}
-//			else{
-//				$(this).prev().trigger('click');
-//				var event = {};
-//				event.target = $(this).prev()[0];
-//				tree_toggle(event);
-//			}
+
 		});
+		
 		$shop.on('click', ".categoryOfferHolder .Content", function(){
+			
 			var cid = $(this).parent().data('cid');
 			var pid = $(this).parent().data('pid');
             var $holder = $(this).parents('.categoryOfferHolder');
-			$holder.find(".previewPic img").attr('src', '../images/preview.png');
+			$holder.find(".previewPic img").attr('src', previewPath);
 			$holder.find(".offerInfo").empty();
 
 			if(pid != 0){
@@ -165,7 +161,7 @@ function _shop(data){
 				getOfferList(cid, self.id, $holder);
 			}
 			else{
-				$(this).prev().trigger('click');
+//				$(this).prev().trigger('click');
 				var event = {};
 				event.target = $(this).prev()[0];
 				tree_toggle(event);
@@ -300,6 +296,12 @@ function _shop(data){
 			
 			var $curWidget;
 			$shop.find('.prepareWidget').click(function(){
+				var title = $shop.find('#widgetTitle').val();
+				if(title.length == 0){
+					toastr.error('Введите название виджета что бы продолжить');
+					return;
+				}
+				$shop.wTitle = title;
 				var type = $shop.find(".widgetTypeList").val();
 				widgetType = type;
 				if(type == 1){//small
@@ -352,7 +354,7 @@ function _shop(data){
 			self.widgets.push(widget);
 			self.prepareCategories();
 			
-			
+
 			$(this).unbind('click');
 			
 			
@@ -366,28 +368,7 @@ function _shop(data){
 	this.getWidgetList= function(){
 		$shop = self.$shop;
 		api.call('getWidgetList', {'shopId': self.id}, function(response){
-			//for(var i in response.list){
-//				var w = response.list[i];//widget
-//				var id = i;
-//				var $w = $('.newWidgetTpl').clone().removeClass('newWidgetTpl').addClass('hidden').addClass('widget'+id);
-//				$shop.find('.widgets').after($w);
-//				$shop.find('.widget-list').append('<li><a href="#" data-id="'+id+'">Виджет '+id+'</a></a>');
-//				$(".widgetTypeList").chosen(chosenOpts);
-//				$(".widgetSkinList").chosen(chosenOpts);
-//
-//				var widget = new _widget($w, self);
-//
-//				getCategoryList(self.id, widget);
-//
-//			}
-//			$(".widget-list li a").bind('click', function(e){
-//				e.preventDefault();
-//
-//				var id = $(this).data("id");
-//				$shop.find(".new-widget").hide();
-//				$shop.find(".widget" + id).show();
-//
-//			});
+		
 		});
 		
 	}

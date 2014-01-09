@@ -11,12 +11,6 @@ function _widget($w, shop){
 	
 	
 	this.generateWidgetPreview = function(){
-		
-		//if($(".widgetTypeList").val() != 3){
-//			toastr.error('Создание больших и маленьких виджетов временно не работает');
-//			return;
-//		}
-		
 		var idArray = this.selectedOffers.map(function(item){return item.attributes.id});
 		if(idArray.length == 0){
 			toastr.error('Необходимо выбрать товар');
@@ -72,59 +66,7 @@ function _widget($w, shop){
 	
 	this.init = function(){
 		
-	
-		
-		
-		
-		
-		//$w.find('.prepareWidget').bind('click', function(e){
-//			e.preventDefault();
-//			
-//			var type = $w.find(".widgetTypeList").val();
-//			var $widgetTpl = '';
-//			switch(type){
-//				case "1":
-//					$widgetTpl = $('.smallWidgetTpl').clone(true).removeClass('.smallWidgetTpl');
-//				break;
-//				case "2":
-//					$widgetTpl = $('.bigWidgetTpl').clone(true).removeClass('.bigWidgetTpl');
-//				break;
-//				case "3":
-//					$widgetTpl = $('.freeWidgetTpl').clone(true).removeClass('.freeWidgetTpl');
-//				break;
-//			}
-//			console.log($widgetTpl);
-			//$widgetTpl.find('.choseProduct').bind('click',  function(e){
-//				e.preventDefault();
-//				$(this).next().slideDown();
-//			})
-//			
-//			$w.find('.widgetHolder').append($widgetTpl);
-//			
-			//$(this).unbind('click');
-//			$w.find('.createRule').bind('click', function(e){
-//				e.preventDefault();
-//				
-//				$(this).next().slideDown();
-//				
-//			})	
-//		})    
-		
 	}
 	
 	this.init();
 }
-
-function _smallWidget($w, shop){
-	
-}
-_smallWidget.prototype = _widget;
-
-function _bigWidget($w, shop){
-	
-}
-_bigWidget.prototype = _widget;
-function _freeWidget($w, shop){
-	
-}
-_freeWidget.prototype = _widget;

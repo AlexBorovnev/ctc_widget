@@ -4,19 +4,21 @@
 		<div class="block-header">Магазин <?=$this->shopId?></div>
 		<div class="block-content">
 			<h4>Список виджетов</h4>
-			<div ><a href="<?=makeLink('/admin/add')?>" class="btn">Добавить новый</a></div>
+			<div ><a href="<?=makeLink('/admin/add/' . $this->shopId)?>" class="btn">Добавить новый</a></div>
 			<table class="tbl t400 widgetTable">
 		    <thead>
 		    <tr>
-		        <td>ID</td>
-		        <td>Тип</td>
-		        <td>Скин</td>
-		        <td>...</td>
+		        <td style="width:50px">ID</td>
+		        <td>Название</td>
+		        <td style="width:100px">Тип</td>
+		        <td style="width:100px">Скин</td>
+		        <td style="width:200px">...</td>
 		    </tr>
 		    </thead>
 		    <?php foreach ($this->widgetsList as $id => $widget): ?>
 		        <tr data="<?=$id?>">
-		            <td><a href="#"><?= $id; ?></a></td>
+		            <td><a href="<?=makeLink('widget_id/' . $id)?>" target="_blank"><?= $id; ?></a></td>
+		            <td><?= $widget['title'] ?></td>
 		            <td><?= $this->typeList[$widget['typeId']] ?></td>
 		            <td><?= $this->skinList[$widget['skinId']] ?></td>
 		            <td>
@@ -30,17 +32,10 @@
 		
 		</div>
 	</div>
-    <div class="pagenation">
-        <?php $cnt = $this->pageCount;
-        for ($i = 1; $i <= $cnt; $i++) {
-            if ($this->currentPage == $i){
-                echo "<span>" . $i . "</span>";
-                continue;
-            }
-            echo "<a href=" . makeLink("admin/shop/" . $this->shopId . "/" . $i) . ">" . $i . "</a>";
-        }?>
-    </div>
-    <div>
+	<?=showPagination($this->currentPage, $this->pageCount, "admin/shop/" . $this->shopId . "/");?>
+	   
+    
+    <div >
 		<a href="<?=makeLink("/admin")?>">Назад</a>
 	</div>
 </div>

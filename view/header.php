@@ -19,6 +19,7 @@
 		<link rel="stylesheet" type="text/css" href="<?=HOST?>css/admin/redmond/jquery-ui-1.10.3.custom.css">
 		<link rel="stylesheet" type="text/css" href="<?=HOST?>css/admin/chosen.min.css">
 		<link rel="stylesheet" type="text/css" href="<?=HOST?>css/admin/toastr.min.css">
+		<link rel="stylesheet" type="text/css" href="<?=HOST?>css/simplePagination.css">
 		<link rel="stylesheet" type="text/css" href="<?=HOST?>css/admin/style.css?<?=REV?>">
 		<link rel="stylesheet" type="text/css" href="<?=HOST?>css/admin/admin.style.css?<?=REV?>">
 
@@ -28,6 +29,7 @@
 		<script type="text/javascript" src="<?=HOST?>js/admin/jquery.carouFredSel-6.2.1-packed.js"></script>
 		<script type="text/javascript" src="<?=HOST?>js/admin/chosen.jquery.min.js"></script>
 		<script type="text/javascript" src="<?=HOST?>js/admin/toastr.min.js"></script>
+		<script type="text/javascript" src="<?=HOST?>js/jquery.simplePagination.js"></script>
 		<script type="text/javascript" src="<?=HOST?>js/all.js"></script>
 	</head>
 	<body>

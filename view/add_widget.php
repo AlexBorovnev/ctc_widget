@@ -6,10 +6,19 @@
 <script type="text/javascript" src="<?=HOST?>js/admin/main2.js?<?=REV?>"></script>
 <script type="text/javascript" src="<?=HOST?>js/admin/main.js?<?=REV?>"></script>
 <script type="text/javascript" src="<?=HOST?>js/admin/system.js?<?=REV?>"></script>
+<script>
 
+$(function(){
+	shopObj = (<?=$this->shop?>);
+	
+	mainInit(shopObj);
+	
+});
+
+</script>
 
 <div class="wrapper clearfix">
-	<a href="<?=makeLink("/admin")?>">Назад</a>
+	<a href="<?=makeLink("/admin/shop/{$this->shopId}")?>">Назад</a>
 	<div id="tabs">
 		<ul class="tabList">
 
@@ -43,7 +52,7 @@
 			<h4>Предпросмотр товара</h4>
 			<div class="preview">
 				<div class="previewPic">
-					<img src="../images/preview.png" />
+					<img src="<?=makeLink('/images/preview.png')?>" />
 				</div>
 				<div class="offerInfo">
 				</div>
@@ -106,7 +115,7 @@
 				<h4>Предпросмотр товара</h4>
 				<div class="preview">
 					<div class="previewPic">
-						<img src="../images/preview.png" />
+						<img src="<?=makeLink('/images/preview.png')?>" />
 					</div>
 					<div class="offerInfo">
 					</div>
@@ -122,10 +131,10 @@
 
 	<div class="tabTpl">
 		<div class="wrap">
-			<div class="widgets">
+			<div class="widgets hidden">
 				<a href="#" class="btn add-widget">+ виджет</a>
 				<div>
-					<ul class="widget-list">
+					<ul class="widget-list hidden">
 
 					</ul>
 				</div>
@@ -173,7 +182,10 @@
 		<h3>Создание нового виджета</h3>
 
 		<div class="clearfix">
-
+             <div class="input-block">
+				<span class="prepend">Название: </span>
+				<input type="text" name="title" id="widgetTitle" placeholder="Название виджета"> 
+			</div>
 			<div class="input-block">
 				<span class="prepend">Тип: </span>
 				<select class="widgetTypeList" data-placeholder="Выберите значение">
