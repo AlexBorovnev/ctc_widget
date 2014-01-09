@@ -12,7 +12,7 @@ class Rules extends AbstractModel
     public function insertRule($shopId, $widgetId, $rule, $position, $ruleType)
     {
         $singleRuleQuery = $this->dbh->prepare(
-            "INSERT INTO rules (shop_id, widget_id, rules_type, source, position) VALUES (:shop_id, :widget_id, :rules_type, :source, :position) ON DUPLICATE KEY UPDATE rules_type = :rules_type, source = :source"
+            "INSERT INTO rules (shop_id, widget_id, rules_type, source, position) VALUES (:shop_id, :widget_id, :rules_type, :source, :position)"
         );
 
         $singleRuleQuery->execute(
@@ -24,6 +24,12 @@ class Rules extends AbstractModel
                 ':position' => $position
             )
         );
+    }
+
+    public function deleteRules($widgetId)
+    {
+        $deleteOldRulesQuery = $this->dbh->prepare("DELETE FROM rules WHERE widget_id=:widget_id");
+        $deleteOldRulesQuery->execute(array(':widget_id' => $widgetId));
     }
 
     public function getRulesList()
@@ -63,6 +69,7 @@ class Rules extends AbstractModel
         }
         $outputList = array_merge(
             array(
+                'widgetId' => $rule['id'],
                 'typeId' => $rule['type_id'],
                 'skinId' => $rule['skin_id'],
                 'shopId' => $rule['shop_id'],

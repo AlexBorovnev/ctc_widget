@@ -6,7 +6,7 @@
 <script type="text/javascript" src="<?= HOST ?>js/admin/offer.js?<?= REV ?>"></script>
 <script type="text/javascript" src="<?= HOST ?>js/admin/edit.js?<?= REV ?>"></script>
 <div class="wrapper clearfix">
-	<a href="<?=makeLink("/admin")?>">Назад</a>
+	<a href="<?=makeLink("/admin/shop/{$this->shopId}")?>">Назад</a>
 	<form>
 		<div id="shop<?=$this->widget['shopId']?>">
 			<div class="block widget widgetTpl">
@@ -21,7 +21,7 @@
 								<div>Тип: <span class="widgetType"><?=$this->widget['typeName']?></span></div>
 								<div>Скин: <span class="widgetSkin"><?=$this->widget['skinName']?></span></div>
 								<?php if($this->widget['typeId'] == \model\Widgets::WIDGET_TYPE_FREE):?>
-									<div>Позиций: <span><?=count($this->widget['positions'])?></span></div>
+									<div class="positionCount">Позиций: <span><?=count($this->widget['positions'])?></span></div>
 								<?php endif; ?>
 								
 
@@ -40,7 +40,7 @@
 
 
 								</div>
-								<div class="colorTpl colorHolder clearfix editor">
+								<div class="colorHolder clearfix editor">
 									<h4>Выбор цвета</h4>
 
 								</div>
@@ -52,14 +52,14 @@
 
 					<?php foreach($this->widget['positions'] as $key => $rule):?>
 						<div class="block inner choose-product chooseProduct chooseProductTpl clearfix">
-							<div class="block-header">Позиция <?=$key+1?> </div>
-							<div class="block-content clearfix dev-block-<?=$key;?>">
+							<div class="block-header">Позиция в виджете</div>
+							<div class="block-content clearfix dev-block-<?=$key;?> dev-positions">
 								<?php if ($rule['typeId'] == \model\Rules::RULE_TYPE_SINGLE):?>
 									<?php $rule['source']['common_data'] = unserialize($rule['source']['common_data'])?>
 									<div class="categoryTpl">
 										<div class="grid13">
 											<h4>Выбор категории</h4>
-											<div class="treeHolder"></div>
+											<div class="treeHolder itemHolder"></div>
 										</div>
 									</div>
 									<div class="grid13">
@@ -81,23 +81,37 @@
 												<div>ID: <?=$rule['source']['offer_id'] ?></div>
 												<div>CODE: <?=$rule['source']['common_data']['vendorCode'] ?></div>
 											</div>
-											<a href="#" class="btn addProduct">Выбрать</a>
+
 										</div>
 									</div>
 
 									<?php elseif ($rule['typeId'] == \model\Rules::RULE_TYPE_RULE):?>
-									<!--                <div class="grid13">-->
-									<!--                    <h4>Выбор категории</h4>-->
-									<!--                    <div class="treeHolder"></div>-->
-									<!--                </div>-->
-									<div class="block-footer">
+                                    <div class="block-content">
+                                        <div class="categoryHolder clearfix">
+                                            <h4>Выбор категории</h4>
+                                            <div class="grid13">
+                                                <div class="ruleHolder treeHolder editor"></div>
+                                            </div>
 
-									</div>
+
+                                        </div>
+                                        <div class="colorHolder clearfix editor">
+                                            <h4>Выбор цвета</h4>
+
+                                        </div>
+
+                                    </div>
+
 									<?php endif; ?>
+                                <input type="hidden" value="<?=$rule['typeId']?>" name="rule_type">
+                                <input type="hidden" value="<?=$key;?>" name="item_position">
 
 							</div>
-
+                            <div class="block-footer">
+                                <a href="#" data-position="<?=$key;?>" class="btn removeProduct">Удалить позицию</a>
+                            </div>
 						</div>
+
 						<?php endforeach;?>
 
 					<div class="block inner preview">
@@ -121,20 +135,6 @@
 						</div>
 					</div>
 
-					<div class="rule ruleTpl">
-						<div class="block-content clearfix">
-							<div class="categoryHolder clearfix"></div>
-
-							<div class="colorHolder clearfix">
-							</div>
-
-						</div>
-
-					</div>
-
-
-
-
 					<div class="treeTpl"></div>
 
 					<div class="tabTpl">
@@ -150,11 +150,10 @@
 						</div>
 					</div>
 
-
 					<input type="hidden" name="shop_id" value="<?= $this->widget['shopId'] ?>">
 					<input type="hidden" name="type_id" value="<?= $this->widget['typeId'] ?>">
 					<input type="hidden" name="skin_id" value="<?= $this->widget['skinId'] ?>">
-
+                    <input type="hidden" name="widget_id" value="<?= $this->widget['widgetId'] ?>">
 
 					<div class="holder"></div>
 				</div>
@@ -163,10 +162,14 @@
 	</form>
 </div>
 <script type="text/javascript">
-	$(document).ready(function () {
-			initEditor.init({commonRule: <?=json_encode($this->widget['commonRule'])?>,
-					positions: <?=json_encode($this->widget['positions'])?>,
-					categoryList: buildCategoryList(<?=json_encode($this->categories)?>),
-					shopId: <?= $this->widget['shopId'] ?>});
-	})
+    $(document).ready(function () {
+        initEditor.init({commonRule: <?=json_encode($this->widget['commonRule'])?>,
+            positions: <?=json_encode($this->widget['positions'])?>,
+            workList: {
+                categoryList: buildCategoryList(<?=json_encode($this->categories)?>),
+                colorList: buildColorList(<?=json_encode($this->colors)?>)
+            },
+            shopId: <?= $this->widget['shopId'] ?>
+            });
+    })
 </script>

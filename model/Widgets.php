@@ -20,17 +20,19 @@ class Widgets extends AbstractModel
 
     public function widgetAdd($data)
     {
-
-        $widgetAddQuery = "INSERT INTO widgets (type_id, shop_id, skin_id, position_count, common_rule) VALUES (:type_id, :shop_id, :skin_id, :pos_count, :common_rule)";
+        $widgetAddQuery = "INSERT INTO widgets (type_id, shop_id, skin_id, position_count, common_rule, title) VALUES (:type_id, :shop_id, :skin_id, :pos_count, :common_rule, :title)";
         $paramValue = array(
             ':type_id' => $data['typeId'],
             ':shop_id' => $data['shopId'],
             ':skin_id' => $data['skinId'],
             ':pos_count' => $data['positions'],
-            ':common_rule' => $data['commonRule']
+            ':common_rule' => $data['commonRule'],
+            ':title' => empty($data['title']) ? null : $data['title']
         );
         if (!empty($data['widgetId'])) {
-            $widgetAddQuery = "UPDATE widgets SET type_id=:type_id, shop_id=:shop_id, skin_id=:skin_id, position_count=:pos_count, common_rule=:common_rule WHERE id=:id";
+            $rulesModel = new Rules($this->dbh);
+            $rulesModel->deleteRules($data['widgetId']);
+            $widgetAddQuery = "UPDATE widgets SET type_id=:type_id, shop_id=:shop_id, skin_id=:skin_id, position_count=:pos_count, common_rule=:common_rule, title=:title WHERE id=:id";
             $paramValue = array_merge($paramValue, array(':id' => $data['widgetId']));
         }
         $widgetAddQuery = $this->dbh->prepare($widgetAddQuery);
@@ -59,7 +61,7 @@ class Widgets extends AbstractModel
         $responseList = array();
         try {
             $widgetsListQuery = $this->dbh->prepare(
-                "SELECT w.id, r.rules_type, r.source, r.position, w.common_rule, w.type_id, w.skin_id FROM widgets w LEFT JOIN rules r ON w.id=r.widget_id WHERE w.shop_id=:shop_id"
+                "SELECT w.id, w.title, r.rules_type, r.source, r.position, w.common_rule, w.type_id, w.skin_id FROM widgets w LEFT JOIN rules r ON w.id=r.widget_id WHERE w.shop_id=:shop_id"
             );
             $widgetsListQuery->bindValue(':shop_id', $data['shopId']);
             $widgetsListQuery->execute();
@@ -73,7 +75,8 @@ class Widgets extends AbstractModel
                     array(
                         'skinId' => $row['skin_id'],
                         'typeId' => $row['type_id'],
-                        'commonRule' => unserialize($row['common_rule'])
+                        'commonRule' => unserialize($row['common_rule']),
+                        'title' => $row['title']
                     )
                 );
             }
@@ -130,7 +133,7 @@ class Widgets extends AbstractModel
         $offset = ($pageNum - 1) * self::WIDGET_PER_PAGE;
         try {
             $widgetsListQuery = $this->dbh->prepare(
-                "SELECT w.id, w.type_id, w.skin_id FROM widgets w LEFT JOIN rules r ON w.id=r.widget_id WHERE w.shop_id=:shop_id GROUP BY w.id LIMIT :offset,:limit "
+                "SELECT w.id, w.type_id, w.skin_id, w.title FROM widgets w LEFT JOIN rules r ON w.id=r.widget_id WHERE w.shop_id=:shop_id GROUP BY w.id LIMIT :offset,:limit "
             );
             $widgetsListQuery->bindValue(':shop_id', $data['shopId']);
             $widgetsListQuery->bindValue(':offset', $offset, \PDO::PARAM_INT);
@@ -140,7 +143,8 @@ class Widgets extends AbstractModel
                 $responseList[$row['id']] =
                     array(
                         'skinId' => $row['skin_id'],
-                        'typeId' => $row['type_id']
+                        'typeId' => $row['type_id'],
+                        'title' => $row['title']
                     );
             }
         } catch (\PDOException $e) {

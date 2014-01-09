@@ -7,76 +7,11 @@ function _widgetType(obj) {
 
 function _widgetSkin(obj) {
 }
-function buildColorList() {
-    var $ul = $("<ul></ul>");
-    for (var i in _colorList) {
-        var colorName = _colorList[i];
-        var color = "#";
-        switch (colorName) {
-            case 'Бежевый':
-                color += "F5F5DC";
-                break;
-            case 'Белый':
-                color += "FFF";
-                break;
-            case 'Голубой':
-                color += "00BFFF";
-                break;
-            case 'Желтый':
-                color += "FFFF00";
-                break;
-            case 'Зеленый':
-                color += "00FF00";
-                break;
-            case 'Золотой':
-                color += "FFD700";
-                break;
-            case 'Коричневый':
-                color += "964B00";
-                break;
-            case 'Красный':
-                color += "FF0000";
-                break;
-            case 'Мультицвет':
-                color += "MULTICOLOR";
-                break;
-            case 'Не указан':
-                color += "";
-                break;
-            case 'Оранжевый':
-                color += "FF4F00";
-                break;
-            case 'Розовый':
-                color += "FFC0CB";
-                break;
-            case 'Серебряный':
-                color += "C0C0C0";
-                break;
-            case 'Серый':
-                color += "808080";
-                break;
-            case 'Синий':
-                color += "3A75C4";
-                break;
-            case 'Фиолетовый':
-                color += "8B00FF";
-                break;
-            case 'Черный':
-                color += "000";
-                break;
-        }
-
-//		if(color == 'MULTICOLOR')
-        $ul.append('<li class="color" data-color-name="' + colorName + '" data-color="' + color + '">' + colorName + '</li>')
-
-    }
-    return $ul;
-}
 
 function getCategoryList(shopId, cb) {
     api.call('getCategoryList', {shopId: shopId}, cb);
 }
-function buildCategoryList(categories) {console.log(categories);
+function buildCategoryList(categories) {
     if (categories.length == 0) {
         toastr.error('нет категорий для отображения');
         return;
@@ -106,27 +41,40 @@ function buildCategoryList(categories) {console.log(categories);
 var initEditor = {
     obj: {},
     init: function (obj) {
-        var $tree = buildTree('myTree', obj.categoryList);
+        var $catTree = buildTree('myTree', obj.workList.categoryList);
+        $('.colorHolder').append(obj.workList.colorList);
         this.obj = obj;
         if (obj.commonRule) {
-            this.initCommonRuleSection($tree);
+            this.initCommonRuleSection($catTree);
         }
-        this.initTreeForSinglePosition($tree);
+        this.initColor();
+        this.initTreeForSinglePosition($catTree);
         this.initEvents('.block-content');
 
+    },
+    initColor: function(selector, color){
+        for (var i in color){
+            $(selector+'[data-color-name="' + color[i] + '"]').addClass('active');
+        }
     },
     initTreeForSinglePosition: function (catTree) {
         var base = this;
         for (var i in base.obj.positions) {
             $('.dev-block-' + i + ' .treeHolder').append(catTree.clone(true));
             $('.dev-block-' + i + ' .treeHolder li').each(function () {
-                if (base.obj.positions[i].source.category_id != undefined && $(this).data('cid') == base.obj.positions[i].source.category_id) {
+                if (base.obj.positions[i].source.category_id != undefined && ($(this).data('cid') == base.obj.positions[i].source.category_id)) {
                     $(this).find('.Content').addClass('b');
                     $(this).parent().parent().removeClass('ExpandClosed').addClass('ExpandOpen');
                     getOfferList($(this).data('cid'), base.obj.shopId, $(this).parents('.dev-block-' + i), base.obj.positions[i].source.offer_id);
                     return false;
+                } else if (base.obj.positions[i].source.categoryId != undefined && (base.obj.positions[i].source.categoryId.indexOf($(this).data('cid')) != -1)){
+                    $(this).find('.Content').addClass('b');
+                    $(this).parent().parent().removeClass('ExpandClosed').addClass('ExpandOpen');
                 }
             })
+            if (base.obj.positions[i].source.color != undefined){
+                base.initColor('.dev-block-' + i +' .dev-editor-color', base.obj.positions[i].source.color);
+            }
         }
     },
 
@@ -134,34 +82,52 @@ var initEditor = {
     initCommonRuleSection: function (catTree) {
         var base = this;
         $('.ruleHolder').append(catTree.clone(true));
-        if (base.obj.commonRule.categoryId){
-            $('.ruleHolder li').each(function(){
-                if(base.obj.commonRule.categoryId.indexOf($(this).data('cid')) != -1 ){
+        if (base.obj.commonRule.categoryId) {
+            $('.ruleHolder li').each(function () {
+                if (base.obj.commonRule.categoryId.indexOf($(this).data('cid')) != -1) {
                     $(this).find('.Content').addClass('b');
                     $(this).parent().parent().removeClass('ExpandClosed').addClass('ExpandOpen');
                 }
             })
         }
-        if (base.obj.commonRule.color){
-
+        if (base.obj.commonRule.color) {
+            this.initColor('.dev-editor-color', base.obj.commonRule.color);
         }
     },
 
     initEvents: function (selector) {
         var base = this;
-        $(selector + ' .treeHolder').on('click', ".Content", function () {
+        $(selector + ' .ruleHolder').on('click', ".Content", function () {
             var cid = $(this).parent().data('cid');
             var pid = $(this).parent().data('pid');
-            var $holder = $(this).parents(selector);
+            if (pid != 0) {
+                $(this).toggleClass('b');
+                if (!$(this).hasClass('b')){
+                    $(this).parents('.IsRoot').children().removeClass('b');
+                }
+            }
+            else {
+                $(this).prev().trigger('click');
+                $(this).toggleClass('b');
+                if ($(this).hasClass('b')){
+                    $(this).parent().find('li .Content').addClass('b');
+                } else {
+                    $(this).parent().find('li .Content').removeClass('b');
+                }
+            }
+        });
+        $(selector + ' .itemHolder').on('click', ".Content", function () {
+            var cid = $(this).parent().data('cid'),
+                pid = $(this).parent().data('pid'),
+                $holder = $(this).parents('.dev-positions');
             $holder.find(".previewPic img").attr('src', '../../images/preview.png');
             $holder.find(".offerInfo").empty();
-
             if (pid != 0) {
-                $holder.find(".Content").removeClass('b');
-                $(this).addClass('b');
-                $holder.find(".noOffers").remove();
-                $holder.find(".offerHolder li").remove();
-                getOfferList(cid, base.obj.shopId, $holder);
+                    $holder.find(".Content.b").removeClass('b');
+                    $(this).addClass('b');
+                    $holder.find(".noOffers").remove();
+                    $holder.find(".offerHolder li").remove();
+                    getOfferList(cid, base.obj.shopId, $holder);
             }
             else {
                 $(this).prev().trigger('click');
@@ -170,35 +136,98 @@ var initEditor = {
                 tree_toggle(event);
             }
         });
-        $(selector + ' .treeHolder').on('click', ".saveWidget", function(e){
+        $(selector + ' .preparedWidget').on('click', ".saveWidget", function (e) {
             e.preventDefault();
             var data = {};
-            if(widgetType == 3){//free
+            if ($(':hidden[name="type_id"]').val() == 3) {//free
                 data = {
-                    'shopId': base.shopId,
+                    'shopId': base.obj.shopId,
                     'skinId': $('[name=skin_id]').val(),
                     'typeId': $('[name=type_id]').val(),
-                    'positions': positions
+                    'positions': base.getPositions(),
+                    'widgetId': $('[name=widget_id]').val()
                 }
             }
-            else{
+            else {
                 data = {
-                    'shopId': base.shopId,
+                    'shopId': base.obj.shopId,
                     'skinId': $('[name=skin_id]').val(),
                     'typeId': $('[name=type_id]').val(),
-                    'commonRule': self.getCommonRule(),
-                    'positions': self.getPositions()
+                    'commonRule': base.getCommonRule(),
+                    'positions': base.getPositions(),
+                    'widgetId': $('[name=widget_id]').val()
                 };
             }
-
-            api.call('setWidget', data, function(response){
+            api.call('setWidget', data, function (response) {
                 toastr.info('Виджет сохранен, id = ' + response.widgetId);
                 widgetId = response.widgetId;
-                self.widgetPreview();
+                //self.widgetPreview();
             });
 
         });
+        $(selector + ' .colorHolder').on('click', '.dev-editor-color', function () {
+            $(this).toggleClass('active');
+            if ($(this).hasClass('active')) {
+                selectedColors.push($(this).data('colorName'));
+            }
+            else {
+                var ind = selectedColors.indexOf($(this).data('colorName'));
+                if (ind != -1)
+                    selectedColors.slice(ind, 1);
+            }
+        });
+        $('.removeProduct').on('click', function(e){
+            var position = $(this).attr('data-position'),
+                count = $('.positionCount span').text();
+            e.preventDefault();
+            $('.dev-block-' + position).parent().remove();
+            count--;
+            $('.positionCount span').text(count)
+        })
+    },
+    getPositions: function(){
+        var positions = [],
+            base = this,
+            data = [];
+        $('.dev-positions').each(function(){
+            var position = $(this).find('[name="item_position"]').val(),
+                type = $(this).find('[name="rule_type"]').val();
+            positions.push ( {type: type, params: base.getSource(position, type)});
+        });
+        return positions;
+    },
+    getCommonRule: function(){
+        return this.getRule('.commonRule');
+    },
+    getSource: function (position, type){
+        var params = [];
+        if (type == 1){
+            return this.getRule('.dev-block-'+ position);
+        }else if (type == 2){
+            var offer = $('.dev-block-'+ position).find('.offerItem.active').data('offer');
+            return new Array(offer['attributes']['id']);
+        }
+        return params;
+    },
+    getRule: function (selector){
+        var colors = $(selector).find('.dev-editor-color.active'),
+            categories = $(selector).find('li .Content.b'),
+            colorsValue = [],
+            categoriesValue = [],
+            params = {};
+        colors.each(function(){
+            colorsValue.push($(this).data('colorName'));
+        });
+        categories.each(function(){
+            categoriesValue.push($(this).parent().data('cid'));
+        });
+        if (colorsValue){
+            params.color = colorsValue;
+        };
+        if (categoriesValue){
+            params.categoryId = categoriesValue;
+        };
+        return params;
     }
 
 }
-
