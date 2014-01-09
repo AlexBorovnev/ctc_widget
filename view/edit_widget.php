@@ -52,7 +52,7 @@
 
 					<?php foreach($this->widget['positions'] as $key => $rule):?>
 						<div class="block inner choose-product chooseProduct chooseProductTpl clearfix">
-							<div class="block-header">Позиция <?=$key+1?> </div>
+							<div class="block-header">Позиция в виджете</div>
 							<div class="block-content clearfix dev-block-<?=$key;?> dev-positions">
 								<?php if ($rule['typeId'] == \model\Rules::RULE_TYPE_SINGLE):?>
 									<?php $rule['source']['common_data'] = unserialize($rule['source']['common_data'])?>

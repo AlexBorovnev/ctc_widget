@@ -102,6 +102,9 @@ var initEditor = {
             var pid = $(this).parent().data('pid');
             if (pid != 0) {
                 $(this).toggleClass('b');
+                if (!$(this).hasClass('b')){
+                    $(this).parents('.IsRoot').children().removeClass('b');
+                }
             }
             else {
                 $(this).prev().trigger('click');
