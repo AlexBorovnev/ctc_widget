@@ -301,7 +301,7 @@ function _shop(data){
 					toastr.error('Введите название виджета что бы продолжить');
 					return;
 				}
-				$shop.wTitle = title;
+				self.wTitle = title;
 				var type = $shop.find(".widgetTypeList").val();
 				widgetType = type;
 				if(type == 1){//small
