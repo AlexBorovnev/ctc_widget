@@ -98,20 +98,32 @@ var initEditor = {
 
     initEvents: function (selector) {
         var base = this;
-        $(selector + ' .treeHolder').on('click', ".Content", function () {
+        $(selector + ' .ruleHolder').on('click', ".Content", function () {
             var cid = $(this).parent().data('cid');
             var pid = $(this).parent().data('pid');
-            var $holder = $(this).parents(selector);
+            var $holder = $(this).parents('.ruleHolder');
+            if (pid != 0) {
+                $(this).toggleClass('b');
+            }
+            else {
+                $(this).prev().trigger('click');
+                var event = {};
+                event.target = $(this).prev()[0];
+                tree_toggle(event);
+            }
+        });
+        $(selector + ' .itemHolder').on('click', ".Content", function () {
+            var cid = $(this).parent().data('cid'),
+                pid = $(this).parent().data('pid'),
+                $holder = $(this).parents('.dev-positions');
             $holder.find(".previewPic img").attr('src', '../../images/preview.png');
             $holder.find(".offerInfo").empty();
             if (pid != 0) {
-                $holder.find(".Content").removeClass('b');
-                $(this).addClass('b');
-                if ($(this).parents('.ruleHolder').length == 0) {
+                    $holder.find(".Content.b").removeClass('b');
+                    $(this).addClass('b');
                     $holder.find(".noOffers").remove();
                     $holder.find(".offerHolder li").remove();
                     getOfferList(cid, base.obj.shopId, $holder);
-                }
             }
             else {
                 $(this).prev().trigger('click');
@@ -168,7 +180,7 @@ var initEditor = {
             var position = $(this).find('[name="item_position"]').val(),
                 type = $(this).find('[name="rule_type"]').val();
             positions[position] = {type: type, params: base.getSource(position, type)};
-        });console.log(positions);
+        });
         return positions;
     },
     getCommonRule: function(){
@@ -201,7 +213,7 @@ var initEditor = {
         };
         if (categoriesValue){
             params.categoryId = categoriesValue;
-        };console.log(params);
+        };
         return params;
     }
 

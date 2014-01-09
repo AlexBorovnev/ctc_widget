@@ -59,7 +59,7 @@
 									<div class="categoryTpl">
 										<div class="grid13">
 											<h4>Выбор категории</h4>
-											<div class="treeHolder"></div>
+											<div class="treeHolder itemHolder"></div>
 										</div>
 									</div>
 									<div class="grid13">
@@ -81,7 +81,7 @@
 												<div>ID: <?=$rule['source']['offer_id'] ?></div>
 												<div>CODE: <?=$rule['source']['common_data']['vendorCode'] ?></div>
 											</div>
-											<a href="#" class="btn addProduct">Выбрать</a>
+											
 										</div>
 									</div>
 
