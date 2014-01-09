@@ -147,7 +147,8 @@ var initEditor = {
                     'skinId': $('[name=skin_id]').val(),
                     'typeId': $('[name=type_id]').val(),
                     'positions': base.getPositions(),
-                    'widgetId': $('[name=widget_id]').val()
+                    'widgetId': $('[name=widget_id]').val(),
+                    'title': $('[name=widget_name]').val()
                 }
             }
             else {
@@ -157,7 +158,8 @@ var initEditor = {
                     'typeId': $('[name=type_id]').val(),
                     'commonRule': base.getCommonRule(),
                     'positions': base.getPositions(),
-                    'widgetId': $('[name=widget_id]').val()
+                    'widgetId': $('[name=widget_id]').val(),
+                    'title': $('[name=widget_name]').val()
                 };
             }
             api.call('setWidget', data, function (response) {

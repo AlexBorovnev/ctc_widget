@@ -177,6 +177,7 @@
             <input type="hidden" name="type_id" value="<?= $this->widget['typeId'] ?>">
             <input type="hidden" name="skin_id" value="<?= $this->widget['skinId'] ?>">
             <input type="hidden" name="widget_id" value="<?= $this->widget['widgetId'] ?>">
+            <input type="hidden" name="widget_name" value="<?= $this->widget['widgetName'] ?>">
 
             <div class="holder"></div>
         </div>
