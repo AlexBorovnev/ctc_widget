@@ -284,6 +284,7 @@ class ApiServer
                 'skinId' => $data['skinId'],
                 'positions' => count($data['positions']),
                 'commonRule' => $data['commonRule'],
+                'title' => empty($data['title']) ? null : $data['title'],
                 'widgetId' => empty($data['widgetId']) ? null : $data['widgetId']
             )
         );
