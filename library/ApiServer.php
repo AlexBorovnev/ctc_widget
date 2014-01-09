@@ -183,6 +183,7 @@ class ApiServer
             $data,
             array(
                 'shopId' => array('type' => 'string', 'required' => true),
+                'title' => array('type' => 'string', 'required' => false),
                 'skinId' => array('type' => 'string', 'required' => true),
                 'typeId' => array('type' => 'string', 'required' => true),
                 'commonRule' => array('type' => 'array', 'required' => false),
