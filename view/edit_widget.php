@@ -21,7 +21,7 @@
 								<div>Тип: <span class="widgetType"><?=$this->widget['typeName']?></span></div>
 								<div>Скин: <span class="widgetSkin"><?=$this->widget['skinName']?></span></div>
 								<?php if($this->widget['typeId'] == \model\Widgets::WIDGET_TYPE_FREE):?>
-									<div>Позиций: <span><?=count($this->widget['positions'])?></span></div>
+									<div class="positionCount">Позиций: <span><?=count($this->widget['positions'])?></span></div>
 								<?php endif; ?>
 								
 
@@ -81,7 +81,7 @@
 												<div>ID: <?=$rule['source']['offer_id'] ?></div>
 												<div>CODE: <?=$rule['source']['common_data']['vendorCode'] ?></div>
 											</div>
-											
+
 										</div>
 									</div>
 
@@ -101,14 +101,15 @@
                                         </div>
 
                                     </div>
-									<div class="block-footer">
 
-									</div>
 									<?php endif; ?>
                                 <input type="hidden" value="<?=$rule['typeId']?>" name="rule_type">
                                 <input type="hidden" value="<?=$key;?>" name="item_position">
-							</div>
 
+							</div>
+                            <div class="block-footer">
+                                <a href="#" data-position="<?=$key;?>" class="btn removeProduct">Удалить позицию</a>
+                            </div>
 						</div>
 
 						<?php endforeach;?>

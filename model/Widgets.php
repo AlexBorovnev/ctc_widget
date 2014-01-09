@@ -20,7 +20,6 @@ class Widgets extends AbstractModel
 
     public function widgetAdd($data)
     {
-
         $widgetAddQuery = "INSERT INTO widgets (type_id, shop_id, skin_id, position_count, common_rule) VALUES (:type_id, :shop_id, :skin_id, :pos_count, :common_rule)";
         $paramValue = array(
             ':type_id' => $data['typeId'],
@@ -30,6 +29,8 @@ class Widgets extends AbstractModel
             ':common_rule' => $data['commonRule']
         );
         if (!empty($data['widgetId'])) {
+            $rulesModel = new Rules($this->dbh);
+            $rulesModel->deleteRules($data['widgetId']);
             $widgetAddQuery = "UPDATE widgets SET type_id=:type_id, shop_id=:shop_id, skin_id=:skin_id, position_count=:pos_count, common_rule=:common_rule WHERE id=:id";
             $paramValue = array_merge($paramValue, array(':id' => $data['widgetId']));
         }

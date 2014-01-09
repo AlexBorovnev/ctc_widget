@@ -171,15 +171,24 @@ var initEditor = {
                 if (ind != -1)
                     selectedColors.slice(ind, 1);
             }
+        });
+        $('.removeProduct').on('click', function(e){
+            var position = $(this).attr('data-position'),
+                count = $('.positionCount span').text();
+            e.preventDefault();
+            $('.dev-block-' + position).parent().remove();
+            count--;
+            $('.positionCount span').text(count)
         })
     },
     getPositions: function(){
         var positions = [],
-            base = this;
+            base = this,
+            data = [];
         $('.dev-positions').each(function(){
             var position = $(this).find('[name="item_position"]').val(),
                 type = $(this).find('[name="rule_type"]').val();
-            positions[position] = {type: type, params: base.getSource(position, type)};
+            positions.push ( {type: type, params: base.getSource(position, type)});
         });
         return positions;
     },
@@ -218,4 +227,3 @@ var initEditor = {
     }
 
 }
-
