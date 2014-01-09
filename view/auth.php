@@ -9,6 +9,7 @@ endif;
 ?>
 <?php if (empty($_SESSION['user_id'])): ?>
     <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
     <title>Вход</title>
     <script type="text/javascript" src="<?= HOST ?>js/admin/jquery-1.9.1.js"></script>
     <link rel="stylesheet" type="text/css" href="<?= HOST ?>css/bootstrap.min.css?<?= REV ?>">
@@ -31,7 +32,7 @@ endif;
                 -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
                 -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
                 box-shadow: 0 1px 2px rgba(0,0,0,.05);
-                background: url(/images/sts_logo.png) no-repeat center;
+                background: url(<?=makeLink('/images/sts_logo.png')?>) no-repeat center;
                 -moz-background-size: 340px auto;
                 -webkit-background-size: 340px auto;
                 -o-background-size: 340px auto;
