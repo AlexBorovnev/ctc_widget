@@ -96,6 +96,11 @@ function showAdminPage($page = '', $param = 1, $pageNum = 1){
             $goodsModel = new Goods(Config::getInstance()->getDbConnection());
             $colorList = $goodsModel->getColorList();;
             $view->colors =  $colorList;
+            
+            $shopModel = new Shops(Config::getInstance()->getDbConnection());
+            $shop = $shopModel->getShop(array('shopId' => array($param)));
+            $view->shop = json_encode($shop[0]);
+            
             $view->render('edit_widget.php');
             break;
         default:

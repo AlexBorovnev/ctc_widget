@@ -5,6 +5,13 @@
 <script type="text/javascript" src="<?= HOST ?>js/admin/system.js?<?= REV ?>"></script>
 <script type="text/javascript" src="<?= HOST ?>js/admin/offer.js?<?= REV ?>"></script>
 <script type="text/javascript" src="<?= HOST ?>js/admin/edit.js?<?= REV ?>"></script>
+<script>
+
+$(function(){
+    shopObj = (<?=$this->shop?>);
+    mainInit(shopObj);
+});
+</script>
 <div class="wrapper clearfix">
 	<a href="<?=makeLink("/admin/shop/{$this->shopId}")?>">Назад</a>
 	<form>

@@ -10,9 +10,7 @@
 
 $(function(){
 	shopObj = (<?=$this->shop?>);
-	
 	mainInit(shopObj);
-	
 });
 
 </script>
