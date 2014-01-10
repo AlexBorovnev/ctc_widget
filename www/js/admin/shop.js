@@ -165,7 +165,6 @@ function _shop(data){
 				}
 
 				selectedCategories = arrayUnique(selectedCategories);
-				console.log(selectedCategories);
 		});
 
 		$shop.on('click', ".categoryOfferHolder .Content", function(){

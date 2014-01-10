@@ -85,7 +85,7 @@ function buildOfferList(offers, $holder, currItem){
 		$holder.find('.previewPic img').attr('src', offer.picture);
 		var $info = $("<div></div>")
 
-		var isAvailable = offer.attributes.available?'Да':'Нет';
+		var isAvailable = offer.attributes.available?'Да':'Нет на складе';
 
 		$info.append("<div>"+offer.model +' '+ offer.vendor+"</div>")
 

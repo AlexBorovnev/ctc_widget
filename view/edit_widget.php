@@ -94,6 +94,7 @@
                                             &nbsp;&nbsp; <?= $rule['source']['common_data']['vendor'] ?></div>
 
                                         <div>Цена: <span class='b'><?= $rule['source']['price'] ?></span></div>
+                                        <div>Доступно: <?=$rule['source']['is_available']? 'Да': 'Нет на складе'?></div>
                                         <div>Цвет: <?= $rule['source']['color'] ?></div>
                                         <div>ID: <?= $rule['source']['offer_id'] ?></div>
                                         <div>CODE: <?= $rule['source']['common_data']['vendorCode'] ?></div>

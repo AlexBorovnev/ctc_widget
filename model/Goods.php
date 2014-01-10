@@ -32,14 +32,16 @@ class Goods extends AbstractModel
         return $commonData;
     }
 
-    public function getSingleOffer($data)
+    public function getSingleOffer($data, $isAvailable=1)
     {
-        $getSingleItem = $this->dbh->prepare(
-            'SELECT * FROM goods WHERE offer_id=:offer_id AND shop_id=:shop_id AND is_available=1'
-        );
-        $getSingleItem->bindValue(':offer_id', unserialize($data['offerId']));
-        $getSingleItem->bindValue(':shop_id', $data['shopId']);
-        $getSingleItem->execute();
+        $getSingleItemQuery = 'SELECT * FROM goods WHERE offer_id=:offer_id AND shop_id=:shop_id';
+        $paramValue = array(':offer_id' => unserialize($data['offerId']), ':shop_id' => $data['shopId']);
+        if ($isAvailable){
+            $getSingleItemQuery .= ' AND is_available=:is_available';
+            $paramValue = array_merge($paramValue, array(':is_available' => $isAvailable));
+        }
+        $getSingleItem = $this->dbh->prepare($getSingleItemQuery);
+        $getSingleItem->execute($paramValue);
         return $getSingleItem->fetch(\PDO::FETCH_ASSOC);
     }
 

@@ -64,7 +64,8 @@ class Rules extends AbstractModel
                 if ($rule['rules_type'] == Rules::RULE_TYPE_SINGLE) {
                     $goodsModel = new Goods($this->dbh);
                     $source = $goodsModel->getSingleOffer(
-                        array('shopId' => $rule['shop_id'], 'offerId' => $rule['source'])
+                        array('shopId' => $rule['shop_id'], 'offerId' => $rule['source']),
+                        0
                     );
                 }
                 $outputList['positions'][$rule['position']] = array(
