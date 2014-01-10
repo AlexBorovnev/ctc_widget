@@ -238,15 +238,7 @@ function _shop(data){
 					var catIds = [];
 					var colors = [];
 					$categories.each(function(){
-							var childs = $(this).data('childs');
-							if(childs != undefined && childs.length > 0){
-								var i = childs.length;
-								while(i--){
-									catIds.push(childs[i]);
-								}
-							}
-							else
-								catIds.push($(this).parent().data('cid'));
+							catIds.push($(this).parent().data('cid'));
 					});
 
 					$colors.each(function(){
