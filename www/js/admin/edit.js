@@ -51,6 +51,7 @@ var initEditor = {
         this.initColor();
         this.initTreeForSinglePosition($catTree);
         this.initEvents('.block-content');
+        this.manageAddBlockButton();
 
     },
     initColor: function (selector, color) {
@@ -205,25 +206,7 @@ var initEditor = {
             }
         });
         $('.addBlockContent').on('checkPositions', function () {
-            var typeWidget = $('[name=type_id]').val();
-            $('.addBlockContent').addClass('active');
-            switch (typeWidget) {
-                case '1':
-                    if (base.count >= 1) {
-                        $('.addBlockContent').removeClass('active');
-                    }
-                    return true;
-                case '2':
-                    if (base.count >= 2) {
-                        $('.addBlockContent').removeClass('active');
-                    }
-                    return true;
-                case '3':
-                    if (base.count >= 7) {
-                        $('.addBlockContent').removeClass('active');
-                    }
-                    return true;
-            }
+            base.manageAddBlockButton();
         });
         $('.addRule').on('click', function (e) {
             e.preventDefault();
@@ -243,6 +226,27 @@ var initEditor = {
         });
     },
     count: 0,
+    manageAddBlockButton: function(){
+        var typeWidget = $('[name=type_id]').val();
+        $('.addBlockContent').addClass('active');
+        switch (typeWidget) {
+            case '1':
+                if (this.count >= 1) {
+                    $('.addBlockContent').removeClass('active');
+                }
+                return true;
+            case '2':
+                if (this.count >= 2) {
+                    $('.addBlockContent').removeClass('active');
+                }
+                return true;
+            case '3':
+                if (this.count >= 7) {
+                    $('.addBlockContent').removeClass('active');
+                }
+                return true;
+        }
+    },
     getPositions: function () {
         var positions = [],
             base = this,
