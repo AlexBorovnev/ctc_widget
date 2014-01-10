@@ -40,6 +40,7 @@ function buildCategoryList(categories) {
 }
 var initEditor = {
     obj: {},
+    count: 0,
     init: function (obj) {
         var $catTree = buildTree('myTree', obj.workList.categoryList);
         $('.colorHolder').append(obj.workList.colorList);
@@ -166,7 +167,6 @@ var initEditor = {
             api.call('setWidget', data, function (response) {
                 toastr.info('Виджет сохранен, id = ' + response.widgetId);
                 widgetId = response.widgetId;
-                //self.widgetPreview();
             });
 
         });
@@ -192,17 +192,7 @@ var initEditor = {
         $('.addItem').on('click', function (e) {
             e.preventDefault();
             if ($(this).hasClass('active')) {
-                var position = $('.widget .dev-positions [name="item_position"]').last().val(),
-                    $offerBlock = $('.block.dev-insert-block.dev-item-block').clone(true);
-                $offerBlock.removeClass('hidden dev-insert-block dev-item-block').insertBefore($('.addBlock'));
-                var $holder = $('.block.widget').find('.block.inner.chooseProduct').last();
-                position++;
-                $holder.find('.dev-positions').addClass('dev-block-' + position);
-                $holder.find('[name="item_position"]').val(position);
-                $holder.find('.removeProduct').attr('data-position', position);
-                base.count++;
-                $('.positionCount span').text(base.count);
-                $('.addBlockContent').trigger('checkPositions');
+                base.addBlock(['dev-insert-block', 'dev-item-block']);
             }
         });
         $('.addBlockContent').on('checkPositions', function () {
@@ -211,22 +201,24 @@ var initEditor = {
         $('.addRule').on('click', function (e) {
             e.preventDefault();
             if ($(this).hasClass('active')) {
-                var position = $('.widget .dev-positions [name="item_position"]').last().val(),
-                    $offerBlock = $('.block.dev-insert-block.dev-rule-block').clone(true);
-                $offerBlock.removeClass('hidden dev-insert-block dev-rule-block').insertBefore($('.addBlock'));
-                var $holder = $('.block.widget').find('.block.inner.chooseProduct').last();
-                position++;
-                $holder.find('.dev-positions').addClass('dev-block-' + position);
-                $holder.find('[name="item_position"]').val(position);
-                $holder.find('.removeProduct').attr('data-position', position);
-                base.count++;
-                $('.positionCount span').text(base.count);
-                $('.addBlockContent').trigger('checkPositions');
+                base.addBlock(['dev-insert-block', 'dev-rule-block']);
             }
         });
     },
-    count: 0,
-    manageAddBlockButton: function(){
+    addBlock: function (selector) {
+        var position = $('.widget .dev-positions [name="item_position"]').last().val(),
+            $offerBlock = $('.' + selector.join('.')).clone(true);
+        $offerBlock.removeClass('hidden ' + selector.join(' ')).insertBefore($('.addBlock'));
+        var $holder = $('.block.widget').find('.block.inner.chooseProduct').last();
+        position++;
+        $holder.find('.dev-positions').addClass('dev-block-' + position);
+        $holder.find('[name="item_position"]').val(position);
+        $holder.find('.removeProduct').attr('data-position', position);
+        this.count++;
+        $('.positionCount span').text(this.count);
+        $('.addBlockContent').trigger('checkPositions');
+    },
+    manageAddBlockButton: function () {
         var typeWidget = $('[name=type_id]').val();
         $('.addBlockContent').addClass('active');
         switch (typeWidget) {
@@ -287,13 +279,10 @@ var initEditor = {
         });
         if (colorsValue) {
             params.color = colorsValue;
-        }
-        ;
+        };
         if (categoriesValue) {
             params.categoryId = categoriesValue;
-        }
-        ;
+        };
         return params;
     }
-
 }
