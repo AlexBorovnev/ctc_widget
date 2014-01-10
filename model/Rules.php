@@ -55,36 +55,40 @@ class Rules extends AbstractModel
     public function prepareRuleToResponse($widgetId)
     {
         $outputList = array('positions' => array());
-        $rules = $this->getWidgetRules($widgetId);
-        foreach ($rules as $rule) {
-            if (!isset($rule['rules_type']) || !isset($rule['source'])){
-                continue;
+        if ($rules = $this->getWidgetRules($widgetId)) {
+            foreach ($rules as $rule) {
+                if (!isset($rule['rules_type']) || !isset($rule['source'])) {
+                    continue;
+                }
+                $source = unserialize($rule['source']);
+                if ($rule['rules_type'] == Rules::RULE_TYPE_SINGLE) {
+                    $goodsModel = new Goods($this->dbh);
+                    $source = $goodsModel->getSingleOffer(
+                        array('shopId' => $rule['shop_id'], 'offerId' => $rule['source'])
+                    );
+                }
+                $outputList['positions'][$rule['position']] = array(
+                    'source' => $source,
+                    'typeId' => $rule['rules_type'],
+                    'typeName' => $rule['rules_name']
+                );
             }
-            $source = unserialize($rule['source']);
-            if ($rule['rules_type'] == Rules::RULE_TYPE_SINGLE){
-                $goodsModel = new Goods($this->dbh);
-                $source = $goodsModel->getSingleOffer(array('shopId' => $rule['shop_id'], 'offerId' => $rule['source']));
-            }
-            $outputList['positions'][$rule['position']] = array(
-                'source' => $source,
-                'typeId' => $rule['rules_type'],
-                'typeName' => $rule['rules_name']
+            $outputList = array_merge(
+                array(
+                    'widgetId' => $rule['id'],
+                    'typeId' => $rule['type_id'],
+                    'skinId' => $rule['skin_id'],
+                    'shopId' => $rule['shop_id'],
+                    'commonRule' => unserialize($rule['common_rule']),
+                    'typeName' => $rule['widget_type'],
+                    'skinName' => $rule['widget_skin'],
+                    'count' => $rule['position_count'],
+                    'widgetName' => $rule['title']
+                ),
+                $outputList
             );
+            return $outputList;
         }
-        $outputList = array_merge(
-            array(
-                'widgetId' => $rule['id'],
-                'typeId' => $rule['type_id'],
-                'skinId' => $rule['skin_id'],
-                'shopId' => $rule['shop_id'],
-                'commonRule' => unserialize($rule['common_rule']),
-                'typeName' => $rule['widget_type'],
-                'skinName' => $rule['widget_skin'],
-                'count' => $rule['position_count'],
-                'widgetName' => $rule['title']
-            ),
-            $outputList
-        );
-        return $outputList;
+        return array();
     }
 }
