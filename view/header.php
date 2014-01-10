@@ -12,7 +12,7 @@
 		<meta name="description" content="">
 		<meta name="keywords" content="">
 
-		<title>Конструктор</title>
+		<title><?=$this->pageTitle?></title>
 
 
 
@@ -33,3 +33,16 @@
 		<script type="text/javascript" src="<?=HOST?>js/all.js"></script>
 	</head>
 	<body>
+    <div class="wrap">
+        <div class="mainHeader">
+            <div class="logo"><a href="<?=makeLink("/")?>"><img src="<?=makeLink("/images/sts_logo.png")?>" width="100px" /></a></div>
+            <div class="title">Система управления виджетами</div>
+            <div class="userInfo">
+                <div>Вы вошли как <?=$_SESSION['user_id']['user_name']?></div>
+                <div class="fr"><a href="<?=makeLink('/logout')?>">Выход</a></div></div>
+            
+            <div class="shops clearfix"></div>
+        </div>
+        <div class="bc">
+            <?=breadcrumbs($this)?>
+        </div>

@@ -35,9 +35,7 @@
 	<?=showPagination($this->currentPage, $this->pageCount, "admin/shop/" . $this->shopId . "/");?>
 	   
     
-    <div >
-		<a href="<?=makeLink("/admin")?>">Назад</a>
-	</div>
+    
 </div>
 <script type="text/javascript">
     $(document).ready(function(){

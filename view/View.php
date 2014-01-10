@@ -33,4 +33,10 @@ namespace View;
 		require_once($tpl);
 		echo ob_get_clean();
 	}
+    public function meta($pageTitle, $url, $shopId = "", $isSubPage = false){
+        $this->pageTitle = $pageTitle;
+        $this->url = $url;
+        $this->shopId = $shopId;
+        $this->isSubPage = $isSubPage;
+    }
 }
