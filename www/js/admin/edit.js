@@ -271,7 +271,9 @@ var initEditor = {
             return this.getRule('.dev-block-' + position);
         } else if (type == 2) {
             var offer = $('.dev-block-' + position).find('.offerItem.active').data('offer');
-            return new Array(offer['attributes']['id']);
+            if (offer){
+                return new Array(offer['attributes']['id']);
+            }
         }
         return params;
     },
