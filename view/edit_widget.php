@@ -26,11 +26,14 @@
                 <div class="block-content">
                     <div class="desc">
                         <!--<div>Выбрано товаров: <span class="widgetCount"><?=$this->widget['count'];?></span></div>-->
-                        <div>Имя виджета: <span class="widgetName"><?= $this->widget['widgetName'] ?></span></div>
-                        <div>Тип: <span class="widgetType"><?= $this->widget['typeName'] ?></span></div>
-                        <div>Скин: <span class="widgetSkin"><?= $this->widget['skinName'] ?></span></div>
+                        <div class="input-block">
+                            <span class="prepend">Название: </span>
+                            <input type="text" class="widgetName" name="widget_name" id="widgetTitle" maxlength=50 placeholder="Название виджета" value="<?= $this->widget['widgetName'] ?>">
+                        </div>
+                        <div class="input-block">Тип: <span class="widgetType"><?= $this->widget['typeName'] ?></span></div>
+                        <div class="input-block">Скин: <span class="widgetSkin"><?= $this->widget['skinName'] ?></span></div>
                         <?php if ($this->widget['typeId'] == \model\Widgets::WIDGET_TYPE_FREE): ?>
-                            <div class="positionCount">Позиций: <span><?= count($this->widget['positions']) ?></span>
+                            <div  class="input-block positionCount">Позиций: <span><?= count($this->widget['positions']) ?></span>
                             </div>
                         <?php endif; ?>
 
@@ -177,7 +180,6 @@
             <input type="hidden" name="type_id" value="<?= $this->widget['typeId'] ?>">
             <input type="hidden" name="skin_id" value="<?= $this->widget['skinId'] ?>">
             <input type="hidden" name="widget_id" value="<?= $this->widget['widgetId'] ?>">
-            <input type="hidden" name="widget_name" value="<?= $this->widget['widgetName'] ?>">
 
             <div class="holder"></div>
         </div>
