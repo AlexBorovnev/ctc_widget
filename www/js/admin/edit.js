@@ -155,6 +155,7 @@ var initEditor = {
             e.preventDefault();
             var data = {},
                 $title = $('[name=widget_name]');
+            $title.val($title.val().trim());
             if (!$title.val()){
                 toastr.error('Введите название виджета что бы продолжить');
                 $title.focus();
@@ -167,7 +168,7 @@ var initEditor = {
                     'typeId': $('[name=type_id]').val(),
                     'positions': base.getPositions(),
                     'widgetId': $('[name=widget_id]').val(),
-                    'title': $('[name=widget_name]').val()
+                    'title': $title.val()
                 }
             }
             else {
@@ -178,7 +179,7 @@ var initEditor = {
                     'commonRule': base.getCommonRule(),
                     'positions': base.getPositions(),
                     'widgetId': $('[name=widget_id]').val(),
-                    'title': $('[name=widget_name]').val()
+                    'title': $title.val()
                 };
             }
             api.call('setWidget', data, function (response) {
