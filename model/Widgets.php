@@ -32,7 +32,7 @@ class Widgets extends AbstractModel
         if (!empty($data['widgetId'])) {
             $rulesModel = new Rules($this->dbh);
             $rulesModel->deleteRules($data['widgetId']);
-            $widgetAddQuery = "UPDATE widgets SET type_id=:type_id, shop_id=:shop_id, skin_id=:skin_id, position_count=:pos_count, common_rule=:common_rule, title=:title WHERE id=:id";
+            $widgetAddQuery = "UPDATE widgets SET edit_count=edit_count+1, type_id=:type_id, shop_id=:shop_id, skin_id=:skin_id, position_count=:pos_count, common_rule=:common_rule, title=:title WHERE id=:id";
             $paramValue = array_merge($paramValue, array(':id' => $data['widgetId']));
         }
         $widgetAddQuery = $this->dbh->prepare($widgetAddQuery);
@@ -133,7 +133,7 @@ class Widgets extends AbstractModel
         $offset = ($pageNum - 1) * self::WIDGET_PER_PAGE;
         try {
             $widgetsListQuery = $this->dbh->prepare(
-                "SELECT w.id, w.type_id, w.skin_id, w.title FROM widgets w LEFT JOIN rules r ON w.id=r.widget_id WHERE w.shop_id=:shop_id GROUP BY w.id LIMIT :offset,:limit "
+                "SELECT w.id, w.type_id, w.skin_id, w.title FROM widgets w LEFT JOIN rules r ON w.id=r.widget_id WHERE w.shop_id=:shop_id GROUP BY w.id ORDER BY w.time_updated DESC LIMIT :offset,:limit"
             );
             $widgetsListQuery->bindValue(':shop_id', $data['shopId']);
             $widgetsListQuery->bindValue(':offset', $offset, \PDO::PARAM_INT);

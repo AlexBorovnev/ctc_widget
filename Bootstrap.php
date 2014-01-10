@@ -93,7 +93,7 @@ function showAdminPage($page = '', $param = 1, $pageNum = 1){
             $shop = $shopModel->getShop(array('shopId' => array($param)));
             $view->shop = json_encode($shop[0]);
             
-            $view->meta('Создание виджета', '/admin/add/' . $shopId, $param, true);
+            $view->meta('Создание виджета', '/admin/add/' . $param, $param, true);
             
             $view->render('add_widget.php');
             break;
