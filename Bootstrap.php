@@ -69,8 +69,7 @@ switch ($rout[0]) {
         header('location: ' . $loc);
     break;
     default:
-        header("HTTP/1.1 404 Not Found");
-        exit;
+        View::getInstance()->render('404.php');
 }
 function auth()
 {
@@ -87,7 +86,7 @@ function showAdminPage($page = '', $param = 1, $pageNum = 1){
             showShopPage($param, $pageNum);
             break;
         case 'add':
-           
+            
             $view->shopId = $param;
             $shopModel = new Shops(Config::getInstance()->getDbConnection());
 
@@ -101,26 +100,30 @@ function showAdminPage($page = '', $param = 1, $pageNum = 1){
         case 'edit':
            
             $rulesModel = new Rules(Config::getInstance()->getDbConnection());
-            $view->widget = $rulesModel->prepareRuleToResponse($param);
-            $categoriesModel = new Categories(Config::getInstance()->getDbConnection());
-            $categoriesList = $categoriesModel->getCategoriesList(array('shopId' => $view->widget['shopId']));
-            $view->categories = array('list' => $categoriesList, 'count' => count($categoriesList));
-			
-			$view->shopId = $view->widget['shopId'];
-            $goodsModel = new Goods(Config::getInstance()->getDbConnection());
-            $colorList = $goodsModel->getColorList();;
-            $view->colors =  $colorList;
+          
             
-            $shopModel = new Shops(Config::getInstance()->getDbConnection());
-            $shop = $shopModel->getShop(array('shopId' => array($view->shopId)));
-            $view->shop = json_encode($shop[0]);
-            $view->meta('Редактирование виджета', '/admin/edit/' . $param, $view->shopId, true);
-            
-            $view->render('edit_widget.php');
+            if ($view->widget = $rulesModel->prepareRuleToResponse($param)){
+                $categoriesModel = new Categories(Config::getInstance()->getDbConnection());
+                $categoriesList = $categoriesModel->getCategoriesList(array('shopId' => $view->widget['shopId']));
+                $view->categories = array('list' => $categoriesList, 'count' => count($categoriesList));
+
+                $view->shopId = $view->widget['shopId'];
+                $goodsModel = new Goods(Config::getInstance()->getDbConnection());
+                $colorList = $goodsModel->getColorList();;
+                $view->colors =  $colorList;
+
+                $shopModel = new Shops(Config::getInstance()->getDbConnection());
+                $shop = $shopModel->getShop(array('shopId' => array($view->shopId)));
+                $view->shop = json_encode($shop[0]);
+				$view->meta('Редактирование виджета', '/admin/edit/' . $param, $view->shopId, true);
+
+                $view->render('edit_widget.php');
+            } else {
+                $view->render('404.php');
+            }
             break;
         default:
-            header("HTTP/1.1 404 Not Found");
-            exit;
+            View::getInstance()->render('404.php');
     }
 }
 
@@ -135,13 +138,10 @@ function showShopPage($shopId, $page){
     foreach ($widgetsModel->getTypeList() as $elem) {
         $typeList[$elem['id']] = $elem['title'];
     }
-
-
     $skinList = array();
     foreach ($widgetsModel->getSkinList() as $elem) {
         $skinList[$elem['id']] = $elem['title'];
     }
-
     $shopModel = new Shops(Config::getInstance()->getDbConnection());
     $shop = $shopModel->getShop(array('shopId' => array($shopId)));
     
