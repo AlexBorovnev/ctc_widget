@@ -1,4 +1,3 @@
 <?php
-header("HTTP/1.1 404 Not Found");
-echo "<h2>404 Not Found";
+header("Location: ".HOST."404.html");
 exit;

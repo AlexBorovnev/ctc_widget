@@ -79,29 +79,24 @@ function showAdminPage($page = '', $param = 1, $pageNum = 1){
     $view = View::getInstance();
     switch ($page){
         case '':
-            
             showMainAdminPage();
             break;
         case 'shop':
             showShopPage($param, $pageNum);
             break;
         case 'add':
-            
             $view->shopId = $param;
             $shopModel = new Shops(Config::getInstance()->getDbConnection());
-
-            $shop = $shopModel->getShop(array('shopId' => array($param)));
-            $view->shop = json_encode($shop[0]);
-            
-            $view->meta('Создание виджета', '/admin/add/' . $param, $param, true);
-            
-            $view->render('add_widget.php');
+            if ($shop = $shopModel->getShop(array('shopId' => array($param)))){
+                $view->shop = json_encode($shop[0]);
+                $view->meta('Создание виджета', '/admin/add/' . $param, $param, true);
+                $view->render('add_widget.php');
+            } else {
+                $view->render('404.php');
+            }
             break;
         case 'edit':
-           
             $rulesModel = new Rules(Config::getInstance()->getDbConnection());
-          
-            
             if ($view->widget = $rulesModel->prepareRuleToResponse($param)){
                 $categoriesModel = new Categories(Config::getInstance()->getDbConnection());
                 $categoriesList = $categoriesModel->getCategoriesList(array('shopId' => $view->widget['shopId']));
@@ -127,38 +122,39 @@ function showAdminPage($page = '', $param = 1, $pageNum = 1){
     }
 }
 
-function showShopPage($shopId, $page){
+function showShopPage($shopId, $page)
+{
     //    $shopsModel = new Shops(Config::getInstance()->getDbConnection());
     $widgetsModel = new Widgets(Config::getInstance()->getDbConnection());
-    //    $shopsList = $shopsModel->getAll();
-    $pageCount = $widgetsModel->getWidgetsPage($shopId);
-    $widgetsList = $widgetsModel->getCommonWidgetInfo(array('shopId' => $shopId), $page);
-
-    $typeList = array();
-    foreach ($widgetsModel->getTypeList() as $elem) {
-        $typeList[$elem['id']] = $elem['title'];
-    }
-    $skinList = array();
-    foreach ($widgetsModel->getSkinList() as $elem) {
-        $skinList[$elem['id']] = $elem['title'];
-    }
-    $shopModel = new Shops(Config::getInstance()->getDbConnection());
-    $shop = $shopModel->getShop(array('shopId' => array($shopId)));
-    
-    
     $view = View::getInstance();
-    $view->pageCount = $pageCount;
-    $view->typeList = $typeList;
-    $view->skinList = $skinList;
-    $view->currentPage = $page;
-    //    $view->shopsList = $shopsList;
-    $view->widgetsList = $widgetsList;
-    $view->shopId = $shopId;
-    
-    $view->meta($shop[0]['title'], '/admin/shop/'.$shopId.'/', $shopId);
-    
-    $view->render('shop.php');
-
+    //    $shopsList = $shopsModel->getAll();
+    if ($pageCount = $widgetsModel->getWidgetsPage($shopId) && $widgetsList = $widgetsModel->getCommonWidgetInfo(
+            array('shopId' => $shopId),
+            $page
+        )
+    ) {
+        $typeList = array();
+        foreach ($widgetsModel->getTypeList() as $elem) {
+            $typeList[$elem['id']] = $elem['title'];
+        }
+        $skinList = array();
+        foreach ($widgetsModel->getSkinList() as $elem) {
+            $skinList[$elem['id']] = $elem['title'];
+        }
+        $shopModel = new Shops(Config::getInstance()->getDbConnection());
+        $shop = $shopModel->getShop(array('shopId' => array($shopId)));
+        $view->pageCount = $pageCount;
+        $view->typeList = $typeList;
+        $view->skinList = $skinList;
+        $view->currentPage = $page;
+        //    $view->shopsList = $shopsList;
+        $view->widgetsList = $widgetsList;
+        $view->shopId = $shopId;
+        $view->meta($shop[0]['title'], '/admin/shop/' . $shopId . '/', $shopId);
+        $view->render('shop.php');
+    } else {
+        $view->render('404.php');
+    }
 }
 
 function showMainAdminPage(){
