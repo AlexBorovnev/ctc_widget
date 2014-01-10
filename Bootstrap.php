@@ -128,11 +128,9 @@ function showShopPage($shopId, $page)
     $widgetsModel = new Widgets(Config::getInstance()->getDbConnection());
     $view = View::getInstance();
     //    $shopsList = $shopsModel->getAll();
-    if ($pageCount = $widgetsModel->getWidgetsPage($shopId) && $widgetsList = $widgetsModel->getCommonWidgetInfo(
-            array('shopId' => $shopId),
-            $page
-        )
-    ) {
+    $pageCount = $widgetsModel->getWidgetsPage($shopId);	
+    $widgetsList = $widgetsModel->getCommonWidgetInfo(array('shopId' => $shopId), $page);
+    if ($pageCount && $widgetsList){
         $typeList = array();
         foreach ($widgetsModel->getTypeList() as $elem) {
             $typeList[$elem['id']] = $elem['title'];
