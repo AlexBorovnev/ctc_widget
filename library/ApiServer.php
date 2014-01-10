@@ -168,7 +168,8 @@ class ApiServer
             array(
                 'shopId' => $data['shopId'],
                 'categoryId' => $data['categoryId'],
-                'color' => empty($data['color']) ? null : $data['color']
+                'color' => empty($data['color']) ? null : $data['color'],
+                'allOffer' => true
             )
         );
         return array('list' => $commonData, 'count' => count($commonData));
