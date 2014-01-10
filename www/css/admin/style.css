@@ -774,3 +774,6 @@ body{
     margin: 10px 0;
     box-shadow: 0px 1px 3px #999;
 }
+.offerItem.notAvailable{
+    color:red;
+}

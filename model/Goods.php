@@ -7,7 +7,7 @@ class Goods extends AbstractModel
 
     public function getOffer($data)
     {
-        $qMarks = 'shop_id = ? AND is_available=1';
+        $qMarks = 'shop_id = ?';
         $qValue = array($data['shopId']);
         if (!empty($data['categoryId'])) {
             $qMarks .= ' AND category_id IN (' . $this->getQueryMark($data['categoryId']) . ')';
@@ -22,24 +22,29 @@ class Goods extends AbstractModel
             $qMarks .= ' AND color IN (' . $this->getQueryMark($data['color']) . ')';
             $qValue = array_merge($qValue, $data['color']);
         }
-        $offerList = $this->dbh->prepare("SELECT common_data FROM goods WHERE $qMarks LIMIT 1000");
+        if (empty($data['allOffer'])) {
+            $qMarks .= ' AND is_available=1';
+        }
+        $offerList = $this->dbh->prepare("SELECT common_data, is_available FROM goods WHERE $qMarks LIMIT 1000");
         $offerList->execute($qValue);
         $offerList = $offerList->fetchAll(\PDO::FETCH_ASSOC);
         $commonData = array();
         foreach ($offerList as $row) {
-            $commonData[] = json_encode(unserialize($row['common_data']));
+            $commonData[] = json_encode(array_merge(unserialize($row['common_data']), array('isAvailable' => $row['is_available'])));
         }
         return $commonData;
     }
 
-    public function getSingleOffer($data)
+    public function getSingleOffer($data, $isAvailable=1)
     {
-        $getSingleItem = $this->dbh->prepare(
-            'SELECT * FROM goods WHERE offer_id=:offer_id AND shop_id=:shop_id AND is_available=1'
-        );
-        $getSingleItem->bindValue(':offer_id', unserialize($data['offerId']));
-        $getSingleItem->bindValue(':shop_id', $data['shopId']);
-        $getSingleItem->execute();
+        $getSingleItemQuery = 'SELECT * FROM goods WHERE offer_id=:offer_id AND shop_id=:shop_id';
+        $paramValue = array(':offer_id' => unserialize($data['offerId']), ':shop_id' => $data['shopId']);
+        if ($isAvailable){
+            $getSingleItemQuery .= ' AND is_available=:is_available';
+            $paramValue = array_merge($paramValue, array(':is_available' => $isAvailable));
+        }
+        $getSingleItem = $this->dbh->prepare($getSingleItemQuery);
+        $getSingleItem->execute($paramValue);
         return $getSingleItem->fetch(\PDO::FETCH_ASSOC);
     }
 

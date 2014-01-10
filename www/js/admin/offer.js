@@ -56,7 +56,6 @@ function getOfferList(cid, shopId, $holder, currItem){
 			offers.push(offer);
 		}
 
-
 		buildOfferList(offers, $holder, currItem);
 
 	});
@@ -74,6 +73,9 @@ function buildOfferList(offers, $holder, currItem){
         if(offers[i].attributes.id == currItem){
             $li.addClass('active');
         }
+        if (offers[i].isAvailable == 0){
+            $li.addClass('notAvailable');
+        }
 		$ul.append($li);
 	}
 	$holder.find('.offerItem').unbind('click');
@@ -84,9 +86,7 @@ function buildOfferList(offers, $holder, currItem){
 		var offer = $(this).data('offer');
 		$holder.find('.previewPic img').attr('src', offer.picture);
 		var $info = $("<div></div>")
-
-		var isAvailable = offer.attributes.available?'Да':'Нет';
-
+		var isAvailable = (offer.isAvailable=='1')?'Да':'Нет на складе';
 		$info.append("<div>"+offer.model +' '+ offer.vendor+"</div>")
 
 		$info.append("<div>Цена: <span class='b'>"+offer.price+"</span></div>")
