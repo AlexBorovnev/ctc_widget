@@ -15,7 +15,7 @@ class Common{
     }
 
     public static function getUserId($login, $password){
-        $authQuery = Config::getInstance()->getDbConnection()->prepare("SELECT id, user_name FROM users WHERE login=:login AND password=MD5(:password)");
+        $authQuery = Config::getInstance()->getDbConnection()->prepare("SELECT id, login AS user_name FROM users WHERE login=:login AND password=MD5(:password)");
         $authQuery->execute(array(':login' => $login, ':password' => $password));
         return $authQuery->fetch(\PDO::FETCH_ASSOC);
     }
