@@ -13,6 +13,7 @@ use model\Goods;
 define ('HOST', 'http://' . $_SERVER['HTTP_HOST'] . '/' . getScripPath());
 define ('REV', time());
 
+session_start();
 
 function __autoload($class_name)
 {
@@ -48,7 +49,7 @@ switch ($rout[0]) {
         break;
     case '':
     case 'admin':
-        session_start();
+        
         auth();
         if (Config::getInstance()->getBusyStatus() == true) {
             echo "<h1>Database Update Now</h1>";
@@ -58,7 +59,15 @@ switch ($rout[0]) {
             $pageNum = empty($rout[3]) ? '1' : $rout[3];
             showAdminPage($pageName, $pageParam, $pageNum);
         }
+        
+//        var_dump();
+        
         break;
+    case 'logout':
+        session_destroy();
+        $loc = makeLink('/');
+        header('location: ' . $loc);
+    break;
     default:
         header("HTTP/1.1 404 Not Found");
         exit;
@@ -68,24 +77,29 @@ function auth()
     require_once 'view/auth.php';
 }
 function showAdminPage($page = '', $param = 1, $pageNum = 1){
+    $view = View::getInstance();
     switch ($page){
         case '':
+            
             showMainAdminPage();
             break;
         case 'shop':
             showShopPage($param, $pageNum);
             break;
         case 'add':
-            $view = View::getInstance();
+           
             $view->shopId = $param;
             $shopModel = new Shops(Config::getInstance()->getDbConnection());
 
             $shop = $shopModel->getShop(array('shopId' => array($param)));
             $view->shop = json_encode($shop[0]);
+            
+            $view->meta('Создание виджета', '/admin/add/' . $shopId, $param, true);
+            
             $view->render('add_widget.php');
             break;
         case 'edit':
-            $view = View::getInstance();
+           
             $rulesModel = new Rules(Config::getInstance()->getDbConnection());
             $view->widget = $rulesModel->prepareRuleToResponse($param);
             $categoriesModel = new Categories(Config::getInstance()->getDbConnection());
@@ -100,6 +114,7 @@ function showAdminPage($page = '', $param = 1, $pageNum = 1){
             $shopModel = new Shops(Config::getInstance()->getDbConnection());
             $shop = $shopModel->getShop(array('shopId' => array($view->shopId)));
             $view->shop = json_encode($shop[0]);
+            $view->meta('Редактирование виджета', '/admin/edit/' . $param, $view->shopId, true);
             
             $view->render('edit_widget.php');
             break;
@@ -127,6 +142,10 @@ function showShopPage($shopId, $page){
         $skinList[$elem['id']] = $elem['title'];
     }
 
+    $shopModel = new Shops(Config::getInstance()->getDbConnection());
+    $shop = $shopModel->getShop(array('shopId' => array($shopId)));
+    
+    
     $view = View::getInstance();
     $view->pageCount = $pageCount;
     $view->typeList = $typeList;
@@ -135,22 +154,26 @@ function showShopPage($shopId, $page){
     //    $view->shopsList = $shopsList;
     $view->widgetsList = $widgetsList;
     $view->shopId = $shopId;
+    
+    $view->meta($shop[0]['title'], '/admin/shop/'.$shopId.'/', $shopId);
+    
     $view->render('shop.php');
 
 }
 
-function showMainAdminPage()
-{
+function showMainAdminPage(){
     $shopsModel = new Shops(Config::getInstance()->getDbConnection());
     $shopsList = $shopsModel->getAll();
 
     $view = View::getInstance();
     $view->shopsList = $shopsList;
+    
+    $view->meta('Главная', '/admin/');
+    
     $view->render('admin.php');
 }
 
-function makeLink($localPath)
-{
+function makeLink($localPath){
     if ($localPath[0] == '/') {
         $localPath = substr($localPath, 1);
     }
@@ -164,7 +187,6 @@ function showPagination($cur, $total, $link){
     $res[] = '<div class="pagenation clearfix">';
     $res[] = '<ul>';
     $cnt = $total;
-
 
     $begin = $cur - 1;
     $end = $cnt - $cur;
@@ -181,8 +203,7 @@ function showPagination($cur, $total, $link){
         $res[] = "<li><a href=" . makeLink($link . 1) . ">&lt;&lt;</a></li>";
         $res[] = "<li><a href=" . makeLink($link . $prev) . ">&lt;</a></li>";
     }
-    if($cur > 3)
-        $res[] = "<li>...</li>";
+    
     if($cur > 2)
         $res[] = "<li><a href=" . makeLink($link . ($cur-2)) . ">".($cur-2)."</a></li>";
     if($cur > 1)
@@ -195,9 +216,6 @@ function showPagination($cur, $total, $link){
     if($cur+1 < $cnt)
         $res[] = "<li><a href=" . makeLink($link . ($cur+2)) . ">".($cur+2)."</a></li>";
 
-    if($cur < $cnt-2)
-        $res[] = "<li>...</li>";
-
     if($cur != $cnt){
         $res[] = "<li><a href=" . makeLink($link . $next) . ">&gt;</a></li>";
         $res[] = "<li><a href=" . makeLink($link . $cnt) . ">&gt;&gt;</a></li>";
@@ -209,4 +227,51 @@ function showPagination($cur, $total, $link){
     $res[] = "</div>";
 
     return implode("\n", $res);
+}
+
+function breadcrumbs(View $view){
+    
+    $curPage = $view->pageTitle;
+    $url = $view->url;
+    $shopId = $view->shopId;
+    $subPage = $view->isSubPage;
+    
+    $separ = '&gt;';
+    
+    $res[] = "<div class='breadcrumbs'><ul>";
+    $res[] = "<li><a href='".makeLink('/')."'>Главная</a></li>";
+    $res[] = "<li>$separ</li>";
+    
+    $curPage = "<li><a href='".makeLink($url)."'>{$curPage}</a></li>";
+    
+    
+    
+    if($subPage){
+         $shopModel = new Shops(Config::getInstance()->getDbConnection());
+         $shop = $shopModel->getShop(array('shopId' => array($shopId)));
+         
+        $shopPage = "<li><a href='".makeLink('/admin/shop/' . $shopId)."'>".$shop[0]['title']."</a></li>";
+        
+        $res[] = $shopPage;
+        $res[] = "<li>$separ</li>";
+    }
+    if($shopId != ''){
+        $res[] = $curPage;        
+    }
+    if(!$subPage && $shopId == ''){
+        array_pop($res);
+    }
+    
+    //if(strlen($shop) != 0 && $curPage != $shop){
+//        
+//        $toSubPage = "<li>{$shop}</li>";
+//    }
+    //if($subPage){
+//        $res[] = "<li><a href='"makeLink"'</li>"; 
+//    }
+    $res[] = "</ul>";
+    $res[] = "</div>";
+
+    return implode("\n", $res);
+    
 }

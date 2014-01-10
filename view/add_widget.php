@@ -16,7 +16,6 @@ $(function(){
 </script>
 
 <div class="wrapper clearfix">
-	<a href="<?=makeLink("/admin/shop/{$this->shopId}")?>">Назад</a>
 	<div id="tabs">
 		<ul class="tabList">
 
@@ -226,7 +225,7 @@ $(function(){
 						<div class="input-block">
 							<span class="prepend">Код для вставки:&nbsp;&nbsp;</span> 
 							<div class="fl"><input type="text" class="custom fl widgetUrl" /></div>
-							<div class="fl"><input type="button" value="Скопировать" onclick="clipBoard('.widgetUrl')" /></div>
+							<!--<div class="fl"><input type="button" value="Скопировать" onclick="clipBoard('.widgetUrl')" /></div>-->
 						</div>
 					</div>
 				</div>

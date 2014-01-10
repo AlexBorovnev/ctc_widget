@@ -13,7 +13,6 @@ $(function(){
 });
 </script>
 <div class="wrapper clearfix">
-	<a href="<?=makeLink("/admin/shop/{$this->shopId}")?>">Назад</a>
 	<form>
 		<div id="shop<?=$this->widget['shopId']?>">
 			<div class="block widget widgetTpl">

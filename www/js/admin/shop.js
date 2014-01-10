@@ -100,10 +100,16 @@ function _shop(data){
 					'commonRule': self.getCommonRule(),
 					'positions': self.getPositions()
 				};	
+                //data validation
                 if (data.commonRule.length == 0){
                     toastr.error('Необходимо выбрать правило');
                     return;
                 }
+                if(data.title == ''){
+                    toastr.error('Укажите название виджета');
+                    return;
+                }
+                
 			}
 			
 			api.call('setWidget', data, function(response){
@@ -313,12 +319,19 @@ function _shop(data){
 			var $curWidget;
 			$shop.find('.prepareWidget').click(function(){
 				var $title = $shop.find('#widgetTitle');
-				if($title.val().length == 0){
+                var titleVal = $title.val().trim();
+                $title.val(titleVal);
+				if(titleVal.length == 0){
 					toastr.error('Введите название виджета что бы продолжить');
                     $title.focus();
 					return;
 				}
-				self.wTitle = $title.val();
+                if(titleVal.length > 40){
+                    toastr.error('Название виджета слишком длинное, макс. 40 символов');
+                    $title.focus();
+                    return;
+                }
+				self.wTitle = titleVal;
 				var type = $shop.find(".widgetTypeList").val();
 				widgetType = type;
 				if(type == 1){//small
@@ -334,7 +347,15 @@ function _shop(data){
 				$shop.find('.preparedWidget').show();
 				$(this).hide();
                 
-                //$shop.find(".widgetSkinList").attr('disabled', true).trigger("liszt:updated");
+                $title.hide().after($title.val());
+                
+                var $skinList = $shop.find(".widgetSkinList"),
+                    $typeList = $shop.find('.widgetTypeList'),
+                    skinVal = $skinList.find('option:selected').html(),
+                    typeVal = $typeList.find('option:selected').html();
+                $skinList.next().hide().after('<span>'+skinVal+'</span>');
+                $typeList.next().hide().after('<span>'+typeVal+'</span>');
+                
 //                $("#select").prop('disabled',true).trigger("liszt:updated");
 //                $shop.find(".widgetSkinList").prop('disabled', true).trigger("liszt:updated");
 			});	

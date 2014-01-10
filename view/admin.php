@@ -1,7 +1,6 @@
-
 <link rel="stylesheet" type="text/css" href="<?=HOST?>css/admin/admin.style.css?<?=REV?>">
 <div class="wrapper clearfix">
-	<div class="block">
+	<div class="block inner">
 		<div class="block-header">Список магазинов</div>
 		<div class="block-content">
 			<ul>
