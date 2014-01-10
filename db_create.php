@@ -161,6 +161,7 @@ CREATE TABLE IF NOT EXISTS `widgets` (
   `position_count` int(11) NOT NULL,
   `click_cnt` int(11) NOT NULL DEFAULT '0',
   `time_updated` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `edit_count` INT(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `FK_widgets_widget_type` (`type_id`),
   KEY `FK_widgets_widget_skin` (`skin_id`),

@@ -32,7 +32,7 @@ class Widgets extends AbstractModel
         if (!empty($data['widgetId'])) {
             $rulesModel = new Rules($this->dbh);
             $rulesModel->deleteRules($data['widgetId']);
-            $widgetAddQuery = "UPDATE widgets SET type_id=:type_id, shop_id=:shop_id, skin_id=:skin_id, position_count=:pos_count, common_rule=:common_rule, title=:title WHERE id=:id";
+            $widgetAddQuery = "UPDATE widgets SET edit_count=edit_count+1, type_id=:type_id, shop_id=:shop_id, skin_id=:skin_id, position_count=:pos_count, common_rule=:common_rule, title=:title WHERE id=:id";
             $paramValue = array_merge($paramValue, array(':id' => $data['widgetId']));
         }
         $widgetAddQuery = $this->dbh->prepare($widgetAddQuery);
