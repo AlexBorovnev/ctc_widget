@@ -41,16 +41,18 @@ function buildCategoryList(categories) {
 var initEditor = {
     obj: {},
     count: 0,
+    filters: ['color', 'categoryId'],
+    catTree: [],
     init: function (obj) {
-        var $catTree = buildTree('myTree', obj.workList.categoryList);
+        this.catTree = buildTree('myTree', obj.workList.categoryList);
         $('.colorHolder').append(obj.workList.colorList);
         this.obj = obj;
         if (obj.commonRule) {
-            this.initCommonRuleSection($catTree);
+            this.initCommonRuleSection();
         }
         this.count = $('[name="widget_count"]').val();
         this.initColor();
-        this.initTreeForSinglePosition($catTree);
+        this.initTreeForSinglePosition();
         this.initEvents('.block-content');
         this.manageAddBlockButton();
 
@@ -60,11 +62,11 @@ var initEditor = {
             $(selector + '[data-color-name="' + color[i] + '"]').addClass('active');
         }
     },
-    initTreeForSinglePosition: function (catTree) {
+    initTreeForSinglePosition: function () {
         var base = this;
-        $('.dev-insert-block .treeHolder').append(catTree.clone(true));
+        $('.dev-insert-block .treeHolder').append(this.catTree.clone(true));
         for (var i in base.obj.positions) {
-            $('.dev-block-' + i + ' .treeHolder').append(catTree.clone(true));
+            $('.dev-block-' + i + ' .treeHolder').append(this.catTree.clone(true));
             $('.dev-block-' + i + ' .treeHolder li').each(function () {
                 if (base.obj.positions[i].source.category_id != undefined && ($(this).data('cid') == base.obj.positions[i].source.category_id)) {
                     $(this).find('.Content').addClass('b');
@@ -81,21 +83,30 @@ var initEditor = {
             }
         }
     },
-
-
-    initCommonRuleSection: function (catTree) {
-        var base = this;
-        $('.ruleHolder').append(catTree.clone(true));
-        if (base.obj.commonRule.categoryId) {
-            $('.ruleHolder li').each(function () {
-                if (base.obj.commonRule.categoryId.indexOf($(this).data('cid')) != -1) {
-                    $(this).find('.Content').addClass('b');
-                    $(this).parent().parent().removeClass('ExpandClosed').addClass('ExpandOpen');
-                }
-            })
+    initSectionForRule: function(filter, value){
+        switch (filter){
+            case 'categoryId':
+                $('.ruleHolder').append(this.catTree.clone(true));
+                $('.ruleHolder li').each(function () {
+                    if (value.indexOf($(this).data('cid')) != -1) {
+                        $(this).find('.Content').addClass('b');
+                        $(this).parent().parent().removeClass('ExpandClosed').addClass('ExpandOpen');
+                    }
+                })
+                break;
+            case 'color':
+                this.initColor('.dev-editor-color', value);
         }
-        if (base.obj.commonRule.color) {
-            this.initColor('.dev-editor-color', base.obj.commonRule.color);
+    },
+
+    initCommonRuleSection: function () {
+        var base = this,
+            rule = base.obj.commonRule;
+
+        for (var i in base.filters){
+            if (rule[base.filters[i]]){
+                base.initSectionForRule(base.filters[i], rule[base.filters[i]]);
+            }
         }
     },
 
@@ -241,8 +252,7 @@ var initEditor = {
     },
     getPositions: function () {
         var positions = [],
-            base = this,
-            data = [];
+            base = this;
         $('.dev-positions').each(function () {
             var position = $(this).find('[name="item_position"]').val(),
                 type = $(this).find('[name="rule_type"]').val();
