@@ -102,14 +102,15 @@ CREATE TABLE IF NOT EXISTS `rules` (
 CREATE TABLE IF NOT EXISTS `rules_type` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `type` varchar(255) DEFAULT NULL,
+  `title` varchar(255) NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- Дамп данных таблицы ctc.rules_type: ~2 rows (приблизительно)
 /*!40000 ALTER TABLE `rules_type` DISABLE KEYS */;
-INSERT INTO `rules_type` (`id`, `type`) VALUES
-	(1, 'rule'),
-	(2, 'single');
+INSERT INTO `rules_type` (`id`, `type`, `title`) VALUES
+	(1, 'rule', 'Правило'),
+	(2, 'single', 'Указанный товар');
 /*!40000 ALTER TABLE `rules_type` ENABLE KEYS */;
 
 
