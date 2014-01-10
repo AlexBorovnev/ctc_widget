@@ -109,6 +109,22 @@ function _shop(data){
 						toastr.error('Укажите название виджета');
 						return;
 					}
+					if(data.typeId == 1){//small
+						if(data.positions.length < 1){
+							toastr.error('Необходимо выбрать товар для позиции');
+							return;
+						}
+					}
+					else if(data.typeId == 2){//big
+						if(data.positions.length < 1){
+							toastr.error('Необходимо выбрать товар для каждой позиции');
+							return;
+						}
+					}
+					//else{ //free
+//						
+//					}
+					console.log()
 
 				}
 
