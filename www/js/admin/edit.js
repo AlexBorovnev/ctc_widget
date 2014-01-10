@@ -153,7 +153,13 @@ var initEditor = {
         });
         $(selector + ' .preparedWidget').on('click', ".saveWidget", function (e) {
             e.preventDefault();
-            var data = {};
+            var data = {},
+                $title = $('[name=widget_name]');
+            if (!$title.val()){
+                toastr.error('Введите название виджета что бы продолжить');
+                $title.focus();
+                return;
+            }
             if ($(':hidden[name="type_id"]').val() == 3) {//free
                 data = {
                     'shopId': base.obj.shopId,
