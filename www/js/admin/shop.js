@@ -261,7 +261,7 @@ function _shop(data){
 					});
 
 					if($categories.length == 0){
-						toastr.error('необходимо выбрать правило');
+						toastr.error('Необходимо выбрать правило или товар');
 						return;
 					}
 					var params = {};
