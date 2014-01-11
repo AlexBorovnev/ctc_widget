@@ -55,7 +55,7 @@ class ApiServer
         if (is_array($value)) {
             array_walk($value, array($this, 'stripTags'));
         } else {
-            $value = strip_tags(trim($value));
+            $value = htmlspecialchars(trim($value));
         }
     }
 

@@ -42,7 +42,7 @@ function _api(host){
 					return;
 				}
 				console.error('error[' + response.code+'] loading data from server, method= ['+methodName+'], params=['+params+'] ');
-				toastr.error('Ошибка при получении данных с сервера, код ' + response.code);
+				toastr.error(response.data.message);
 		});
 	}
 }
