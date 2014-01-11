@@ -122,8 +122,8 @@ function _shop(data){
 						}
 					}
 					//else{ //free
-//						
-//					}
+					//						
+					//					}
 					console.log()
 
 				}
@@ -146,6 +146,19 @@ function _shop(data){
 					toastr.error('Выберите товар');
 				else
 					toastr.info('Товар выбран');
+
+				var $tpl = $(this).parents('.categoryOfferHolder');
+				$tpl.hide();
+				var $selectedOfferTpl = $(".selectedOfferTpl").clone(true).removeClass('selectedOfferTpl');
+				
+				var $preview = $(this).parent('.preview').clone(true);
+				$preview.find('.btn').remove();
+				$selectedOfferTpl.find('.forPreview').append($preview);
+                $(this).unbind('click');
+                $(this).hide();
+				$tpl.parent().find('._preview').append($selectedOfferTpl);
+				$(this).parents('.pos').find('.choseProduct').hide();
+				$(this).parents('.pos').find('.savePosition').show();
 		})
 		$shop.on('click', ".categoryHolder .Content", function(){
 
@@ -157,18 +170,21 @@ function _shop(data){
 
 				$(this).toggleClass('active')
 				if($(this).hasClass('active')){
-					if(childs != undefined && childs.length > 0){
+					if(childs != undefined && childs.length > 0){//PARENT
 						domChilds.addClass('active');
 					}
 				}
 				else{
-					if(childs != undefined && childs.length > 0){
+					if(childs != undefined && childs.length > 0){//PARENT
 						domChilds.removeClass('active');
 					}
-					else{
+					else{//CHILD
+						$(this).parent().parent().parent().find('.Content:first').removeClass('active');
 						var childsActive = $(this).parent().parent().parent().find('.Container .Content.active').length;
-						if(childsActive == 0)
-							$(this).parent().parent().parent().find('.Content:first').removeClass('active');
+						var childsTotal = $(this).parent().parent().parent().find('.Container .Content').length;
+						if(childsActive == childsTotal)
+							$(this).parent().parent().parent().find('.Content:first').addClass('active');
+							
 					}
 				}
 				selectedCategories = [];
@@ -206,6 +222,7 @@ function _shop(data){
 				}
 
 		});
+
 		$shop.on('click', '.colorHolder .color', function(){
 				$(this).toggleClass('active');
 				if($(this).hasClass('active')){
@@ -219,11 +236,21 @@ function _shop(data){
 		})
 		$shop.on('click', ".createRule",function(e){
 				e.preventDefault();
-				$(this).parent().find(".ruleHolder").slideToggle();
+				var $tpl = $(this).parent().find(".ruleHolder");
+				$(this).css({'background': 'none', 'background-color': '#ff7676', 'color': "#000"});
+
+				$tpl.slideDown();
+				$(this).unbind('click');
+				$(this).parent().find('.saveRule').show();
 		});
 		$shop.on('click', ".choseProduct",function(e){
 				e.preventDefault();
-				$(this).parent().find('.categoryOfferHolder').slideToggle();
+				var $tpl = $(this).parent().find('.categoryOfferHolder');
+				$(this).css({'background': 'none', 'background-color': '#ff7676', 'color': "#000"});
+
+				$tpl.slideDown();
+				$(this).off('click');
+				$(this).parent().find('.saveOffer').show();
 		});
 		$shop.on('click', ".addPosition", function(e){
 				e.preventDefault();
@@ -233,11 +260,36 @@ function _shop(data){
 				}
 				var $newPos = $freePosition.clone(true);
 				$newPos.find('.positionNum').html(posNum++);
+				$newPos.find('.savePosition').hide();
+				$newPos.find('.saveRule').hide();
 
 				$(this).prev().append($newPos);
 		})
+		$shop.on('click', '.saveRule', function(e){
+				e.preventDefault();
+				var $selectedRule = $(".selectedRuleTpl").clone(true).removeClass('selectedRuleTpl');
+				var $tpl = $(this).parents('.rule');
+				$tpl.hide();
+				var cats = [];
+				var colors = [];
+				$tpl.find('.color.active').each(function(){
+						colors.push($(this).html());
+				});
+				$tpl.find('.Content.active').each(function(){
+						cats.push($(this).html());
+				});
+				$selectedRule.find('.ruleCategories').html(cats.join(', '));
+				$selectedRule.find('.ruleColors').html(colors.join(', '));
+				$(this).parents('.pos').find('._preview').append($selectedRule);
+				$(this).parents('.widget').find('.rule_preview').append($selectedRule);
+				$(this).parents('.pos').find('.savePosition').show();
+				$(this).parents('.pos').find('.createRule').hide();
+				$(this).parents('.widget').find('.createRule').hide();
+//				$tpl.parent().find('._preview')
+		});
 		$shop.on('click', ".savePosition", function(e){
-
+            	e.preventDefault();
+			
 				var $p = $(this).parent().parent();
 				var $offer = $p.find('.categoryOfferHolder').find('.offerItem.active');
 				var offerId = '';
@@ -279,8 +331,9 @@ function _shop(data){
 
 				$p.find('.ruleHolder, .categoryOfferHolder').slideUp();
 
-				$(this).hide();
-				$(this).next().removeClass('hidden');
+				$(this).hide().after("<div style='margin-left: 5px;'><h5>Сохранено</h5></div>");
+				$(this).prev().hide().prev().hide();
+				
 				toastr.info("Позиция сохранена");
 		});
 	}

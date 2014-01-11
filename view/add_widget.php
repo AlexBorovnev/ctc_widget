@@ -8,10 +8,10 @@
 <script type="text/javascript" src="<?=HOST?>js/admin/system.js?<?=REV?>"></script>
 <script>
 
-$(function(){
-	shopObj = (<?=$this->shop?>);
-	mainInit(shopObj);
-});
+	$(function(){
+			shopObj = (<?=$this->shop?>);
+			mainInit(shopObj);
+	});
 
 </script>
 
@@ -27,6 +27,17 @@ $(function(){
 	</div>
 </div>
 <div class="hidden">
+	<div class="selectedOffer selectedOfferTpl">
+		<h5>Выбранный товар</h5>
+		<div class="forPreview"></div>
+	</div>
+	<div class="selectedRule selectedRuleTpl">
+		<h5>Выбранные правила:</h5>
+		<div class="forPreviewRule">
+			<div><span class="b">Категории: </span><span class="ruleCategories">222</span><br></div>
+			<div><span class="b">Цвета: </span><span class="ruleColors">33123</span></div>
+		</div>
+	</div>
 	<div class="categoryTpl">
 		<div class="grid13">
 			<h4>Выбор категории</h4>
@@ -72,26 +83,30 @@ $(function(){
 		</div>
 	</div>
 
-	<div class="freePositionTpl">
+	<div class="pos freePositionTpl">
 		<div class="header"><h4><span class="positionNum"></span> позиция</h4></div>
 		<div class="body clearfix">
 			<a href="#" class="btn choseProduct">Выбрать товар</a>
 			<a href="#" class="btn createRule">Создать правило</a>
+			<a href="#" class="btn savePosition">Сохранить позицию</a>
 			<div class="categoryOfferHolder clearfix"></div>
 			<div class="ruleHolder clearfix"></div>
-			<div class="clearfix">
-				<a href="#" class="btn savePosition">Сохранить позицию</a>
-				<span class="saved hidden">Сохранено</span>
-			</div>
+			<div class="_preview"></div>
 		</div>
 	</div>
 	<div class="rule ruleTpl">
 		<div class="block-content clearfix">
-			<div class="categoryHolder clearfix"></div>
+			<div class="clearfix">
+				<div class="categoryHolder clearfix">
+				</div>
 
-			<div class="colorHolder clearfix">
+
+				<div class="colorHolder clearfix">
+				</div>
 			</div>
-
+			<div class="clearfix">
+				<a href="#" class="btn saveRule"><span>Сохранить правило</span></a>
+			</div>
 		</div>
 
 	</div>
@@ -139,11 +154,12 @@ $(function(){
 
 		</div>
 	</div>
-	<div class="positionTpl">
+	<div class="pos positionTpl">
 		<div class="header"><h4><span class="positionNum"></span> позиция</h4></div>
 		<div class="body">
 			<a href="#" class="btn choseProduct">Выбрать товар</a>
 			<div class="categoryOfferHolder"></div>
+			<div class="_preview"></div>
 		</div>
 	</div>
 
@@ -151,17 +167,34 @@ $(function(){
 		<div class="block-header">Маленький виджет</div>
 		<div class="block-content">
 			<a href="#" class="btn createRule">Создать правило</a>
+			<div class="clearfix">
+				<div class="rule_preview"></div>
+			</div>
+
 			<div class="ruleHolder"></div>
-			<div class="positionHolder clearfix"  data-position-num="1"></div>
+			<div class="positionHolder clearfix"  data-position-num="1">
+
+			</div>
+
+
 		</div>
 	</div>
 	<div class="block inner bigWidget bigWidgetTpl widget">
 		<div class="block-header">Большой виджет</div>
 		<div class="block-content">
 			<a href="#" class="btn createRule">Создать правило</a>
+			<div class="clearfix">
+				<div class="rule_preview"></div>
+			</div>
 			<div class="ruleHolder"></div>
-			<div class="positionHolder clearfix positionHolder1" data-position-num="1"></div>
-			<div class="positionHolder clearfix positionHolder2" data-position-num="2"></div>
+			<div class="positionHolder clearfix positionHolder1" data-position-num="1">
+
+			</div>
+			<div class="positionHolder clearfix positionHolder2" data-position-num="2">
+
+			</div>
+
+
 		</div>
 	</div>
 	<div class="block inner widget freeWidget freeWidgetTpl">
@@ -171,7 +204,7 @@ $(function(){
 			<div class="positions">
 
 			</div>
-			<a href="#" class="btn addPosition">Добавить позицию</a>
+			<a href="#" class="btn btn-primary addPosition">Добавить позицию</a>
 
 		</div>
 	</div>
@@ -179,7 +212,7 @@ $(function(){
 		<h3>Создание нового виджета</h3>
 
 		<div class="clearfix">
-             <div class="input-block">
+			<div class="input-block">
 				<span class="prepend">Название: </span>
 				<input type="text" name="title" id="widgetTitle" placeholder="Название виджета"> 
 			</div>
@@ -217,7 +250,7 @@ $(function(){
 				<div class="widgetInfo"> 
 
 					<div class="desc hidden">
-                        <div>Название виджета: <span class="widgetTitle"></span></div>
+						<div>Название виджета: <span class="widgetTitle"></span></div>
 						<!--div>Выбрано товаров: <span class="widgetCount"></span></div-->
 						<div>Тип: <span class="widgetType"></span></div>
 						<div>Скин: <span class="widgetSkin"></span></div>

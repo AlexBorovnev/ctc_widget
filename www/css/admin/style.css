@@ -494,7 +494,7 @@ ol.offerHolder{
 .previewPic img{
 	width: 100%;
 /*	height: 100%;*/
-	border: 1px solid #cc0835;
+/*	border: 1px solid #cc0835;*/
 }
 
 .previewPic{
@@ -614,7 +614,7 @@ a.disabledBtn:hover{
 }
 
 .savePosition{
-	margin-top: 20px;
+/*	margin-top: 20px;*/
 }
 
 .saved{
@@ -777,3 +777,45 @@ body{
 .offerItem.notAvailable{
     color:red;
 }
+h5{
+	font-size: 12px;
+	font-weight: bold;
+	color: #5F5F5F;
+}
+
+.selectedRule, .selectedOffer{
+	margin: 5px;
+}
+
+.ruleCategories{
+	
+}
+
+.forPreview{
+	border: 1px solid #ddd;
+	box-shadow: 1px 1px 7px #999;
+	width: 200px;
+	padding: 5px;
+}
+.selectedOffer{
+	width: 240px;
+	float: left;
+}
+
+.selectedRule{
+	
+	float: left;
+	
+}
+
+.forPreviewRule{
+	border: 1px solid #ddd;
+	box-shadow: 1px 1px 7px #999;
+	padding: 5px;
+	width: 500px;
+}
+
+.forPreviewRule > div{
+	margin-bottom: 10px;
+}
+
