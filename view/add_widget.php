@@ -83,8 +83,10 @@
 		</div>
 	</div>
 
-	<div class="pos freePositionTpl">
-		<div class="header"><h4><span class="positionNum"></span> позиция</h4></div>
+	<div data-init-pos="" class="pos freePositionTpl">
+		<div class="header"><h4><span class="positionNum"></span> позиция</h4>
+            <a href="#" data-position-num="" class="btn removePosition">Удалить позицию</a>
+        </div>
 		<div class="body clearfix">
 			<a href="#" class="btn choseProduct">Выбрать товар</a>
 			<a href="#" class="btn createRule">Создать правило</a>

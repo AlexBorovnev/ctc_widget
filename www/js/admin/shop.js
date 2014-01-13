@@ -18,6 +18,7 @@ function _shop(data){
 	$preparedWidget,
 
 	posNum = 1,
+    indexNum = 1,
 	selectedOffers = [],
 	selectedCategories = [],
 	selectedColors = [],
@@ -259,12 +260,38 @@ function _shop(data){
 					return;
 				}
 				var $newPos = $freePosition.clone(true);
-				$newPos.find('.positionNum').html(posNum++);
+                $newPos.find('.removePosition').attr('data-position-num', posNum);
+                $newPos.attr('data-init-pos', indexNum);
+                $newPos.find('.positionNum').html(posNum++);
 				$newPos.find('.savePosition').hide();
 				$newPos.find('.saveRule').hide();
+                indexNum++;
 
 				$(this).prev().append($newPos);
 		})
+        $shop.on('click', '.removePosition', function(e){
+            e.preventDefault();
+            if (confirm('Удалить позицию?')){
+                var removePosition = parseInt($(this).attr('data-position-num'), 10);
+                var indexPosition = parseInt($(this).parents('.pos').attr('data-init-pos'), 10);
+                $(this).parents('.pos').remove();
+                for (var i in positions){
+                    if (positions[i].num == indexPosition){
+                        positions.splice(i, 1);
+                    }
+                }
+                $('.positionNum').each(function(){
+                    var changePosition = parseInt($(this).html(), 10);
+                    if (changePosition > removePosition){
+                        $(this).html(changePosition -1);
+                        $('.removePosition[data-position-num="'+ changePosition +'"]').attr('data-position-num', changePosition -1);
+                    }
+                })
+                console.log(positions);
+                posNum--;
+            }
+
+        });
 		$shop.on('click', '.saveRule', function(e){
 				e.preventDefault();
 				var $selectedRule = $(".selectedRuleTpl").clone(true).removeClass('selectedRuleTpl');
@@ -289,14 +316,14 @@ function _shop(data){
 		});
 		$shop.on('click', ".savePosition", function(e){
             	e.preventDefault();
-			
 				var $p = $(this).parent().parent();
 				var $offer = $p.find('.categoryOfferHolder').find('.offerItem.active');
 				var offerId = '';
+                var num = $(this).parents('.pos').attr('data-init-pos');
 				if($offer.length > 0){
 					offerId = $offer.data('offer').attributes.id;
 
-					var position = {'type': 2, 'params': [offerId]};
+					var position = {'type': 2, 'params': [offerId], 'num': num};
 					self.addPosition(position);
 				}
 				else{
@@ -324,7 +351,7 @@ function _shop(data){
 						params['color'] = colors;
 					}
 
-					var position = {'type': 1, 'params': params};
+					var position = {'type': 1, 'params': params, 'num': num};
 
 					self.addPosition(position);
 				}
