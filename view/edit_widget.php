@@ -79,6 +79,10 @@
                             </div>
                             <div class="grid13">
                                 <h4>Выбор товара</h4>
+                                <div class="search">
+                                    <input type="text" name="offer_id" placeholder="Введите артикул товара">
+                                    <a href="#" class="btn searchProduct">Поиск</a>
+                                </div>
                                 <ol class="offerHolder">
                                 </ol>
                             </div>
@@ -199,6 +203,10 @@
         </div>
         <div class="grid13">
             <h4>Выбор товара</h4>
+            <div class="search">
+                <input type="text" name="offer_id" placeholder="Введите артикул товара">
+                <a href="#" class="btn searchProduct">Поиск</a>
+            </div>
             <ol class="offerHolder">
             </ol>
         </div>

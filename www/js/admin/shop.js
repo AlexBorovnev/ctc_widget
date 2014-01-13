@@ -287,7 +287,6 @@ function _shop(data){
                         $('.removePosition[data-position-num="'+ changePosition +'"]').attr('data-position-num', changePosition -1);
                     }
                 })
-                console.log(positions);
                 posNum--;
             }
 

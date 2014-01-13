@@ -149,7 +149,13 @@ class ApiServer
             )
         );
         $goodsModel = new Goods($this->dbh);
-        $commonData = $goodsModel->getOffer(array('shopId' => $data['shopId'], 'offerId' => $data['offerId']));
+        $commonData = $goodsModel->getOffer(
+            array(
+                'shopId' => $data['shopId'],
+                'offerId' => $data['offerId'],
+                'allOffer' => empty($data['allOffer']) ? false : true
+            )
+        );
         return array('list' => $commonData, 'count' => count($commonData));
     }
 
