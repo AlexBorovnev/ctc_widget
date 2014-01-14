@@ -223,21 +223,18 @@ class ApiServer
     protected function rulesAdd($shopId, $widgetId, $rules)
     {
         foreach ($rules as $key => $rule) {
-            array_walk(
-                $rule,
-                function ($value) use ($key, $shopId, $widgetId) {
-                    switch ($value['type']) {
-                        case Rules::RULE_TYPE_SINGLE:
-                            $this->insertSingleItem($shopId, $widgetId, $value['params'], $key);
-                            break;
-                        case Rules::RULE_TYPE_RULE:
-                            $this->insertRuleItem($shopId, $widgetId, $value['params'], $key);
-                            break;
-                        default:
-                            throw new \Exception('Rule type undefined');
-                    }
+            foreach ($rule as $position){
+                switch ($position['type']) {
+                    case Rules::RULE_TYPE_SINGLE:
+                        $this->insertSingleItem($shopId, $widgetId, $position['params'], $key);
+                        break;
+                    case Rules::RULE_TYPE_RULE:
+                        $this->insertRuleItem($shopId, $widgetId, $position['params'], $key);
+                        break;
+                    default:
+                        throw new \Exception('Rule type undefined');
                 }
-            );
+            }
         }
     }
 
