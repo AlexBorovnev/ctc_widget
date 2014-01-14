@@ -60,7 +60,12 @@ class DbLoadWidget extends WidgetAbstract
     {
         switch ($rule['rules_type']) {
             case Rules::RULE_TYPE_SINGLE:
-                return $this->getSingleItem($rule['shop_id'], $rule);
+                if ($offer = $this->getSingleItem($rule['shop_id'], $rule)){
+                    return $offer;
+                } elseif (!empty($rule['freeWidgetRule'])) {
+                    return $this->getRandomItem($rule['shop_id'], $rule['freeWidgetRule']);
+                }
+                return array();
             case Rules::RULE_TYPE_RULE:
                 return $this->getRandomItem($rule['shop_id'], $rule['source']);
             default:
@@ -70,8 +75,21 @@ class DbLoadWidget extends WidgetAbstract
 
     protected function getRules($widgetId)
     {
+        $preparedRule = array();
         $rulesModel = new Rules($this->dbh);
-        return $rulesModel->getWidgetRules($widgetId);
+        $rules = $rulesModel->getWidgetRules($widgetId);
+        foreach ($rules as $rule){
+            if ($rule['rules_type'] == Rules::RULE_TYPE_RULE){
+                $preparedRule[$rule['position']]['freeWidgetRule'] = $rule['source'];
+                unset($rule['source']);
+                $rule['rules_type'] = Rules::RULE_TYPE_SINGLE;
+            }
+            if (empty($preparedRule[$rule['position']])){
+                $preparedRule[$rule['position']] = array();
+            }
+            $preparedRule[$rule['position']] = array_merge($preparedRule[$rule['position']], $rule);
+        }
+        return $preparedRule;
     }
 
     protected function getSingleItem($shopId, $rule)

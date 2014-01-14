@@ -56,6 +56,8 @@ function mainInit(shopObj){
                 toastr.error('Такого товара не существует')
                 return;
             }
+            //if tree must closed uncomment this line
+            //holder.find('.b').removeClass('b').parents('.IsRoot').removeClass('ExpandOpen').addClass('ExpandClosed');
             var offers = [];
             for(var i in response.list){
                 var item = response.list[i];

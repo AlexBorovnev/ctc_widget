@@ -10,6 +10,9 @@ class Rules extends AbstractModel
     const RULE_TYPE_SINGLE_TITLE = 'Указанный товар';
     const RULE_TYPE_RULE_TITLE = 'Правило';
 
+    const RULE_TYPE_SINGLE_VALUE = 'single';
+    const RULE_TYPE_RULE_VALUE = 'rule';
+
     protected $filterList = array('categoryId' => 'category_id', 'color' => 'color');
 
     public function insertRule($shopId, $widgetId, $rule, $position, $ruleType)
@@ -65,13 +68,18 @@ class Rules extends AbstractModel
                     $goodsModel = new Goods($this->dbh);
                     $source = $goodsModel->getSingleOffer(
                         array('shopId' => $rule['shop_id'], 'offerId' => $rule['source']),
-                        0
+                        !Goods::OFFER_IS_AVAILABLE
                     );
+                    $outputList['positions'][$rule['position']]['source'] = $source;
+                } elseif($rule['rules_type'] == Rules::RULE_TYPE_RULE){
+                    $outputList['positions'][$rule['position']]['freeWidgetRules'] = $source;
                 }
-                $outputList['positions'][$rule['position']] = array(
-                    'source' => $source,
-                    'typeId' => $rule['rules_type'],
-                    'typeName' => $rule['rules_name']
+                $outputList['positions'][$rule['position']] = array_merge(
+                    $outputList['positions'][$rule['position']],
+                    array(
+                        'typeId' => $rule['rules_type'],
+                        'typeName' => $rule['rules_name']
+                    )
                 );
             }
             $outputList = array_merge(

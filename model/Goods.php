@@ -3,6 +3,7 @@ namespace model;
 
 class Goods extends AbstractModel
 {
+    const OFFER_IS_AVAILABLE = 1;
     protected $fields = array('categoryId' => 'category_id', 'color' => 'color', 'shopId' => 'shop_id');
 
     public function getOffer($data)
