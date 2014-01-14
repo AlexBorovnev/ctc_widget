@@ -819,3 +819,19 @@ h5{
 	margin-bottom: 10px;
 }
 
+.removePosition{
+	color: #f00 !important;
+	font-size: 12px;
+}
+
+.mr20{
+	margin-right: 20px;
+}
+
+.mr40{
+	margin-right: 40px;
+}
+
+.green{
+	color: #00962A !important;
+}

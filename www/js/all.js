@@ -1,5 +1,9 @@
 $(function(){
-	$( "input[type=button], input[type=submit], button, a.btn" ).button().find('span').css('font-weight', 'bold');
+	makeButton( "input[type=button], input[type=submit], button, a.btn" );
 	$( ".check" ).button();
 	
 });
+
+function makeButton(selector){
+	$(selector).button().find('span').css('font-weight', 'bold');
+}

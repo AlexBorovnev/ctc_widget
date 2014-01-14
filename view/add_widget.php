@@ -28,11 +28,11 @@
 </div>
 <div class="hidden">
 	<div class="selectedOffer selectedOfferTpl">
-		<h5>Выбранный товар</h5>
+		<h5 class="fl mr40">Выбранный товар</h5><a href="#" class="changeOffer green">Изменить</a>
 		<div class="forPreview"></div>
 	</div>
 	<div class="selectedRule selectedRuleTpl">
-		<h5>Выбранные правила:</h5>
+		<h5 class="fl mr40">Выбранные правила:</h5><a href="#" class="changeRule green">Изменить</a>
 		<div class="forPreviewRule">
 			<div><span class="b">Категории: </span><span class="ruleCategories">222</span><br></div>
 			<div><span class="b">Цвета: </span><span class="ruleColors">33123</span></div>
@@ -84,13 +84,14 @@
 	</div>
 
 	<div data-init-pos="" class="pos freePositionTpl">
-		<div class="header"><h4><span class="positionNum"></span> позиция</h4>
-            <a href="#" data-position-num="" class="btn removePosition">Удалить позицию</a>
+		<div class="header">
+			<h4 class="fl mr20"><span class="positionNum"></span> позиция</h4>
+            <a href="#" data-position-num="" class="removePosition">Удалить позицию</a>
         </div>
 		<div class="body clearfix">
 			<a href="#" class="btn choseProduct">Выбрать товар</a>
 			<a href="#" class="btn createRule">Создать правило</a>
-			<a href="#" class="btn savePosition">Сохранить позицию</a>
+<!--			<a href="#" class="btn savePosition">Сохранить позицию</a>-->
 			<div class="categoryOfferHolder clearfix"></div>
 			<div class="ruleHolder clearfix"></div>
 			<div class="_preview"></div>
@@ -172,10 +173,10 @@
 			<div class="clearfix">
 				<div class="rule_preview"></div>
 			</div>
-
-			<div class="ruleHolder"></div>
-			<div class="positionHolder clearfix"  data-position-num="1">
-
+            
+				<div class="ruleHolder"></div>
+				<div class="positionHolder clearfix"  data-position-num="1">
+			
 			</div>
 
 
@@ -189,12 +190,14 @@
 				<div class="rule_preview"></div>
 			</div>
 			<div class="ruleHolder"></div>
+			
 			<div class="positionHolder clearfix positionHolder1" data-position-num="1">
 
 			</div>
 			<div class="positionHolder clearfix positionHolder2" data-position-num="2">
 
 			</div>
+			
 
 
 		</div>

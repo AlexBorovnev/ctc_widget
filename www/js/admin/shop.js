@@ -1,3 +1,29 @@
+var State = new function(){
+	var self = this;
+	this.isRuleSelected = false;
+	this.isOfferSelected = false;
+	
+	this.isRuleValid = false;
+	this.isOfferValid = false;
+	
+	this.isRuleSaved = false;
+	this.isOfferSaved = false;
+	this.hasPosition = false;
+	
+	
+	this.clear = function(){
+		this.isRuleSelected = false;
+		this.isOfferSelected = false;
+		
+		this.isRuleValid = false;
+		this.isOfferValid = false;
+		
+		this.isRuleSaved = false;
+		this.isOfferSaved = false;
+		this.hasPosition = false;
+	}
+};                      
+
 function _shop(data){
 	this.id = data.id;
 	this.title = data.title;
@@ -43,8 +69,61 @@ function _shop(data){
 			var tpl = {'type': '2', 'params': [offer.attributes.id]}
 			params.push(tpl);
 		}
-		return params;
+		return [params];
 	} 
+	this.getFreePositions = function(){
+		var $poses = $shop.find('.pos:visible');
+		var l = $poses.length;
+		var out = [];
+		while(l--){
+			var $p = $($poses[l]);
+			var $offer = $p.find('.categoryOfferHolder').find('.offerItem.active');
+				var offerId = '';
+                var num = $(this).parents('.pos').attr('data-init-pos');
+                var preparedPosition = [];
+				if($offer.length > 0){
+					offerId = $offer.data('offer').attributes.id;
+
+					var position = {'type': 2, 'params': [offerId], 'num': num};
+					preparedPosition.push(position);
+
+				}
+				
+				var $categories = $p.find('.ruleHolder .tree .Content.active');//cid
+				var $colors = $p.find('.ruleHolder .colorHolder .color.active');
+				var catIds = [];
+				var colors = [];
+				$categories.each(function(){
+						catIds.push($(this).parent().data('cid'));
+				});
+
+				$colors.each(function(){
+						colors.push($(this).data('colorName'));
+				});
+
+				if($categories.length == 0){
+					toastr.error('Необходимо выбрать правило');
+					return;
+				}
+				var params = {};
+				if(catIds.length > 0){
+					params['categoryId'] = catIds;
+				}
+				if(colors.length > 0){
+					params['color'] = colors;
+				}
+
+				var position = {'type': 1, 'params': params, 'num': num};
+                preparedPosition.push(position);
+                out.push(preparedPosition);
+				//self.addPosition(preparedPosition);
+				
+		}
+		return out;	
+				
+				
+
+	}
 
 	this.getCommonRule = function(){
 		if(this.getWidgetType == 3){
@@ -72,17 +151,48 @@ function _shop(data){
 		$wInfo.find('.widgetTitle').html(self.wTitle);
 	}
 	this.initEvents = function(){
+		$shop.on('click', '.changeOffer', function(e){
+			e.preventDefault();
+			
+			var parent = $(this).parents('.pos');
+			if(parent.length == 0)
+				parent = $(this).parents('.widget');
+			var previewOffer = parent.find('.selectedOffer');
+			var holder = parent.find('.categoryOfferHolder');
+			
+			previewOffer.remove();
+			holder.show();
+		});
+		
+		$shop.on('click', '.changeRule', function(e){
+			e.preventDefault();
+			
+			var parent = $(this).parents('.pos');
+			if(parent.length == 0)
+				parent = $(this).parents('.widget');
+			var previewRule = parent.find('.selectedRule');
+			var holder = parent.find('.ruleHolder .rule');
+			
+			State.isRuleSelected = true;
+			
+			previewRule.remove();
+			holder.show();
+		});
+		
 		$shop.on('click', ".saveWidget", function(e){
 				e.preventDefault();
 				var data = {};
 				if(widgetType == 3){//free
-
+					var positions = self.getFreePositions();
+					if(positions == undefined){
+						return;
+					}
 					if(positions.length == 0)
-						{
+					{
 						toastr.error('Необходимо создать как минимум 1 позицию');
 						return;
 					}
-
+                    
 					data = {
 						'shopId': self.id,
 						'title' : self.wTitle,
@@ -136,11 +246,12 @@ function _shop(data){
 				});
 
 		});
-		$shop.on('click', ".addProduct ", function(e){
+		
+		$shop.on('click', ".addProduct", function(e){
 				e.preventDefault();
-				selectedOffers = [];
+//				selectedOffers = [];
 				$(this).parents('.categoryOfferHolder').find('.offerItem.active').each(function(){
-						selectedOffers.push($(this).data('offer'));
+					selectedOffers.push($(this).data('offer'));
 				})
 
 				if(selectedOffers.length == 0)
@@ -155,12 +266,15 @@ function _shop(data){
 				var $preview = $(this).parent('.preview').clone(true);
 				$preview.find('.btn').remove();
 				$selectedOfferTpl.find('.forPreview').append($preview);
-                $(this).unbind('click');
-                $(this).hide();
+//                $(this).unbind('click');
 				$tpl.parent().find('._preview').append($selectedOfferTpl);
 				$(this).parents('.pos').find('.choseProduct').hide();
 				$(this).parents('.pos').find('.savePosition').show();
+				
+				State.isOfferSaved = true;
+				State.isOfferSelected = false;
 		})
+		
 		$shop.on('click', ".categoryHolder .Content", function(){
 
 				var cid = $(this).parent().data('cid'),
@@ -199,7 +313,7 @@ function _shop(data){
 
 				selectedCategories = arrayUnique(selectedCategories);
 		});
-
+		
 		$shop.on('click', ".categoryOfferHolder .Content", function(){
 
 				var cid = $(this).parent().data('cid');
@@ -235,26 +349,106 @@ function _shop(data){
 						selectedColors.slice(ind, 1);
 				}
 		})
-		$shop.on('click', ".createRule",function(e){
+		
+		$shop.on('click', ".createRule", function(e){
 				e.preventDefault();
+				console.log('State.isOfferSelected: ' + State.isOfferSelected);
+				if(State.isOfferSelected){
+					if(confirm("Сохранить выбранный товар?")){
+						
+						var $parent = $(this).parents('.pos');
+						var $selOffer = $parent.find('.offerItem.active');
+						if($selOffer.length > 0){//save
+							$parent.find('.addProduct').trigger('click');
+						}
+						else{
+							toastr.error('Выберите товар');
+							return;
+						}
+					}
+					else{
+						State.isOfferSelected = false;
+						var $parent = $(this).parents('.pos');
+						var $but = $parent.find('.choseProduct');
+						var css = $but.data('oldCss');
+						$but.css(css);
+						var $holder = $parent.find('.categoryOfferHolder');
+						$holder.slideUp();
+//						$holder.find('.saveRule').hide();
+						
+						$holder.find('.Content.b').removeClass('b');
+						$holder.find('.ExpandOpen').removeClass('ExpandOpen').addClass('ExpandClosed');
+						$holder.find('.offerHolder').empty();
+						$holder.find(".previewPic img").attr('src', previewPath);
+						$holder.find(".offerInfo").empty();
+						
+					}
+				}
+				if(State.isRuleSelected){
+					return;
+				}
+				State.isRuleSelected = true;
+				
 				var $tpl = $(this).parent().find(".ruleHolder");
+				var css = $(this).css(['background', 'background-color', 'color']);
+				$(this).data('oldCss', css);
+				
 				$(this).css({'background': 'none', 'background-color': '#ff7676', 'color': "#000"});
-
 				$tpl.slideDown();
-				$(this).unbind('click');
+				
 				$(this).parent().find('.saveRule').show();
 		});
-		$shop.on('click', ".choseProduct",function(e){
+		
+		$shop.on('click', ".choseProduct", function(e){
 				e.preventDefault();
+				
+				if(State.isRuleSelected){
+					if(confirm("Сохранить выбранные правила ?")){
+						if(!State.isRuleValid){
+							toastr.error('Необходимо выбрать правило перед сохранением');
+							return;
+						}
+						var $parent = $(this).parents('.pos');
+						var $button = $parent.find('.saveRule');
+						$button.trigger('click');	
+						
+					}
+					else{
+						//отмена 
+						State.isRuleSelected = false;
+						var $parent = $(this).parents('.pos');
+						var $but = $parent.find('.createRule');
+						var css = $but.data('oldCss');
+						$but.css(css);
+						var $holder = $parent.find('.ruleHolder');
+						$holder.slideUp();
+						$holder.find('.saveRule').hide();
+						
+						$holder.find('.Content.active').removeClass('active');
+						$holder.find('.color.active').removeClass('active');
+					}
+				}
+				if(State.isOfferSelected){
+					return;
+				}
+				State.isOfferSelected = true;
+				
 				var $tpl = $(this).parent().find('.categoryOfferHolder');
+				var css = $(this).css(['background', 'background-color', 'color']);
+				$(this).data('oldCss', css);
 				$(this).css({'background': 'none', 'background-color': '#ff7676', 'color': "#000"});
 
 				$tpl.slideDown();
-				$(this).off('click');
-				$(this).parent().find('.saveOffer').show();
+				//$(this).off('click');
+				
 		});
+		
 		$shop.on('click', ".addPosition", function(e){
 				e.preventDefault();
+				//if(State.hasPosition){
+//					toastr.error('Сохраните или удалите позицию, перед добавлением новой');
+//					return;
+//				}
 				if(posNum > 7){
 					toastr.error('Максимальное количество позиций - 7');
 					return;
@@ -267,8 +461,11 @@ function _shop(data){
 				$newPos.find('.saveRule').hide();
                 indexNum++;
 
+                State.clear();
+                State.hasPosition = true;
 				$(this).prev().append($newPos);
 		})
+		
         $shop.on('click', '.removePosition', function(e){
             e.preventDefault();
             if (confirm('Удалить позицию?')){
@@ -292,11 +489,12 @@ function _shop(data){
             }
 
         });
+        
 		$shop.on('click', '.saveRule', function(e){
 				e.preventDefault();
 				var $selectedRule = $(".selectedRuleTpl").clone(true).removeClass('selectedRuleTpl');
 				var $tpl = $(this).parents('.rule');
-				$tpl.hide();
+				
 				var cats = [];
 				var colors = [];
 				$tpl.find('.color.active').each(function(){
@@ -305,6 +503,15 @@ function _shop(data){
 				$tpl.find('.Content.active').each(function(){
 						cats.push($(this).html());
 				});
+				if(cats.length === 0 || colors.length === 0){
+					toastr.error('Укажите правило');
+					return;
+				}
+				State.isRuleValid = true;
+				State.isRuleSelected = false;
+				
+				$tpl.hide();
+				
 				$selectedRule.find('.ruleCategories').html(cats.join(', '));
 				$selectedRule.find('.ruleColors').html(colors.join(', '));
 				$(this).parents('.pos').find('._preview').append($selectedRule);
@@ -312,59 +519,14 @@ function _shop(data){
 				$(this).parents('.pos').find('.savePosition').show();
 				$(this).parents('.pos').find('.createRule').hide();
 				$(this).parents('.widget').find('.createRule').hide();
-//				$tpl.parent().find('._preview')
 		});
+		
 		$shop.on('click', ".savePosition", function(e){
             	e.preventDefault();
-				var $p = $(this).parent().parent();
-				var $offer = $p.find('.categoryOfferHolder').find('.offerItem.active');
-				var offerId = '';
-                var num = $(this).parents('.pos').attr('data-init-pos');
-				if($offer.length > 0){
-					offerId = $offer.data('offer').attributes.id;
-
-					var position = {'type': 2, 'params': [offerId], 'num': num};
-					self.addPosition(position);
-				}
-				else{
-					var $categories = $p.find('.ruleHolder .tree .Content.active');//cid
-					var $colors = $p.find('.ruleHolder .colorHolder .color.active');
-					var catIds = [];
-					var colors = [];
-					$categories.each(function(){
-							catIds.push($(this).parent().data('cid'));
-					});
-
-					$colors.each(function(){
-							colors.push($(this).data('colorName'));
-					});
-
-					if($categories.length == 0){
-						toastr.error('необходимо выбрать правило или товар');
-						return;
-					}
-					var params = {};
-					if(catIds.length > 0){
-						params['categoryId'] = catIds;
-					}
-					if(colors.length > 0){
-						params['color'] = colors;
-					}
-
-					var position = {'type': 1, 'params': params, 'num': num};
-
-					self.addPosition(position);
-				}
-
-				$p.find('.ruleHolder, .categoryOfferHolder').slideUp();
-
-				$(this).hide().after("<div style='margin-left: 5px;'><h5>Сохранено</h5></div>");
-				$(this).prev().hide().prev().hide();
 				
-				toastr.info("Позиция сохранена");
 		});
-	}
-
+	}       
+    
 	this.initTemplates = function(list){
 		var $tree = buildTree('myTree', list);
 		//            $(".treeTpl").append($tree);
@@ -509,3 +671,5 @@ function _shop(data){
 
 	this.init();
 }
+
+
