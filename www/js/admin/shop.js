@@ -288,6 +288,7 @@ function _shop(data){
 
 				$(this).toggleClass('active')
 				if($(this).hasClass('active')){
+					State.isRuleValid = true;
 					if(childs != undefined && childs.length > 0){//PARENT
 						domChilds.addClass('active');
 					}
@@ -342,8 +343,10 @@ function _shop(data){
 		});
 
 		$shop.on('click', '.colorHolder .color', function(){
+				
 				$(this).toggleClass('active');
 				if($(this).hasClass('active')){
+					State.isRuleValid = true;
 					selectedColors.push($(this).data('colorName'));
 				}
 				else{
