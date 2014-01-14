@@ -80,11 +80,17 @@ class ApiServer
             switch ($params['required']) {
                 case true:
                     if (empty($data[$name]) || !$this->correctType($data[$name], $params['type'])) {
+                        if (!$this->config['env']['prod']){
+                            $this->sendResponse(array('message' => sprintf('Param %s is incorrect', $params['type'])), true, 5);
+                        }
                         $this->sendResponse(array('message' => $this->config['messages'][5]), true, 5);
                     }
                     break;
                 case false:
                     if (!empty($data[$name]) && !$this->correctType($data[$name], $params['type'])) {
+                        if (!$this->config['env']['prod']){
+                            $this->sendResponse(array('message' => sprintf('Param %s is incorrect', $params['type'])), true, 5);
+                        }
                         $this->sendResponse(array('message' => $this->config['messages'][5]), true, 5);
                     }
                     break;
