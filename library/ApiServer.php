@@ -205,15 +205,7 @@ class ApiServer
             $data['positions'] = array();
         }
         foreach ($data['positions'] as $rule) {
-            array_walk($rule, function($value){
-                    $this->checkNeededParam(
-                        $value,
-                        array(
-                            'type' => array('type' => 'string', 'required' => true),
-                            'params' => array('type' => 'array', 'required' => true)
-                        )
-                    );
-                });
+            array_walk($rule, array($this, 'checkNeededParam'));
         }
         try {
             $this->dbh->beginTransaction();
