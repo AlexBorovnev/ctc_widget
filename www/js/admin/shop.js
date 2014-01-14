@@ -71,9 +71,9 @@ function _shop(data){
 		for(var i in selectedOffers){
 			var offer = selectedOffers[i];
 			var tpl = {'type': '2', 'params': [offer.attributes.id]}
-			params.push(tpl);
+			params.push([tpl]);
 		}
-		return [params];
+		return params;
 	} 
 	this.getFreePositions = function(){
 		var $poses = $shop.find('.pos:visible');
