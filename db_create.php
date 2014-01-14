@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS `rules` (
   `rules_type` int(10) NOT NULL,
   `source` text DEFAULT NULL,
   `position` int(11) DEFAULT NULL,
-  UNIQUE KEY `widget_id` (`widget_id`,`position`,`shop_id`),
+  UNIQUE INDEX `widget_id` (`widget_id`, `position`, `shop_id`, `rules_type`),
   KEY `FK_rules_widgets` (`widget_id`),
   KEY `FK_rules_rules_type` (`rules_type`),
   KEY `FK_rules_shops` (`shop_id`),
