@@ -64,6 +64,10 @@ function _shop(data){
 	}
 	this.getPositions = function(){
 		var params = [];
+		var selectedOffers = [];
+		$shop.find('.offerItem.active').each(function(){
+					selectedOffers.push($(this).data('offer'));
+				})
 		for(var i in selectedOffers){
 			var offer = selectedOffers[i];
 			var tpl = {'type': '2', 'params': [offer.attributes.id]}
@@ -250,11 +254,10 @@ function _shop(data){
 		$shop.on('click', ".addProduct", function(e){
 				e.preventDefault();
 //				selectedOffers = [];
-				$(this).parents('.categoryOfferHolder').find('.offerItem.active').each(function(){
-					selectedOffers.push($(this).data('offer'));
-				})
+				var l = $(this).parents('.categoryOfferHolder').find('.offerItem.active').length;
+				
 
-				if(selectedOffers.length == 0)
+				if(l == 0)
 					toastr.error('Выберите товар');
 				else
 					toastr.info('Товар выбран');
