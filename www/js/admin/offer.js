@@ -65,7 +65,7 @@ function buildOfferList(offers, $holder, currItem){
 	//var $w = widget.$w;
 //	var offers = widget.offers;
 	var $ul = $holder.find("ol.offerHolder");
-
+    $ul.empty();
 	for(var i in offers){
 
 		var $li = $('<li class="offerItem">'+ offers[i].vendor +" "+ offers[i].vendorCode +'</li>');

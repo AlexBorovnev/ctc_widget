@@ -149,7 +149,13 @@ class ApiServer
             )
         );
         $goodsModel = new Goods($this->dbh);
-        $commonData = $goodsModel->getOffer(array('shopId' => $data['shopId'], 'offerId' => $data['offerId']));
+        $commonData = $goodsModel->getOffer(
+            array(
+                'shopId' => $data['shopId'],
+                'offerId' => $data['offerId'],
+                'allOffer' => empty($data['allOffer']) ? false : true
+            )
+        );
         return array('list' => $commonData, 'count' => count($commonData));
     }
 
@@ -199,13 +205,15 @@ class ApiServer
             $data['positions'] = array();
         }
         foreach ($data['positions'] as $rule) {
-            $this->checkNeededParam(
-                $rule,
-                array(
-                    'type' => array('type' => 'string', 'required' => true),
-                    'params' => array('type' => 'array', 'required' => true)
-                )
-            );
+            array_walk($rule, function($value){
+                    $this->checkNeededParam(
+                        $value,
+                        array(
+                            'type' => array('type' => 'string', 'required' => true),
+                            'params' => array('type' => 'array', 'required' => true)
+                        )
+                    );
+                });
         }
         try {
             $this->dbh->beginTransaction();
@@ -223,16 +231,21 @@ class ApiServer
     protected function rulesAdd($shopId, $widgetId, $rules)
     {
         foreach ($rules as $key => $rule) {
-            switch ($rule['type']) {
-                case Rules::RULE_TYPE_SINGLE:
-                    $this->insertSingleItem($shopId, $widgetId, $rule['params'], $key);
-                    break;
-                case Rules::RULE_TYPE_RULE:
-                    $this->insertRuleItem($shopId, $widgetId, $rule['params'], $key);
-                    break;
-                default:
-                    throw new \Exception('Rule type undefined');
-            }
+            array_walk(
+                $rule,
+                function ($value) use ($key, $shopId, $widgetId) {
+                    switch ($value['type']) {
+                        case Rules::RULE_TYPE_SINGLE:
+                            $this->insertSingleItem($shopId, $widgetId, $value['params'], $key);
+                            break;
+                        case Rules::RULE_TYPE_RULE:
+                            $this->insertRuleItem($shopId, $widgetId, $value['params'], $key);
+                            break;
+                        default:
+                            throw new \Exception('Rule type undefined');
+                    }
+                }
+            );
         }
     }
 

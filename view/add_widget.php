@@ -52,6 +52,10 @@
 		</div>
 		<div class="grid13">
 			<h4>Выбор товара</h4>
+            <div class="search">
+                <input type="text" name="offer_id" placeholder="Введите артикул товара">
+                <a href="#" class="btn searchProduct">Поиск</a>
+            </div>
 			<ol class="offerHolder">
 
 			</ol>
@@ -83,7 +87,7 @@
 		</div>
 	</div>
 
-	<div data-init-pos="" class="pos freePositionTpl">
+	<div data-init-pos="" class="pos freePositionTpl dev-positions">
 		<div class="header">
 			<h4 class="fl mr20"><span class="positionNum"></span> позиция</h4>
             <a href="#" data-position-num="" class="removePosition">Удалить позицию</a>
@@ -122,6 +126,11 @@
 			</div>
 			<div class="grid13">
 				<h4>Выбор товара</h4>
+
+                <div class="search">
+                    <input type="text" name="offer_id" placeholder="Введите артикул товара">
+                    <a href="#" class="btn searchProduct">Поиск</a>
+                </div>
 				<ol class="offerHolder">
 
 				</ol>
@@ -157,7 +166,7 @@
 
 		</div>
 	</div>
-	<div class="pos positionTpl">
+	<div class="pos positionTpl dev-positions">
 		<div class="header"><h4><span class="positionNum"></span> позиция</h4></div>
 		<div class="body">
 			<a href="#" class="btn choseProduct">Выбрать товар</a>

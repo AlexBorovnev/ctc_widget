@@ -68,23 +68,23 @@ var initEditor = {
         for (var i in base.obj.positions) {
             $('.dev-block-' + i + ' .treeHolder').append(this.catTree.clone(true));
             $('.dev-block-' + i + ' .treeHolder li').each(function () {
-                if (base.obj.positions[i].source.category_id != undefined && ($(this).data('cid') == base.obj.positions[i].source.category_id)) {
+                if ($(this).parents('.dev-offer-category').length > 0 && base.obj.positions[i].source != undefined && base.obj.positions[i].source.category_id != undefined && ($(this).data('cid') == base.obj.positions[i].source.category_id)) {
                     $(this).find('.Content').addClass('b');
-                    $(this).parent().parent().removeClass('ExpandClosed').addClass('ExpandOpen');
+                    $(this).parents('.IsRoot').removeClass('ExpandClosed').addClass('ExpandOpen');
                     getOfferList($(this).data('cid'), base.obj.shopId, $(this).parents('.dev-block-' + i), base.obj.positions[i].source.offer_id);
-                    return false;
-                } else if (base.obj.positions[i].source.categoryId != undefined && (base.obj.positions[i].source.categoryId.indexOf($(this).data('cid')) != -1)) {
+                }
+                if ($(this).parents('.dev-category-rule').length > 0 && base.obj.positions[i].freeWidgetRules && base.obj.positions[i].freeWidgetRules.categoryId != undefined && (base.obj.positions[i].freeWidgetRules.categoryId.indexOf($(this).data('cid')) != -1)) {
                     $(this).find('.Content').addClass('b');
                     $(this).parent().parent().removeClass('ExpandClosed').addClass('ExpandOpen');
                 }
             })
-            if (base.obj.positions[i].source.color != undefined) {
-                base.initColor('.dev-block-' + i + ' .dev-editor-color', base.obj.positions[i].source.color);
+            if (base.obj.positions[i].freeWidgetRules && base.obj.positions[i].freeWidgetRules.color != undefined) {
+                base.initColor('.dev-block-' + i + ' .dev-editor-color', base.obj.positions[i].freeWidgetRules.color);
             }
         }
     },
-    initSectionForRule: function(filter, value){
-        switch (filter){
+    initSectionForRule: function (filter, value) {
+        switch (filter) {
             case 'categoryId':
                 $('.ruleHolder').append(this.catTree.clone(true));
                 $('.ruleHolder li').each(function () {
@@ -103,8 +103,8 @@ var initEditor = {
         var base = this,
             rule = base.obj.commonRule;
 
-        for (var i in base.filters){
-            if (rule[base.filters[i]]){
+        for (var i in base.filters) {
+            if (rule[base.filters[i]]) {
                 base.initSectionForRule(base.filters[i], rule[base.filters[i]]);
             }
         }
@@ -156,7 +156,7 @@ var initEditor = {
             var data = {},
                 $title = $('[name=widget_name]');
             $title.val($title.val().trim());
-            if (!$title.val()){
+            if (!$title.val()) {
                 toastr.error('Введите название виджета что бы продолжить');
                 $title.focus();
                 return;
@@ -260,12 +260,18 @@ var initEditor = {
     getPositions: function () {
         var positions = [],
             base = this;
-        $('.dev-positions').each(function () {
+        $('.dev-positions').each(function (i) {
             var position = $(this).find('[name="item_position"]').val(),
-                type = $(this).find('[name="rule_type"]').val();
-            if (position) {
-                positions.push({type: type, params: base.getSource(position, type)});
-            }
+                $type = $(this).find('[name="rule_type"]');
+                if (position){
+                    positions[i] = [];
+                    $type.each(function(){
+                        var source = base.getSource(position, $(this).val());console.log(source.length, source);
+                        if (source.length > 0 || source.length == undefined){
+                            positions[i].push({type: $(this).val(), params: source});
+                        }
+                    });
+                }
         });
         return positions;
     },
@@ -278,7 +284,7 @@ var initEditor = {
             return this.getRule('.dev-block-' + position);
         } else if (type == 2) {
             var offer = $('.dev-block-' + position).find('.offerItem.active').data('offer');
-            if (offer){
+            if (offer) {
                 return new Array(offer['attributes']['id']);
             }
         }
@@ -298,10 +304,12 @@ var initEditor = {
         });
         if (colorsValue) {
             params.color = colorsValue;
-        };
+        }
+        ;
         if (categoriesValue) {
             params.categoryId = categoriesValue;
-        };
+        }
+        ;
         return params;
     }
 }

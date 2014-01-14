@@ -45,6 +45,28 @@ function mainInit(shopObj){
 			$(".colorTpl").append(buildColorList());
 
 	})
+
+    $('.searchProduct').on('click', function(e){
+        e.preventDefault();
+        var offerId = $(this).parent().find('[name="offer_id"]').val(),
+            shopId = shopObj.id,
+            holder = $(this).parents('.dev-positions');
+        api.call('getOffer', {'shopId': shopId, 'offerId': [offerId], 'allOffer': true}, function(response){
+            if(response.list.length == 0){
+                toastr.error('Такого товара не существует')
+                return;
+            }
+            //if tree must closed uncomment this line
+            //holder.find('.b').removeClass('b').parents('.IsRoot').removeClass('ExpandOpen').addClass('ExpandClosed');
+            var offers = [];
+            for(var i in response.list){
+                var item = response.list[i];
+                var offer = $.parseJSON(item);
+                offers.push(offer);
+            }
+            buildOfferList(offers, holder);
+        });
+    })
 }
 
 
