@@ -136,6 +136,7 @@ function _shop(data){
 		$wInfo = $shop.find('.widgetInfo');                                     
 		$wInfo.find(".desc.hidden").removeClass('hidden');
 		$wInfo.find(".widgetUrl").val(host);
+		$wInfo.find(".previewUrl").attr('href', host);
 		$wInfo.find(".widgetType").html($(".widgetTypeList option:selected").html());
 		$wInfo.find(".widgetSkin").html($(".widgetSkinList option:selected").html());
 		$wInfo.find(".widgetCount").html(selectedOffers.length);
