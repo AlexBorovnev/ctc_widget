@@ -135,15 +135,16 @@ var initEditor = {
         $(selector + ' .dev-offer-category').on('click', ".Content", function () {
             var cid = $(this).parent().data('cid'),
                 pid = $(this).parent().data('pid'),
-                $holder = $(this).parents('.dev-positions');
-            $holder.find(".previewPic img").attr('src', '../../images/preview.png');
-            $holder.find(".offerInfo").empty();
+                $holderOffer = $(this).parents('.dev-positions'),
+                $holderCategory = $(this).parents('.dev-offer-category');
+            $holderOffer.find(".previewPic img").attr('src', '../../images/preview.png');
+            $holderOffer.find(".offerInfo").empty();
             if (pid != 0) {
-                $holder.find(".Content.b").removeClass('b');
+                $holderCategory.find(".Content.b").removeClass('b');
                 $(this).addClass('b');
-                $holder.find(".noOffers").remove();
-                $holder.find(".offerHolder li").remove();
-                getOfferList(cid, base.obj.shopId, $holder);
+                $holderOffer.find(".noOffers").remove();
+                $holderOffer.find(".offerHolder li").remove();
+                getOfferList(cid, base.obj.shopId, $holderOffer);
             }
             else {
                 $(this).prev().trigger('click');

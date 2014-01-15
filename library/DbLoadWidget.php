@@ -95,6 +95,9 @@ class DbLoadWidget extends WidgetAbstract
     protected function getSingleItem($shopId, $rule)
     {
         $goodsModel = new Goods($this->dbh);
+        if (!isset($rule['source'])) {
+            return array();
+        }
         $offerData = $goodsModel->getSingleOffer(array('offerId' => $rule['source'], 'shopId' => $shopId));
         if (!$offerData && isset($rule['common_rule'])) {
             $offerData = $this->getRandomItem($shopId, $rule['common_rule']);

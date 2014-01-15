@@ -82,7 +82,7 @@
                                 </div>
                                 <div class="grid13">
                                     <h4>Предпросмотр товара</h4>
-                                    <?php if ($rule['typeId'] == \model\Rules::RULE_TYPE_SINGLE):
+                                    <?php if (!empty($rule['source'])):
                                      $rule['source']['common_data'] = unserialize(
                                         $rule['source']['common_data']
                                     ) ?>
