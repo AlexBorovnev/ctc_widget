@@ -128,31 +128,34 @@ function showShopPage($shopId, $page)
     $widgetsModel = new Widgets(Config::getInstance()->getDbConnection());
     $view = View::getInstance();
     //    $shopsList = $shopsModel->getAll();
-    $pageCount = $widgetsModel->getWidgetsPage($shopId);	
+    $pageCount = $widgetsModel->getWidgetsPage($shopId);
     $widgetsList = $widgetsModel->getCommonWidgetInfo(array('shopId' => $shopId), $page);
-    if ($pageCount && $widgetsList){
-        $typeList = array();
-        foreach ($widgetsModel->getTypeList() as $elem) {
-            $typeList[$elem['id']] = $elem['title'];
-        }
-        $skinList = array();
-        foreach ($widgetsModel->getSkinList() as $elem) {
-            $skinList[$elem['id']] = $elem['title'];
-        }
-        $shopModel = new Shops(Config::getInstance()->getDbConnection());
-        $shop = $shopModel->getShop(array('shopId' => array($shopId)));
-        $view->pageCount = $pageCount;
-        $view->typeList = $typeList;
-        $view->skinList = $skinList;
-        $view->currentPage = $page;
-        //    $view->shopsList = $shopsList;
-        $view->widgetsList = $widgetsList;
-        $view->shopId = $shopId;
-        $view->meta($shop[0]['title'], '/admin/shop/' . $shopId . '/', $shopId);
-        $view->render('shop.php');
-    } else {
+    $typeList = array();
+    foreach ($widgetsModel->getTypeList() as $elem) {
+        $typeList[$elem['id']] = $elem['title'];
+    }
+    $skinList = array();
+    foreach ($widgetsModel->getSkinList() as $elem) {
+        $skinList[$elem['id']] = $elem['title'];
+    }
+    $shopModel = new Shops(Config::getInstance()->getDbConnection());
+    $shop = $shopModel->getShop(array('shopId' => array($shopId)));
+    if (!$shop){
         $view->render('404.php');
     }
+    $view->pageCount = $pageCount;
+    $view->typeList = $typeList;
+    $view->skinList = $skinList;
+    $view->currentPage = $page;
+    //    $view->shopsList = $shopsList;
+    $view->widgetsList = $widgetsList;
+    $view->shopId = $shopId;
+    if (isset($shop[0]['title'])) {
+        $view->meta($shop[0]['title'], '/admin/shop/' . $shopId . '/', $shopId);
+    } else {
+        $view->meta('Магазин', '/admin/shop/' . $shopId . '/', $shopId);
+    }
+    $view->render('shop.php');
 }
 
 function showMainAdminPage(){
