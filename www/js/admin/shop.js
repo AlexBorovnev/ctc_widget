@@ -503,8 +503,12 @@ function _shop(data){
 				$(this).parents('.pos').find('._preview').append($selectedRule);
 				$(this).parents('.widget').find('.rule_preview').append($selectedRule);
 				$(this).parents('.pos').find('.savePosition').show();
-				$(this).parents('.pos').find('.createRule').hide();
-				$(this).parents('.widget').find('.createRule').hide();
+				var $but = $(this).parents('.pos').find('.createRule');
+				if($but.length == 0)
+					$but = $(this).parents('.widget').find('.createRule');
+				
+				$but.hide();
+				
 		});
 		
 		$shop.on('click', ".savePosition", function(e){
