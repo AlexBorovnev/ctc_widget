@@ -43,6 +43,7 @@ var initEditor = {
     count: 0,
     filters: ['color', 'categoryId'],
     catTree: [],
+    status: 'ok',
     init: function (obj) {
         this.catTree = buildTree('myTree', obj.workList.categoryList);
         $('.colorHolder').append(obj.workList.colorList);
@@ -112,7 +113,7 @@ var initEditor = {
 
     initEvents: function (selector) {
         var base = this;
-        $(selector + ' .ruleHolder').on('click', ".Content", function () {
+        $(selector + ' .dev-category-rule').on('click', ".Content", function () {
             var cid = $(this).parent().data('cid');
             var pid = $(this).parent().data('pid');
             if (pid != 0) {
@@ -131,7 +132,7 @@ var initEditor = {
                 }
             }
         });
-        $(selector + ' .itemHolder').on('click', ".Content", function () {
+        $(selector + ' .dev-offer-category').on('click', ".Content", function () {
             var cid = $(this).parent().data('cid'),
                 pid = $(this).parent().data('pid'),
                 $holder = $(this).parents('.dev-positions');
@@ -156,9 +157,15 @@ var initEditor = {
             var data = {},
                 $title = $('[name=widget_name]');
             $title.val($title.val().trim());
+            base.status = 'ok';
             if (!$title.val()) {
                 toastr.error('Введите название виджета что бы продолжить');
                 $title.focus();
+                return;
+            }
+            var positions = base.getPositions();
+            if (base.status == 'error_rule'){
+                toastr.error('Не выбрано правило');
                 return;
             }
             if ($(':hidden[name="type_id"]').val() == 3) {//free
@@ -166,7 +173,7 @@ var initEditor = {
                     'shopId': base.obj.shopId,
                     'skinId': $('[name=skin_id]').val(),
                     'typeId': $('[name=type_id]').val(),
-                    'positions': base.getPositions(),
+                    'positions': positions,
                     'widgetId': $('[name=widget_id]').val(),
                     'title': $title.val()
                 }
@@ -177,7 +184,7 @@ var initEditor = {
                     'skinId': $('[name=skin_id]').val(),
                     'typeId': $('[name=type_id]').val(),
                     'commonRule': base.getCommonRule(),
-                    'positions': base.getPositions(),
+                    'positions': positions,
                     'widgetId': $('[name=widget_id]').val(),
                     'title': $title.val()
                 };
@@ -262,11 +269,23 @@ var initEditor = {
             base = this;
         $('.dev-positions').each(function (i) {
             var position = $(this).find('[name="item_position"]').val(),
-                $type = $(this).find('[name="rule_type"]');
+                $type = $(this).find('[name="rule_type"]'),
+                widgetType = $(':hidden[name="type_id"]').val();
                 if (position){
                     positions[i] = [];
                     $type.each(function(){
-                        var source = base.getSource(position, $(this).val());console.log(source.length, source);
+                        var source = base.getSource(position, $(this).val()),
+                            count = 0;
+                        if (widgetType == 3 && $(this).val() == 1){console.log(source);
+                            for (var j in source){
+                                if (source[j].length == 0){
+                                    count++;
+                                }
+                            }
+                            if (count == base.filters.length){
+                                base.status = 'error_rule';
+                            }
+                        }
                         if (source.length > 0 || source.length == undefined){
                             positions[i].push({type: $(this).val(), params: source});
                         }
@@ -292,7 +311,7 @@ var initEditor = {
     },
     getRule: function (selector) {
         var colors = $(selector).find('.dev-editor-color.active'),
-            categories = $(selector).find('li .Content.b'),
+            categories = $(selector).find('.dev-category-rule li .Content.b'),
             colorsValue = [],
             categoriesValue = [],
             params = {};
