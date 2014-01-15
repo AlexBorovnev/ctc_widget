@@ -224,23 +224,6 @@ function _shop(data){
 						toastr.error('Укажите название виджета');
 						return;
 					}
-					if(data.typeId == 1){//small
-						if(data.positions.length < 1){
-							toastr.error('Необходимо выбрать товар для позиции');
-							return;
-						}
-					}
-					else if(data.typeId == 2){//big
-						if(data.positions.length < 1){
-							toastr.error('Необходимо выбрать товар для каждой позиции');
-							return;
-						}
-					}
-					//else{ //free
-					//						
-					//					}
-					console.log()
-
 				}
 
 				api.call('setWidget', data, function(response){
@@ -253,10 +236,8 @@ function _shop(data){
 		
 		$shop.on('click', ".addProduct", function(e){
 				e.preventDefault();
-//				selectedOffers = [];
-				var l = $(this).parents('.categoryOfferHolder').find('.offerItem.active').length;
-				
 
+				var l = $(this).parents('.categoryOfferHolder').find('.offerItem.active').length;
 				if(l == 0)
 					toastr.error('Выберите товар');
 				else
@@ -522,8 +503,12 @@ function _shop(data){
 				$(this).parents('.pos').find('._preview').append($selectedRule);
 				$(this).parents('.widget').find('.rule_preview').append($selectedRule);
 				$(this).parents('.pos').find('.savePosition').show();
-				$(this).parents('.pos').find('.createRule').hide();
-				$(this).parents('.widget').find('.createRule').hide();
+				var $but = $(this).parents('.pos').find('.createRule');
+				if($but.length == 0)
+					$but = $(this).parents('.widget').find('.createRule');
+				
+				$but.hide();
+				
 		});
 		
 		$shop.on('click', ".savePosition", function(e){
