@@ -1,4 +1,4 @@
-var State = new function(){
+function State(){
 	var self = this;
 	this.isRuleSelected = false;
 	this.isOfferSelected = false;
@@ -9,20 +9,7 @@ var State = new function(){
 	this.isRuleSaved = false;
 	this.isOfferSaved = false;
 	this.hasPosition = false;
-	
-	
-	this.clear = function(){
-		this.isRuleSelected = false;
-		this.isOfferSelected = false;
-		
-		this.isRuleValid = false;
-		this.isOfferValid = false;
-		
-		this.isRuleSaved = false;
-		this.isOfferSaved = false;
-		this.hasPosition = false;
-	}
-};                      
+}
 
 function _shop(data){
 	this.id = data.id;
@@ -177,13 +164,17 @@ function _shop(data){
 			var previewRule = parent.find('.selectedRule');
 			var holder = parent.find('.ruleHolder .rule');
 			
-			State.isRuleSelected = true;
+			
+			var state = parent.data('state');
+			state.isRuleSelected = true;
+			parent.data('state', state);
 			
 			previewRule.remove();
 			holder.show();
 		});
 		
 		$shop.on('click', ".saveWidget", function(e){
+				var $saveWidgetButton = $(this);
 				e.preventDefault();
 				var data = {};
 				if(widgetType == 3){//free
@@ -230,6 +221,7 @@ function _shop(data){
 						toastr.info('Виджет сохранен, id = ' + response.widgetId);
 						widgetId = response.widgetId;
 						self.widgetPreview();
+						$saveWidgetButton.hide();
 				});
 
 		});
@@ -237,6 +229,9 @@ function _shop(data){
 		$shop.on('click', ".addProduct", function(e){
 				e.preventDefault();
 
+				var $pos = $(this).parents('.pos');
+				var state = $pos.data('state');
+				
 				var l = $(this).parents('.categoryOfferHolder').find('.offerItem.active').length;
 				if(l == 0)
 					toastr.error('Выберите товар');
@@ -255,12 +250,17 @@ function _shop(data){
 				$(this).parents('.pos').find('.choseProduct').hide();
 				$(this).parents('.pos').find('.savePosition').show();
 				
-				State.isOfferSaved = true;
-				State.isOfferSelected = false;
+				state.isOfferSaved = true;
+				state.isOfferSelected = false;
+				$pos.data('state', state);
 		})
 		
 		$shop.on('click', ".categoryHolder .Content", function(){
-
+                var $pos = $(this).parents('.pos');
+                if($pos.length == 0)$pos = $(this).parents('.widget');
+				var state = $pos.data('state');
+				if(state == null) state = new State();
+				 
 				var cid = $(this).parent().data('cid'),
 				pid = $(this).parent().data('pid');
 
@@ -269,7 +269,7 @@ function _shop(data){
 
 				$(this).toggleClass('active')
 				if($(this).hasClass('active')){
-					State.isRuleValid = true;
+					state.isRuleValid = true;
 					if(childs != undefined && childs.length > 0){//PARENT
 						domChilds.addClass('active');
 					}
@@ -297,6 +297,8 @@ function _shop(data){
 				}
 
 				selectedCategories = arrayUnique(selectedCategories);
+				
+				$pos.data('state', state);
 		});
 		
 		$shop.on('click', ".categoryOfferHolder .Content", function(){
@@ -324,10 +326,13 @@ function _shop(data){
 		});
 
 		$shop.on('click', '.colorHolder .color', function(){
-				
+				var $pos = $(this).parents('.pos');
+                if($pos.length == 0)$pos = $(this).parents('.widget');
+				var state = $pos.data('state');
+				if(state == null) state = new State();
 				$(this).toggleClass('active');
 				if($(this).hasClass('active')){
-					State.isRuleValid = true;
+					state.isRuleValid = true;
 					selectedColors.push($(this).data('colorName'));
 				}
 				else{
@@ -335,12 +340,16 @@ function _shop(data){
 					if(ind != -1)
 						selectedColors.slice(ind, 1);
 				}
+				$pos.data('state', state);
 		})
 		
 		$shop.on('click', ".createRule", function(e){
 				e.preventDefault();
-				console.log('State.isOfferSelected: ' + State.isOfferSelected);
-				if(State.isOfferSelected){
+				var $pos = $(this).parents('.pos');
+				var state = $pos.data('state');
+				if(state == null)
+					state = new State();
+				if(state.isOfferSelected){
 					if(confirm("Сохранить выбранный товар?")){
 						
 						var $parent = $(this).parents('.pos');
@@ -354,7 +363,7 @@ function _shop(data){
 						}
 					}
 					else{
-						State.isOfferSelected = false;
+						state.isOfferSelected = false;
 						var $parent = $(this).parents('.pos');
 						var $but = $parent.find('.choseProduct');
 						var css = $but.data('oldCss');
@@ -371,10 +380,10 @@ function _shop(data){
 						
 					}
 				}
-				if(State.isRuleSelected){
+				if(state.isRuleSelected){
 					return;
 				}
-				State.isRuleSelected = true;
+				state.isRuleSelected = true;
 				
 				var $tpl = $(this).parent().find(".ruleHolder");
 				var css = $(this).css(['background', 'background-color', 'color']);
@@ -382,16 +391,19 @@ function _shop(data){
 				
 				$(this).css({'background': 'none', 'background-color': '#ff7676', 'color': "#000"});
 				$tpl.slideDown();
-				
+				$pos.data('state', state);
 				$(this).parent().find('.saveRule').show();
 		});
 		
 		$shop.on('click', ".choseProduct", function(e){
 				e.preventDefault();
-				
-				if(State.isRuleSelected){
+				var $pos = $(this).parents('.pos');
+				var state = $pos.data('state');
+				if(state == null)
+					state = new State();
+				if(state.isRuleSelected){
 					if(confirm("Сохранить выбранные правила ?")){
-						if(!State.isRuleValid){
+						if(!state.isRuleValid){
 							toastr.error('Необходимо выбрать правило перед сохранением');
 							return;
 						}
@@ -402,7 +414,7 @@ function _shop(data){
 					}
 					else{
 						//отмена 
-						State.isRuleSelected = false;
+						state.isRuleSelected = false;
 						var $parent = $(this).parents('.pos');
 						var $but = $parent.find('.createRule');
 						var css = $but.data('oldCss');
@@ -415,11 +427,11 @@ function _shop(data){
 						$holder.find('.color.active').removeClass('active');
 					}
 				}
-				if(State.isOfferSelected){
+				if(state.isOfferSelected){
 					return;
 				}
-				State.isOfferSelected = true;
-				
+				state.isOfferSelected = true;
+				$pos.data('state', state);
 				var $tpl = $(this).parent().find('.categoryOfferHolder');
 				var css = $(this).css(['background', 'background-color', 'color']);
 				$(this).data('oldCss', css);
@@ -432,10 +444,7 @@ function _shop(data){
 		
 		$shop.on('click', ".addPosition", function(e){
 				e.preventDefault();
-				//if(State.hasPosition){
-//					toastr.error('Сохраните или удалите позицию, перед добавлением новой');
-//					return;
-//				}
+
 				if(posNum > 7){
 					toastr.error('Максимальное количество позиций - 7');
 					return;
@@ -447,9 +456,10 @@ function _shop(data){
 				$newPos.find('.savePosition').hide();
 				$newPos.find('.saveRule').hide();
                 indexNum++;
-
-                State.clear();
-                State.hasPosition = true;
+                var state = new State();
+                
+                $newPos.data('state', state);
+                
 				$(this).prev().append($newPos);
 		})
 		
@@ -480,6 +490,10 @@ function _shop(data){
 				e.preventDefault();
 				var $selectedRule = $(".selectedRuleTpl").clone(true).removeClass('selectedRuleTpl');
 				var $tpl = $(this).parents('.rule');
+				var $pos = $(this).parents('.pos');
+                if($pos.length == 0)$pos = $(this).parents('.widget');
+				var state = $pos.data('state');
+				if(state == null) state = new State();
 				
 				var cats = [];
 				var colors = [];
@@ -489,13 +503,13 @@ function _shop(data){
 				$tpl.find('.Content.active').each(function(){
 						cats.push($(this).html());
 				});
-				if(cats.length === 0 || colors.length === 0){
+				if(cats.length === 0 && colors.length === 0){
 					toastr.error('Укажите правило');
 					return;
 				}
-				State.isRuleValid = true;
-				State.isRuleSelected = false;
-				
+				state.isRuleValid = true;
+				state.isRuleSelected = false;
+				$pos.data('state', state);
 				$tpl.hide();
 				
 				$selectedRule.find('.ruleCategories').html(cats.join(', '));
