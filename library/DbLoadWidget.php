@@ -78,6 +78,7 @@ class DbLoadWidget extends WidgetAbstract
         $preparedRule = array();
         $rulesModel = new Rules($this->dbh);
         $rules = $rulesModel->getWidgetRules($widgetId);
+        //prepare rule for free widget, if position has rule, we use it after search offer by id, id it exists
         foreach ($rules as $rule){
             if ($rule['rules_type'] == Rules::RULE_TYPE_RULE){
                 $preparedRule[$rule['position']]['freeWidgetRule'] = $rule['source'];
@@ -99,6 +100,7 @@ class DbLoadWidget extends WidgetAbstract
             return array();
         }
         $offerData = $goodsModel->getSingleOffer(array('offerId' => $rule['source'], 'shopId' => $shopId));
+        //if offer not found in db, than implement common rule for position in widget
         if (!$offerData && isset($rule['common_rule'])) {
             $offerData = $this->getRandomItem($shopId, $rule['common_rule']);
         }
