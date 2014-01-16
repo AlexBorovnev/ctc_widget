@@ -274,6 +274,7 @@
 							<div class="fl"><input type="text" class="custom fl widgetUrl" /></div>
 							<!--<div class="fl"><input type="button" value="Скопировать" onclick="clipBoard('.widgetUrl')" /></div>-->
 						</div>
+						<div><a href="" class="previewUrl">Предпросмотр</a></div>
 					</div>
 				</div>
 				<div class="widgetPreview">
