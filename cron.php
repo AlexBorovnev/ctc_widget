@@ -236,7 +236,11 @@ class initBase
         foreach ($data->attributes() as $key => $value) {
             $params['attributes'][$key] = (string)$value;
         }
-        return array_merge((array)$data, $params);
+        $preparedData = array();
+        foreach ($data as $key=>$value){
+            $preparedData[(string)$key] = (string)$value;
+        }
+        return array_merge($preparedData, $params);
     }
 
     private function resetAvailableValue($shopId)
