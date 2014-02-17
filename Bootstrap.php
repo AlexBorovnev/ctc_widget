@@ -35,6 +35,9 @@ switch ($rout[0]) {
         if (!empty($rout[1])) {
             $widgetsId = strip_tags($rout[1]);
             $widgets = $widget->getWidget($widgetsId);
+            if (!$widgets){
+                View::getInstance()->render('404.php');
+            }
             $view = View::getInstance();
             $view->widgets = $widgets;
             $view->widgetId = $widgetsId;

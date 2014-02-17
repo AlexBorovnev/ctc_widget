@@ -165,10 +165,11 @@ var initEditor = {
                 return;
             }
             var positions = base.getPositions();
-            if (base.status == 'error_rule'){
-                toastr.error('Не выбрано правило');
-                return;
-            }
+
+//            if (base.status == 'error_rule'){
+//                toastr.error('Не выбрано правило');
+//                return;
+//            }
             if ($(':hidden[name="type_id"]').val() == 3) {//free
                 data = {
                     'shopId': base.obj.shopId,
@@ -277,7 +278,7 @@ var initEditor = {
                     $type.each(function(){
                         var source = base.getSource(position, $(this).val()),
                             count = 0;
-                        if (widgetType == 3 && $(this).val() == 1){console.log(source);
+                        if (widgetType == 3 && $(this).val() == 1){
                             for (var j in source){
                                 if (source[j].length == 0){
                                     count++;
@@ -285,6 +286,7 @@ var initEditor = {
                             }
                             if (count == base.filters.length){
                                 base.status = 'error_rule';
+                                source = [];
                             }
                         }
                         if (source.length > 0 || source.length == undefined){

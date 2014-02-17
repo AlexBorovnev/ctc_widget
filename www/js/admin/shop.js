@@ -92,19 +92,24 @@ function _shop(data){
 						colors.push($(this).data('colorName'));
 				});
 
-				if($categories.length == 0){
-					toastr.error('Необходимо выбрать правило');
-					return;
-				}
-				var params = {};
+//				if($categories.length == 0){
+//					toastr.error('Необходимо выбрать правило');
+//					return;
+//				}
+				var params = {},
+                    rule = false;
 				if(catIds.length > 0){
 					params['categoryId'] = catIds;
+                    rule = true;
 				}
 				if(colors.length > 0){
 					params['color'] = colors;
+                    rule = true;
 				}
-
-				var position = {'type': 1, 'params': params, 'num': num};
+                var position = {};
+                if (rule){
+                    position = {'type': 1, 'params': params, 'num': num};
+                }
                 preparedPosition.push(position);
                 out.push(preparedPosition);
 				//self.addPosition(preparedPosition);
@@ -208,10 +213,10 @@ function _shop(data){
 						'positions': self.getPositions()
 					};    
 					//data validation
-					if (data.commonRule.length == 0){
-						toastr.error('Необходимо выбрать правило');
-						return;
-					}
+//					if (data.commonRule.length == 0){
+//						toastr.error('Необходимо выбрать правило');
+//						return;
+//					}
 					if(data.title == ''){
 						toastr.error('Укажите название виджета');
 						return;

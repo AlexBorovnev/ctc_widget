@@ -50,7 +50,9 @@ class DbLoadWidget extends WidgetAbstract
             array_splice($offers, $delta);
         } elseif ($delta > 0) {
             for ($i = 0; $i < $delta; $i++) {
-                $offers[] = $this->getRandomItem($rule['shop_id'], $rule['common_rule']);
+                if ($offer = $this->getRandomItem($rule['shop_id'], $rule['common_rule'])){
+                    $offers[] = $this->getRandomItem($rule['shop_id'], $rule['common_rule']);
+                }
             }
         }
         return $offers;
@@ -101,7 +103,7 @@ class DbLoadWidget extends WidgetAbstract
         }
         $offerData = $goodsModel->getSingleOffer(array('offerId' => $rule['source'], 'shopId' => $shopId));
         //if offer not found in db, than implement common rule for position in widget
-        if (!$offerData && isset($rule['common_rule'])) {
+        if (!$offerData && !empty($rule['common_rule'])) {
             $offerData = $this->getRandomItem($shopId, $rule['common_rule']);
         }
         return $offerData;
@@ -110,11 +112,15 @@ class DbLoadWidget extends WidgetAbstract
     protected function getRandomItem($shopId, $rule = array())
     {
         $rule = is_string($rule) ? unserialize($rule) : $rule;
+        $offer = array();
         $goodsModel = new Goods($this->dbh);
-        $offer = $goodsModel->getRandomItem($shopId, $rule);
-        if (!$offer) {
-            $offer = $this->getRandomItem($shopId, $this->repeatAttemptWithParentCategory($shopId, $rule));
+        if ($rule){
+            $offer = $goodsModel->getRandomItem($shopId, $rule);
         }
+        //uncoment this lines if needed search in parent category
+//        if (!$offer) {
+//            $offer = $this->getRandomItem($shopId, $this->repeatAttemptWithParentCategory($shopId, $rule));
+//        }
         return $offer;
     }
 

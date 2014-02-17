@@ -207,6 +207,9 @@ class ApiServer
                 'widgetId' => array('type' => 'string', 'required' => false)
             )
         );
+        if (empty($data['commonRule'])) {
+            $data['commonRule'] = array();
+        }
         if (empty($data['positions'])) {
             $data['positions'] = array();
         }
@@ -312,9 +315,10 @@ class ApiServer
         switch ($typeId) {
             case Widgets::WIDGET_TYPE_SMALL:
             case Widgets::WIDGET_TYPE_BIG:
-                if (empty($data['commonRule'])) {
-                    $this->sendResponse(array('message' => $this->config['messages'][5]), true, 5);
-                }
+                //uncomment this line if common rule been required for small and big widget
+//                if (empty($data['commonRule'])) {
+//                    $this->sendResponse(array('message' => $this->config['messages'][5]), true, 5);
+//                }
                 break;
             case Widgets::WIDGET_TYPE_FREE:
                 if (empty($data['positions'])) {
