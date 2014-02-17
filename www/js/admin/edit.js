@@ -222,7 +222,7 @@ var initEditor = {
             var position = parseInt($(this).attr('data-position'), 10);
             var nextPosition = -1;
             $('.upProduct').each(function(){
-                var pos = parseInt($(this).attr('data-position'), 10);console.log(pos, position, nextPosition);
+                var pos = parseInt($(this).attr('data-position'), 10);
                 if (pos < position && pos > nextPosition){
                     nextPosition = pos;
                 }
