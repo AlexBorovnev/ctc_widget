@@ -14,7 +14,7 @@ class Widgets extends AbstractModel
 
     const WIDGET_TYPE_SMALL_POSITIONS = 1;
     const WIDGET_TYPE_BIG_POSITIONS = 2;
-    const WIDGET_MAX_POSITIONS = 7;
+    const WIDGET_MAX_POSITIONS = 15;
 
     const WIDGET_PER_PAGE = 20;
 

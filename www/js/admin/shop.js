@@ -451,8 +451,8 @@ function _shop(data){
 		$shop.on('click', ".addPosition", function(e){
 				e.preventDefault();
 
-				if(posNum > 7){
-					toastr.error('Максимальное количество позиций - 7');
+				if(posNum > 15){
+					toastr.error('Максимальное количество позиций - 15');
 					return;
 				}
 				var $newPos = $freePosition.clone(true);

@@ -260,7 +260,7 @@ var initEditor = {
                 }
                 return true;
             case '3':
-                if (this.count >= 7) {
+                if (this.count >= 15) {
                     $('.addBlockContent').removeClass('active');
                 }
                 return true;
