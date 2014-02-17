@@ -9,7 +9,7 @@
 <script>
 
 	$(function(){
-			shopObj = (<?=$this->shop?>);
+            var shopObj = {shop: <?=$this->shop?>, hostServer: '<?=HOST?>'};
 			mainInit(shopObj);
 	});
 

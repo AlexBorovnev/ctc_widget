@@ -128,7 +128,7 @@ function _shop(data){
 		return rule;
 	}
 	this.widgetPreview = function(){
-		var host = "http://146.185.169.28/sts.loc/www/widget_id/" + widgetId;
+		var host = serverHost + 'widget_id/' + widgetId;
 		var iframe = "<iframe src=\""+host+" \" width=\"100%\" height=\"600px\"></iframe>";
 		$shop.find(".widgetPreview").find('iframe').slideUp(function(){$(this).remove});
 		$shop.find(".widgetPreview").append(iframe);

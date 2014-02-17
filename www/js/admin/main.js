@@ -5,22 +5,25 @@ var widgets = [],
 	widgetTypes = [],
 	widgetSkins = [],
 	api,
-	serverHost = '/handler', //for server use	
+	serverHostApi = '/handler', //for server use
 	preview
 	_offers = [],
 	_colorList = [],
 	selectedColors = [],
-	previewPath = '';
+	previewPath = '',
+    serverHost = '';
 
 
 function mainInit(shopObj){
-	api = new _api(serverHost);
+    serverHostApi = shopObj.hostServer + 'handler';
+    serverHost = shopObj.hostServer;
+	api = new _api(serverHostApi);
 
 	api.call('getShopList', {}, function(response){
 			//for(var i in response.list){
 			//			shops.push(new _shop(response.list[i]));
 			//		}
-			shops.push(new _shop(shopObj));
+			shops.push(new _shop(shopObj.shop));
 
 	});
 	

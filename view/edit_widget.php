@@ -7,7 +7,7 @@
 <script type="text/javascript" src="<?= HOST ?>js/admin/edit.js?<?= REV ?>"></script>
 <script>
     $(function () {
-        shopObj = (<?=$this->shop?>);
+        var shopObj = {shop: <?=$this->shop?>, hostServer: '<?=HOST?>'};
         mainInit(shopObj);
     });
 </script>
