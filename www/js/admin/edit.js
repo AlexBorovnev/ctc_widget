@@ -215,6 +215,48 @@ var initEditor = {
             base.count--;
             $('.positionCount span').text(base.count);
             $('.addBlockContent').trigger('checkPositions');
+
+        });
+        $('.upProduct').on('click', function(e){
+            e.preventDefault();
+            var position = parseInt($(this).attr('data-position'), 10);
+            var nextPosition = -1;
+            $('.upProduct').each(function(){
+                var pos = parseInt($(this).attr('data-position'), 10);console.log(pos, position, nextPosition);
+                if (pos < position && pos > nextPosition){
+                    nextPosition = pos;
+                }
+            });
+            var next = $('.dev-block-' + nextPosition).parent();
+            if (nextPosition != -1 && next.length > 0){
+                var current = $('.dev-block-' + position).parent().clone(true);
+                $('.dev-block-' + position).parent().remove();
+                current = base.changePositionHtml(current, nextPosition, position);
+                next = base.changePositionHtml(next, position, nextPosition);
+                current.insertBefore(next);
+                $(document).scrollTop($('.dev-block-' + nextPosition).position().top);
+            }
+        });
+        $('.downProduct').on('click', function(e){
+            e.preventDefault();
+            var position = parseInt($(this).attr('data-position'), 10);
+            var prevPosition = 16;
+            $('.downProduct').each(function(){
+                var pos = parseInt($(this).attr('data-position'), 10);
+                if (pos > position && prevPosition > pos){
+                    prevPosition = pos;
+                }
+            });
+            var prev = $('.dev-block-' + prevPosition).parent();
+            if (prevPosition != position && prev.length > 0){
+                var current = $('.dev-block-' + position).parent().clone(true);
+                $('.dev-block-' + position).parent().remove();
+
+                current = base.changePositionHtml(current, prevPosition, position);
+                prev = base.changePositionHtml(prev, position, prevPosition);
+                current.insertAfter(prev);
+                $(document).scrollTop($('.dev-block-' + prevPosition).position().top);
+            }
         });
         $('.addItem').on('click', function (e) {
             e.preventDefault();
@@ -232,6 +274,15 @@ var initEditor = {
             }
         });
     },
+    changePositionHtml: function(item, newPosition, prevPosition){
+        item.find('.dev-positions').removeClass('dev-block-' + prevPosition);
+        item.find('.dev-positions').addClass('dev-block-' + newPosition);
+        item.find('[name="item_position"]').val(newPosition);
+        item.find('.removeProduct').attr('data-position', newPosition);
+        item.find('.upProduct').attr('data-position', newPosition);
+        item.find('.downProduct').attr('data-position', newPosition);
+        return item;
+    },
     addBlock: function (selector) {
         var position = $('.widget .dev-positions [name="item_position"]').last().val(),
             $offerBlock = $('.' + selector.join('.')).clone(true);
@@ -241,6 +292,8 @@ var initEditor = {
         $holder.find('.dev-positions').addClass('dev-block-' + position);
         $holder.find('[name="item_position"]').val(position);
         $holder.find('.removeProduct').attr('data-position', position);
+        $holder.find('.upProduct').attr('data-position', position);
+        $holder.find('.downProduct').attr('data-position', position);
         this.count++;
         $('.positionCount span').text(this.count);
         $('.addBlockContent').trigger('checkPositions');

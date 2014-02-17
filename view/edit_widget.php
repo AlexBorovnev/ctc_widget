@@ -132,6 +132,8 @@
                         <input type="hidden" value="<?= $key; ?>" name="item_position">
                     </div>
                     <div class="block-footer">
+                        <a class="upProduct" data-position="<?= $key; ?>" href="#"><img src="<?= makeLink('/images/uparrow.png') ?>"></a>
+                        <a class="downProduct" data-position="<?= $key; ?>" href="#"><img src="<?= makeLink('/images/downarrow.png') ?>"></a>
                         <a href="#" data-position="<?= $key; ?>" class="btn removeProduct">Удалить позицию</a>
                     </div>
                 </div>
@@ -226,6 +228,8 @@
         <input type="hidden" value="" name="item_position">
     </div>
     <div class="block-footer">
+        <a class="upProduct" data-position="" href="#"><img src="<?= makeLink('/images/uparrow.png') ?>"></a>
+        <a class="downProduct" data-position="" href="#"><img src="<?= makeLink('/images/downarrow.png') ?>"></a>
         <a href="#" data-position="" class="btn removeProduct">Удалить позицию</a>
     </div>
 </div>
