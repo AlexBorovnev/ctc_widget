@@ -12,6 +12,7 @@
 		        <td>Название</td>
 		        <td style="width:100px">Тип</td>
 		        <td style="width:100px">Скин</td>
+                <td style="width:100px">Кол-во кликов</td>
 		        <td style="width:200px">...</td>
 		    </tr>
 		    </thead>
@@ -21,6 +22,7 @@
 		            <td><?= $widget['title'] ?></td>
 		            <td><?= $this->typeList[$widget['typeId']] ?></td>
 		            <td><?= $this->skinList[$widget['skinId']] ?></td>
+                    <td><?= $widget['clickCount'] ?></td>
 		            <td>
 		            	<a href="<?=makeLink('widget_id/' . $id)?>" target="_blank">Предпросмотр</a><br>
 		            	<a class="dev_delete_widget" data="<?=$id?>" href="#">Удалить</a><br>

@@ -133,7 +133,7 @@ class Widgets extends AbstractModel
         $offset = ($pageNum - 1) * self::WIDGET_PER_PAGE;
         try {
             $widgetsListQuery = $this->dbh->prepare(
-                "SELECT w.id, w.type_id, w.skin_id, w.title FROM widgets w LEFT JOIN rules r ON w.id=r.widget_id WHERE w.shop_id=:shop_id GROUP BY w.id ORDER BY w.time_updated DESC LIMIT :offset,:limit"
+                "SELECT w.id, w.type_id, w.skin_id, w.title, w.click_cnt FROM widgets w LEFT JOIN rules r ON w.id=r.widget_id WHERE w.shop_id=:shop_id GROUP BY w.id ORDER BY w.time_updated DESC LIMIT :offset,:limit"
             );
             $widgetsListQuery->bindValue(':shop_id', $data['shopId']);
             $widgetsListQuery->bindValue(':offset', $offset, \PDO::PARAM_INT);
@@ -144,7 +144,8 @@ class Widgets extends AbstractModel
                     array(
                         'skinId' => $row['skin_id'],
                         'typeId' => $row['type_id'],
-                        'title' => $row['title']
+                        'title' => $row['title'],
+                        'clickCount' => $row['click_cnt']
                     );
             }
         } catch (\PDOException $e) {
