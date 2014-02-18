@@ -25,11 +25,8 @@ class initBase
     public function updateBase()
     {
         foreach ($this->getBaseUrl() as $shopName => $baseUrl) {
-            echo "Begin download {$shopName}: " . time() . '</br>';
             if ($this->downloadBase($baseUrl, $shopName)) {
-                echo "Begin DB {$shopName}: " . time() . '</br>';
                 $this->updateDB($shopName);
-                echo "Begin remove {$shopName}: " . time() . '</br>';
                 $this->removeTmp();
             }
         }
