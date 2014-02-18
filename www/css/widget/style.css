@@ -13,8 +13,8 @@ body{
 }
 
 .int_val {
-    font-weight: 800;
-    font-size: 30px;
+    font-weight: 600;
+    font-size: 15px;
 }
 
 .float_val {
@@ -24,8 +24,8 @@ body{
 }
 
 .button_sell img{
-    margin: 0 auto;
     display: block;
+    margin: 0 auto;
 }
 
 .widget {
@@ -37,21 +37,23 @@ body{
 }
 
 .w .pic .desc{
-	min-height: 16px;
-	text-align: left;
-	padding: 8px;
-	font-size: 14px;
+	min-height: 11px;
+	text-align: center;
+	font-size: 10px;
 	line-height: 14px;
 	font-family: Tahoma;
+    word-wrap:break-word;
+
 }
 
 .offer_img{
-    width:240px;
-    height:320px;
+    width:170px;
+    height:255px;
 }
 
 .logo{
 	margin-left: 12px;
+    height: 22px;
 }
 
 .slider{
@@ -68,14 +70,13 @@ body{
 	list-style: none;
 	display: block;
 	float: left;
-	margin: 0 10px;
-	width: 242px !important;
+	margin: 0 20px;
+	width: 170px !important;
 	background-color: #fff;
 	
 }
 .slider ul li .pic{
-	border: 1px solid #cc0835;
-	min-height: 367px;
+	min-height: 255px;
 }
 
 .slider .arrow-left{
@@ -109,15 +110,8 @@ body{
 
 
 .btn{
-	width: 189px;
-	border-radius: 20px;
-	-webkit-border-radius: 20px;
-    -moz-border-radius: 20px;
-	background-color: #f55c78;
-	height: 40px;
-	text-align: center;
-	margin:0 auto;
-	behavior: url("./css/PIE.htc");
+	width: 170px;
+	height: 30px;
 }
 
 .btn a{
@@ -135,7 +129,7 @@ body{
 }
 
 .w > div{
-	margin-bottom: 10px;
+	margin-bottom: 5px;
 }
 
 .w a img{
@@ -145,7 +139,7 @@ body{
 .copyright{
 	float: right;
 	color: #ccc;
-	font-size: 11px;
+	font-size: 9px;
 	margin: 0 5%;
 	font-family: "Times New Roman";
 }

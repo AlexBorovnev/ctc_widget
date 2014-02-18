@@ -44,18 +44,16 @@
 								src="<?=$widget['picture']?>"
 								alt="" ></a>
 						<div class="desc">
-							<?= $widget['common_data']['model'] . ' ' . $widget['common_data']['vendor'] ?> 
+							<?= $widget['common_data']['vendor']. ' ' . $widget['common_data']['model'] ?>
 						</div>
 					</div>
 					<div>
 						<span class="price_text">
-							<span class="int_val"><?= $widget['price']['viewPrice']['intValue'] ?></span>
-							<span class="float_val"><?= $widget['price']['viewPrice']['floatValue'] ?></span>
-							руб
+							<span class="int_val"><?= $widget['price']['viewPrice']['intValue'] ?> руб.</span>
 						</span>
 
 					</div>
-					<div class="btn"><a class="refer_link button_sell" href="<?= $widget['url']; ?>" target="_blank">Купить</a></div>
+					<div class="btn"><a class="refer_link button_sell" href="<?= $widget['url']; ?>" target="_blank"><img src="<?=HOST?>images/sell_button.png"></a></div>
 				</li>
 				<?php endforeach; ?>
 		</ul>
@@ -82,6 +80,7 @@
 					align: "center", 
 					width: "100%",
 					auto: false,
+                    height: 349,
 					scroll : {
 						items: 1, 
 						onBefore: function(){
