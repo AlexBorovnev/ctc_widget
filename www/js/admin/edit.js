@@ -313,7 +313,7 @@ var initEditor = {
                 }
                 return true;
             case '3':
-                if (this.count >= 15) {
+                if (this.count >= freeWidgetPositions) {
                     $('.addBlockContent').removeClass('active');
                 }
                 return true;

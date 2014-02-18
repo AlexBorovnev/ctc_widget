@@ -221,13 +221,16 @@ function _shop(data){
 						toastr.error('Укажите название виджета');
 						return;
 					}
-				}
 
+				}
+                if(widgetId){
+                    data.widgetId = widgetId;
+                }
 				api.call('setWidget', data, function(response){
 						toastr.info('Виджет сохранен, id = ' + response.widgetId);
 						widgetId = response.widgetId;
 						self.widgetPreview();
-						$saveWidgetButton.hide();
+						//$saveWidgetButton.hide();
 				});
 
 		});
@@ -451,8 +454,8 @@ function _shop(data){
 		$shop.on('click', ".addPosition", function(e){
 				e.preventDefault();
 
-				if(posNum > 15){
-					toastr.error('Максимальное количество позиций - 15');
+				if(posNum > freeWidgetPositions){
+					toastr.error('Максимальное количество позиций - ' + freeWidgetPositions);
 					return;
 				}
 				var $newPos = $freePosition.clone(true);

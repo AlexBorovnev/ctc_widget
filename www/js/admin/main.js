@@ -12,6 +12,8 @@ var widgets = [],
 	selectedColors = [],
 	previewPath = '',
     serverHost = '';
+    widgetId = '';
+    freeWidgetPositions = 15;
 
 
 function mainInit(shopObj){
