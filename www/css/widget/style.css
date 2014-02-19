@@ -85,7 +85,6 @@ body{
 .slider ul li .pic{
 	min-height: 255px;
 }
-
 .slider .arrow-left{
 	background: transparent url("../../images/prev_arrow.png") 0% 0% no-repeat;
 	width: 32px;

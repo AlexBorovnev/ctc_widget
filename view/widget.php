@@ -77,7 +77,7 @@
 			var $carousel = $(".slider ul").carouFredSel({
 					circular: false,
 					infinite: false,
-					align: "center",
+					align: "left",
 					width: "100%",
 					auto: false,
                     height: 349,
@@ -86,11 +86,8 @@
 						onBefore: function(){
 						},
 						onEnd: function(direction){
-
-
 						}
 					},
-
 					prev	: {
 						button	: ".arrow-left",
 						key		: "left",
@@ -120,7 +117,9 @@
             function(){ $(this).addClass('arrow-right-inactive') },
             function(){ $(this).removeClass('arrow-right-inactive') }
         );
+        $('.caroufredsel_wrapper').css('margin-left', '28px');
         setArrowPosition();
+
         $(window).resize(function () {
             setArrowPosition();
         });
