@@ -77,7 +77,7 @@
 			var $carousel = $(".slider ul").carouFredSel({
 					circular: false,
 					infinite: false,
-					align: "center", 
+					align: "center",
 					width: "100%",
 					auto: false,
                     height: 349,
@@ -125,9 +125,9 @@
             element = $('li.w').first();
         $('.arrow-left').css('left', firstElementLeft - $('.arrow-left').width() - 2);
         var widgetViewCount = Math.floor(($(document).width() - firstElementLeft) /  (elementWidth));
-        var widgetViewOffset = widgetViewCount?$('li.w').eq(widgetViewCount - 1).offset().left:firstElementLeft;
+        var widgetViewOffset = widgetViewCount ? $('li.w').eq(widgetViewCount - 1).offset().left:firstElementLeft;
         var lastElementRight = $(document).width() - widgetViewOffset - element.width();
         $('.arrow-right').css('right', lastElementRight - $('.arrow-right').width() - 2);
-        console.log($(window).width(), widgetViewCount, element.width());
+        console.log(firstElementLeft, $(window).width(), widgetViewOffset, element.width());
 	});
 </script>
