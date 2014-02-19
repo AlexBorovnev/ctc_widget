@@ -48,9 +48,9 @@ var initEditor = {
         this.catTree = buildTree('myTree', obj.workList.categoryList);
         $('.colorHolder').append(obj.workList.colorList);
         this.obj = obj;
-        if (obj.commonRule) {
+        //if (obj.commonRule) {
             this.initCommonRuleSection();
-        }
+        //}
         this.count = $('[name="widget_count"]').val();
         this.initColor();
         this.initTreeForSinglePosition();
@@ -88,12 +88,14 @@ var initEditor = {
         switch (filter) {
             case 'categoryId':
                 $('.ruleHolder').append(this.catTree.clone(true));
-                $('.ruleHolder li').each(function () {
-                    if (value.indexOf($(this).data('cid')) != -1) {
-                        $(this).find('.Content').addClass('b');
-                        $(this).parent().parent().removeClass('ExpandClosed').addClass('ExpandOpen');
-                    }
-                })
+                if (value){
+                    $('.ruleHolder li').each(function () {
+                        if (value.indexOf($(this).data('cid')) != -1) {
+                            $(this).find('.Content').addClass('b');
+                            $(this).parent().parent().removeClass('ExpandClosed').addClass('ExpandOpen');
+                        }
+                    })
+                }
                 break;
             case 'color':
                 this.initColor('.dev-editor-color', value);
@@ -102,11 +104,12 @@ var initEditor = {
 
     initCommonRuleSection: function () {
         var base = this,
-            rule = base.obj.commonRule;
-
+            rule = base.obj.commonRule || [];
         for (var i in base.filters) {
             if (rule[base.filters[i]]) {
                 base.initSectionForRule(base.filters[i], rule[base.filters[i]]);
+            } else {
+                base.initSectionForRule(base.filters[i]);
             }
         }
     },
