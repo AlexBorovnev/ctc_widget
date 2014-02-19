@@ -31,8 +31,8 @@
 		<span><img src="<?=HOST?>images/logo.png" alt=""></span>
 	</div>
 	<div class="slider">
-		<div class="arrow-left"></div>
-		<div class="arrow-right"></div>
+		<div class="arrow-left arrow-left-inactive"></div>
+		<div class="arrow-right arrow-right-inactive"></div>
 		<ul>
 
 			<?php  //$widgets = $widget->getWidget($widgetsId);
@@ -112,5 +112,13 @@
 						}
 					}
 			});
+        $('.arrow-left').hover(
+            function(){ $(this).removeClass('arrow-left-inactive') },
+            function(){ $(this).addClass('arrow-left-inactive') }
+        );
+        $('.arrow-right').hover(
+            function(){ $(this).removeClass('arrow-right-inactive') },
+            function(){ $(this).addClass('arrow-right-inactive') }
+        );
 	});
 </script>

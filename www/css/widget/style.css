@@ -107,7 +107,13 @@ body{
 	right: 12px;
 	z-index: 100;
 }
+.slider .arrow-right.arrow-right-inactive{
+    background: transparent url("../../images/next_arrow-inactive.png") 0% 0% no-repeat;
+}
 
+.slider .arrow-left.arrow-left-inactive{
+    background: transparent url("../../images/prev_arrow-inactive.png") 0% 0% no-repeat;
+}
 
 .btn{
 	width: 170px;
