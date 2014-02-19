@@ -120,13 +120,19 @@
             function(){ $(this).addClass('arrow-right-inactive') },
             function(){ $(this).removeClass('arrow-right-inactive') }
         );
+        setArrowPosition();
+        $(window).resize(function () {
+            setArrowPosition();
+        });
+	});
+    function setArrowPosition(){
         var firstElementLeft = $('li.w').first().offset().left,
             elementWidth = $('li.w').first().outerWidth(true),
             element = $('li.w').first();
         $('.arrow-left').css('left', firstElementLeft - $('.arrow-left').width() - 2);
-        var widgetViewCount = Math.floor(($(document).width() - firstElementLeft) /  (elementWidth));
-        var widgetViewOffset = widgetViewCount ? $('li.w').eq(widgetViewCount - 1).offset().left:firstElementLeft;
+        var widgetViewCount = Math.floor(($(document).width() - firstElementLeft) / (elementWidth));
+        var widgetViewOffset = widgetViewCount ? $('li.w').eq(widgetViewCount - 1).offset().left : firstElementLeft;
         var lastElementRight = $(document).width() - widgetViewOffset - element.width();
         $('.arrow-right').css('right', lastElementRight - $('.arrow-right').width() - 2);
-	});
+    }
 </script>
