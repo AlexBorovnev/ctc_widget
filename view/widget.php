@@ -24,15 +24,9 @@
 
 </head>
 <body>
-	<?php
-		$copyright = "OOO «Приват Трэйд»,111033, г.Москва, ул. Самокатная, д.1, стр.21; ОГРН 1087746760397";
-	?>
-	<div class="logo">
-		<span><img src="<?=HOST?>images/logo.png" alt=""></span>
-	</div>
 	<div class="slider">
-		<div class="arrow-left arrow-left-inactive"></div>
-		<div class="arrow-right arrow-right-inactive"></div>
+		<div class="arrow-left"></div>
+		<div class="arrow-right"></div>
 		<ul>
 
 			<?php  //$widgets = $widget->getWidget($widgetsId);
@@ -58,7 +52,13 @@
 				<?php endforeach; ?>
 		</ul>
 	</div>
-	<div class="copyright"><?=$copyright?></div>
+
+	<div class="copyright">
+       <p>
+           <img class="logo" src="<?= HOST ?>images/logo.png" alt="">
+           <span class="copyright-text">OOO «Приват Трэйд»,111033, г.Москва, ул. Самокатная, д.1, стр.21; ОГРН 1087746760397</span>
+       </p>
+    </div>
 </body>
 <script>
 
@@ -113,12 +113,21 @@
 					}
 			});
         $('.arrow-left').hover(
-            function(){ $(this).removeClass('arrow-left-inactive') },
-            function(){ $(this).addClass('arrow-left-inactive') }
+            function(){ $(this).addClass('arrow-left-inactive') },
+            function(){ $(this).removeClass('arrow-left-inactive') }
         );
         $('.arrow-right').hover(
-            function(){ $(this).removeClass('arrow-right-inactive') },
-            function(){ $(this).addClass('arrow-right-inactive') }
+            function(){ $(this).addClass('arrow-right-inactive') },
+            function(){ $(this).removeClass('arrow-right-inactive') }
         );
+        var firstElementLeft = $('li.w').first().offset().left,
+            elementWidth = $('li.w').first().outerWidth(true),
+            element = $('li.w').first();
+        $('.arrow-left').css('left', firstElementLeft - $('.arrow-left').width() - 2);
+        var widgetViewCount = Math.floor(($(document).width() - firstElementLeft) /  (elementWidth));
+        var widgetViewOffset = widgetViewCount?$('li.w').eq(widgetViewCount - 1).offset().left:firstElementLeft;
+        var lastElementRight = $(document).width() - widgetViewOffset - element.width();
+        $('.arrow-right').css('right', lastElementRight - $('.arrow-right').width() - 2);
+        console.log($(window).width(), widgetViewCount, element.width());
 	});
 </script>
