@@ -128,6 +128,5 @@
         var widgetViewOffset = widgetViewCount ? $('li.w').eq(widgetViewCount - 1).offset().left:firstElementLeft;
         var lastElementRight = $(document).width() - widgetViewOffset - element.width();
         $('.arrow-right').css('right', lastElementRight - $('.arrow-right').width() - 2);
-        console.log(firstElementLeft, $(window).width(), widgetViewOffset, element.width());
 	});
 </script>
