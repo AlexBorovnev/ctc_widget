@@ -1,6 +1,12 @@
 <?php
-require_once __DIR__.'/library/Config.php';
+function __autoload($class_name)
+{
+    require_once __DIR__ . '/' . str_replace('\\', '/', $class_name) . '.php';
+}
+
 use library\Config;
+use model\Categories;
+
 
 class initBase
 {
@@ -19,15 +25,17 @@ class initBase
     {
         chdir($this->projectDir);
         $this->config = Config::getInstance()->getConfig();
-        Config::getInstance()->setBusyStatus(true);
     }
 
     public function updateBase()
     {
-        foreach ($this->getBaseUrl() as $shopName => $baseUrl) {
-            if ($this->downloadBase($baseUrl, $shopName)) {
-                $this->updateDB($shopName);
-                $this->removeTmp();
+        if (!Config::getInstance()->getBusyStatus()){
+            Config::getInstance()->setBusyStatus(true);
+            foreach ($this->getBaseUrl() as $shopName => $baseUrl) {
+                if ($this->downloadBase($baseUrl, $shopName)) {
+                    $this->updateDB($shopName);
+                    $this->removeTmp();
+                }
             }
         }
     }
@@ -114,10 +122,13 @@ class initBase
                 $this->dbh = Config::getInstance()->getDbConnection();
                 $newData = simplexml_load_file(self::BASE_NAME);
                 $shopId = $this->getShopId($shopName, (string)$newData->shop->url);
+                $this->preparedAction($shopId);
                 $this->addCurrency($shopId, $newData->shop->currencies);
                 $this->updateCategories($shopId, $newData->shop->categories);
                 $this->updateWithTmpTable($shopId, $newData->shop->offers);
+                $this->addParamsListForCategory($shopId);
             } catch (\Exception $e) {
+                var_dump($e->getMessage(), $e->getLine(), $e->getFile());
                 $this->setupBackup($shopName);
             }
         } else {
@@ -125,6 +136,21 @@ class initBase
         }
     }
 
+    private function preparedAction($shopId)
+    {
+        $this->dbh->exec("CREATE TABLE goods_param_tmp LIKE goods_param");
+        $this->dbh->exec("INSERT INTO goods_param_tmp SELECT * FROM goods_param WHERE shop_id<>{$shopId}");
+    }
+
+    private function addParamsListForCategory($shopId)
+    {
+        $categoriesModel = new Categories($this->dbh);
+        $categoriesModel->setCategoryList($categoriesModel->getCategoriesList(array('shopId' => $shopId)));
+        foreach ($categoriesModel->getCategoryWithChildList() as $catId => $childs){
+            $categoriesModel->addCategoriesParam($shopId, $catId, $childs);
+        }
+
+    }
     private function addCurrency($shopId, $data = array())
     {
         $currencyList = array();
@@ -171,8 +197,8 @@ class initBase
         $stmt = $this->dbh->prepare(
             "INSERT LOW_PRIORITY INTO categories (category_id, shop_id,parent_id, title) VALUES (:category_id, :shop_id, :parent_id, :title) ON DUPLICATE KEY UPDATE parent_id=:parent_id, title=:title"
         );
-        $this->dbh->beginTransaction();
         foreach ($categories->children() as $category) {
+            $categoryId = (int)$category->attributes()->id;
             $stmt->execute(
                 array(
                     'category_id' => (int)$category->attributes()->id,
@@ -182,47 +208,71 @@ class initBase
                 )
             );
         }
-        $this->dbh->commit();
     }
 
     private function updateWithTmpTable($shopId, $offers)
     {
-        $this->dbh->beginTransaction();
         $this->createTmpTable();
         $this->copyDataToTmpTable();
         $this->resetAvailableValue($shopId);
         $this->updateDataInTmpTable($shopId, $offers);
         $this->dbh->prepare('DROP TABLE goods')->execute();
         $this->dbh->prepare('RENAME TABLE goods_tmp TO goods')->execute();
-        $this->dbh->commit();
+        $this->dbh->exec('DROP TABLE goods_param');
+        $this->dbh->exec('RENAME TABLE goods_param_tmp TO goods_param');
         return true;
     }
 
     private function updateDataInTmpTable($shopId, $offers)
     {
         $offerUpdate = $this->dbh->prepare(
-            "INSERT INTO goods_tmp (offer_id, category_id,shop_id, is_available, url, price, currency, picture, title, common_data, color) VALUES (:offer_id, :category_id, :shop_id, :is_available, :url, :price, :currency, :picture, :title, :common_data, :color) ON DUPLICATE KEY UPDATE category_id=:category_id, is_available=:is_available, url=:url, price=:price, currency=:currency, picture=:picture, title=:title, common_data=:common_data, color=:color"
+            "INSERT INTO goods_tmp (offer_id, category_id,shop_id, is_available, url, price, currency, picture, title, common_data) VALUES (:offer_id, :category_id, :shop_id, :is_available, :url, :price, :currency, :picture, :title, :common_data) ON DUPLICATE KEY UPDATE is_available=:is_available, url=:url, price=:price, currency=:currency, picture=:picture, title=:title, common_data=:common_data"
         );
         foreach ($offers->children() as $offer) {
             $data = $this->prepareCommonData($offer);
             $offerUpdate->execute(
                 array(
-                    'offer_id' => $data['attributes']['id'],
-                    'category_id' => $data['categoryId'],
-                    'shop_id' => (int)$shopId,
-                    'is_available' => (boolean)$data['attributes']['available'],
-                    'url' => $data['url'],
-                    'price' => $data['price'],
-                    'currency' => $data['currencyId'],
-                    'picture' => $data['picture'],
-                    'title' => $data['model'],
-                    'common_data' => serialize($this->prepareCommonData($offer)),
-                    'color' => $data['param']['color']
+                    ':offer_id' => $data['attributes']['id'],
+                    ':category_id' => $data['categoryId'],
+                    ':shop_id' => (int)$shopId,
+                    ':is_available' => ($data['attributes']['available'] == true) ? 1 : 0,
+                    ':url' => $data['url'],
+                    ':price' => $data['price'],
+                    ':currency' => $data['currencyId'],
+                    ':picture' => $data['picture'],
+                    ':title' => sprintf("%s %s", $data['model'], $data['vendor']),
+                    ':common_data' => serialize($this->prepareCommonData($offer)),
                 )
             );
+            $this->addParamsForOffer($shopId,  $data['attributes']['id'], $data['categoryId'], $offer);
         }
     }
 
+    private function addParamsForOffer($shopId, $offerId, $categoryId, $data)
+    {
+        $paramId = null;
+        $queryNewParam = $this->dbh->prepare("INSERT INTO params (title) VALUES(:title)");
+        $queryParamExists = $this->dbh->prepare("SELECT id FROM params WHERE title LIKE :title");
+        $queryAddValue = $this->dbh->prepare("INSERT INTO goods_param_tmp (shop_id, offer_id, category_id, param_id, value) VALUES(:shop_id, :offer_id, :category_id, :param_id, :value) ON DUPLICATE KEY UPDATE value=:value");
+        foreach ($data->param as $value) {
+            $title = (string)$value->attributes()->name;
+            $queryParamExists->execute(array(':title' => $title));
+            if (!$data = $queryParamExists->fetch(PDO::FETCH_ASSOC)){
+                $queryNewParam->execute(array(':title' => $title));
+                $paramId = $this->dbh->lastInsertId();
+            } else {
+                $paramId = $data['id'];
+            }
+            $queryAddValue->execute(array(
+                    ':shop_id' => $shopId,
+                    ':offer_id' => $offerId,
+                    ':category_id' => $categoryId,
+                    ':param_id' => $paramId,
+                    ':value' => (string) $value
+                ));
+
+        }
+    }
     private function prepareCommonData($data)
     {
         $paramsNameConvert = array('Цвет' => 'color', 'Размеры' => 'size');
@@ -260,32 +310,9 @@ class initBase
 
     private function createTmpTableCode($tableName)
     {
-        $key_prefix = time();
         return <<<EOL
-CREATE TABLE `{$tableName}` (
-	`category_id` INT(11) UNSIGNED NOT NULL,
-	`shop_id` INT(11) NULL DEFAULT NULL,
-	`offer_id` VARCHAR(20) NULL DEFAULT NULL,
-	`price` VARCHAR(20) NULL DEFAULT NULL,
-	`url` VARCHAR(255) NULL DEFAULT NULL,
-	`currency` VARCHAR(20) NULL DEFAULT NULL,
-	`picture` VARCHAR(255) NULL DEFAULT NULL,
-	`common_data` TEXT NULL,
-	`is_available` INT(1) NULL DEFAULT NULL,
-	`title` VARCHAR(255) NULL DEFAULT NULL,
-	`updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-	`color` VARCHAR(50) NULL DEFAULT NULL,
-	UNIQUE INDEX `offer_id` (`offer_id`, `shop_id`),
-	INDEX `category_id` (`category_id`, `shop_id`),
-	INDEX `shop_id` (`shop_id`),
-	CONSTRAINT `FK_goods_categories_{$key_prefix}` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`) ON UPDATE CASCADE ON DELETE CASCADE,
-	CONSTRAINT `FK_goods_shops_{$key_prefix}` FOREIGN KEY (`shop_id`) REFERENCES `shops` (`id`) ON UPDATE CASCADE ON DELETE CASCADE
-)
-COLLATE='utf8_general_ci'
-ENGINE=InnoDB;
-
+CREATE TABLE `{$tableName}` LIKE goods
 EOL;
-
     }
 
     public function __destruct()

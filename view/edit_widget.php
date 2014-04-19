@@ -5,6 +5,7 @@
 <script type="text/javascript" src="<?= HOST ?>js/admin/system.js?<?= REV ?>"></script>
 <script type="text/javascript" src="<?= HOST ?>js/admin/offer.js?<?= REV ?>"></script>
 <script type="text/javascript" src="<?= HOST ?>js/admin/edit.js?<?= REV ?>"></script>
+<script type="text/javascript" src="<?=HOST?>js/admin/param.js?<?=REV?>"></script>
 <script>
     $(function () {
         var shopObj = {shop: <?=$this->shop?>, hostServer: '<?=HOST?>'};
@@ -44,17 +45,21 @@
             <?php if ($this->widget['typeId'] != \model\Widgets::WIDGET_TYPE_FREE): ?>
                 <div class="block inner commonRule clearfix">
                     <div class="block-header">Общее правило</div>
-                    <div class="block-content">
+                    <div class="block-content rule">
                         <div class="categoryHolder clearfix">
                             <h4>Выбор категории</h4>
 
                             <div class="grid13">
-                                <div class="ruleHolder editor dev-category-rule"></div>
+                                <div class="ruleHolder editor dev-category-rule dev-rule">
+                                <?=$this->getTreeView($this->categories, $this->widget['shopId']);?>
+                                </div>
                             </div>
                         </div>
-                        <div class="colorHolder clearfix editor">
-                            <h4>Выбор цвета</h4>
-                        </div>
+                        <div class="paramsHolder clearfix editor grid13 paramTpl">
+                            <? if (isset($this->widget['commonRule']['categoryId']) && isset($this->widget['commonRule']['param'])):?>
+                                <?=$this->buildParamsBlock($this->widget['commonRule']['categoryId'], $this->widget['commonRule']['param'], $this->widget['shopId']);?>
+                            <? endif; ?>
+                    </div>
                     </div>
                 </div>
             <?php endif; ?>
@@ -63,12 +68,13 @@
                     <div class="block-header">Позиция в виджете. Спопособ выбора
                         товара: <?= $rule['typeName']; ?></div>
                     <div class="block-content clearfix dev-block-<?= $key; ?> dev-positions">
-
-                            <div class="block-content clearfix">
+                        <div class="block-content clearfix">
                                 <div class="categoryTpl">
                                     <div class="grid13">
                                         <h4>Выбор категории</h4>
-                                        <div class="treeHolder itemHolder  dev-offer-category"></div>
+                                        <div class="treeHolder itemHolder  dev-offer-category dev-rule">
+                                            <?=$this->getTreeView($this->categories, $this->widget['shopId']);?>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="grid13">
@@ -88,46 +94,61 @@
                                     ) ?>
                                     <div class="preview">
                                         <div class="previewPic">
-                                            <img src="<?= $rule['source']['picture'] ?>"/>
+                                            <? $picture = @unserialize($rule['source']['picture']); ?>
+                                            <img src="<?= ($picture !== false) ? $picture[0] : $rule['source']['picture'] ?>"/>
                                         </div>
                                         <div class="offerInfo">
-                                            <div><?= $rule['source']['common_data']['model'] ?>
-                                                &nbsp;&nbsp; <?= $rule['source']['common_data']['vendor'] ?></div>
+                                            <div><?=trim($rule['source']['title'])?></div>
                                             <div>Цена: <span class='b'><?= $rule['source']['price'] ?></span></div>
                                             <div>
-                                                Доступно: <?= $rule['source']['is_available'] ? 'Да' : 'Нет на складе' ?></div>
-                                            <div>Цвет: <?= $rule['source']['color'] ?></div>
+                                                Доступно: <?= $rule['source']['is_available'] ? 'Да' : 'Нет на складе' ?>
+                                            </div>
+                                            <? if (isset($rule['source']['common_data']['param'])): ?>
+                                                <div>Параметры:</br>
+                                                <? foreach ($rule['source']['common_data']['param'] as $name => $value): ?>
+                                                    &nbsp;&nbsp;&nbsp;<?=$name?>:&nbsp;<?=$value?></br>
+                                                <? endforeach; ?>
+                                                 </div>
+                                            <? endif; ?>
                                             <div>ID: <?= $rule['source']['offer_id'] ?></div>
-                                            <div>CODE: <?= $rule['source']['common_data']['vendorCode'] ?></div>
+                                            <div>Категория: <?= $rule['source']['category_title']?></div>
+                                            <? if (isset($rule['source']['common_data']['vendorCode'])): ?>
+                                                <? if(is_array($rule['source']['common_data']['vendorCode'])):?>
+                                                    <div>CODE: <?= $rule['source']['common_data']['vendorCode'][0] ?></div>
+                                                <? else: ?>
+                                                    <div>CODE: <?= $rule['source']['common_data']['vendorCode'] ?></div>
+                                                <? endif; ?>
+                                            <?endif;?>
                                         </div>
                                     </div>
                                     <? else: ?>
                                     <div class="preview">
-                                        <div class="previewPic">
-                                            <img src="../../images/preview.png"/>
-                                        </div>
-                                        <div class="offerInfo">
-                                        </div>
+                                        <div class="previewPic"><img src="../../images/preview.png"/></div>
+                                        <div class="offerInfo"></div>
                                     </div>
                                     <?php endif; ?>
                                 </div>
                                 <input type="hidden" value="<?= \model\Rules::RULE_TYPE_SINGLE?>" name="rule_type">
                             </div>
-
                         <?php if (!empty($rule['freeWidgetRules'])): ?>
-                            <div class="block-content clearfix">
-                                <div class="categoryHolder clearfix dev-category-rule">
-                                    <h4>Выбор категории</h4>
+                        <div class="block-content clearfix  rule">
+                            <div class="categoryHolder clearfix dev-category-rule">
+                                <h4>Выбор категории</h4>
 
-                                    <div class="grid13">
-                                        <div class="ruleHolder treeHolder editor"></div>
+                                <div class="grid13">
+                                    <div class="ruleHolder treeHolder editor dev-rule">
+                                    <?=$this->getTreeView($this->categories, $this->widget['shopId']);?>
                                     </div>
                                 </div>
-                                <div class="colorHolder clearfix editor">
-                                    <h4>Выбор цвета</h4>
-                                </div>
-                                <input type="hidden" value="<?= \model\Rules::RULE_TYPE_RULE ?>" name="rule_type">
                             </div>
+                            <div class="paramsHolder clearfix editor grid13 paramTpl">
+                                <?=$this->buildParamsBlock(isset($rule['freeWidgetRules']['categoryId'])?$rule['freeWidgetRules']['categoryId']:array(),
+                                    isset($rule['freeWidgetRules']['param'])?$rule['freeWidgetRules']['param']:array(),
+                                    $this->shopId);
+                                ?>
+                            </div>
+                            <input type="hidden" value="<?= \model\Rules::RULE_TYPE_RULE ?>" name="rule_type">
+                        </div>
                         <?php endif; ?>
                         <input type="hidden" value="<?= $key; ?>" name="item_position">
                     </div>
@@ -179,8 +200,7 @@
         </div>
     </div>
 </div>
-<div
-    class="block inner choose-product chooseProduct chooseProductTpl clearfix  dev-insert-block dev-item-block hidden">
+<div class="block inner choose-product chooseProduct chooseProductTpl clearfix  dev-insert-block dev-item-block hidden">
     <div class="block-header">Позиция в виджете. Спопособ выбора
         товара: <?= \model\Rules::RULE_TYPE_SINGLE_TITLE ?></div>
     <div class="block-content clearfix dev-positions">
@@ -188,7 +208,9 @@
         <div class="categoryTpl">
             <div class="grid13">
                 <h4>Выбор категории</h4>
-                <div class="treeHolder itemHolder  dev-offer-category"></div>
+                <div class="treeHolder itemHolder  dev-offer-category">
+                    <?=$this->getTreeView($this->categories, $this->widget['shopId']);?>
+                </div>
             </div>
         </div>
         <div class="grid13">
@@ -212,18 +234,20 @@
         </div>
             </div>
         <?php if ($this->widget['typeId'] == \model\Widgets::WIDGET_TYPE_FREE): ?>
-        <div class="block-content clearfix">
+        <div class="rule"><div class="block-content clearfix rule ">
             <div class="categoryHolder clearfix">
                 <h4>Выбор категории</h4>
 
                 <div class="grid13">
-                    <div class="ruleHolder treeHolder editor dev-category-rule"></div>
+                    <div class="ruleHolder treeHolder editor dev-category-rule dev-rule">
+                        <?=$this->getTreeView($this->categories, $this->widget['shopId']);?>
+                    </div>
                 </div>
             </div>
-            <div class="colorHolder clearfix editor">
-                <h4>Выбор цвета</h4>
+            <div class="paramsHolder clearfix editor grid13 paramTpl">
             </div>
             <input type="hidden" value="<?= \model\Rules::RULE_TYPE_RULE ?>" name="rule_type">
+        </div>
         </div>
         <? endif;?>
         <input type="hidden" value="<?= \model\Rules::RULE_TYPE_SINGLE ?>" name="rule_type">
@@ -240,13 +264,15 @@
 </form>
 </div>
 <script type="text/javascript">
+    showLoading(true);
+    $(window).load(function(){
+        $('.loading').fadeOut(2000);
+        $('.overlay').fadeOut(2000);
+    });
+
     $(document).ready(function () {
-        initEditor.init({commonRule: <?=json_encode($this->widget['commonRule'])?>,
-            positions: <?=json_encode($this->widget['positions'])?>,
-            workList: {
-                categoryList: buildCategoryList(<?=json_encode($this->categories)?>),
-                colorList: buildColorList(<?=json_encode($this->colors)?>)
-            },
+        initEditor.init({commonRule: <?=json_encode($this->widget['commonRule'], JSON_NUMERIC_CHECK | JSON_FORCE_OBJECT )?>,
+            positions: <?=json_encode($this->widget['positions'], JSON_NUMERIC_CHECK | JSON_FORCE_OBJECT )?>,
             shopId: <?= $this->widget['shopId'] ?>
         });
     })

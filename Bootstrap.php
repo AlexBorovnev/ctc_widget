@@ -27,6 +27,10 @@ function getScripPath()
     $path = implode('/', $rout);
     return ($path) ? $path . '/' : '';
 }
+$config = Config::getInstance()->getConfig();
+if ($config['env']['prod']){
+    error_reporting(E_ERROR | E_PARSE);
+}
 
 $widget = new DbLoadWidget(Config::getInstance()->getConfig(), Config::getInstance()->getDbConnection());
 $rout = explode('/', strtok(trim(str_replace(getScripPath(), '', $_SERVER['REQUEST_URI']), '/'), '?'));
@@ -80,6 +84,7 @@ function auth()
 }
 function showAdminPage($page = '', $param = 1, $pageNum = 1){
     $view = View::getInstance();
+    $memcached = Common::getInstance()->getMemcache();
     switch ($page){
         case '':
             showMainAdminPage();
@@ -101,9 +106,15 @@ function showAdminPage($page = '', $param = 1, $pageNum = 1){
         case 'edit':
             $rulesModel = new Rules(Config::getInstance()->getDbConnection());
             if ($view->widget = $rulesModel->prepareRuleToResponse($param)){
-                $categoriesModel = new Categories(Config::getInstance()->getDbConnection());
-                $categoriesList = $categoriesModel->getCategoriesList(array('shopId' => $view->widget['shopId']));
-                $view->categories = array('list' => $categoriesList, 'count' => count($categoriesList));
+                $view->viewLoading =true;
+                if ($tree = $memcached->get('categoryTree_'.$view->widget['shopId'])){
+                    $view->categories = unserialize($tree);
+                }else {
+                    $categoriesModel = new Categories(Config::getInstance()->getDbConnection());
+                    $categoriesList = $categoriesModel->getCategoriesList(array('shopId' => $view->widget['shopId']), Categories::GET_TREE_RESULT);
+                    $view->categories = $categoriesList;
+                    $memcached->set('categoryTree_'.$view->widget['shopId'], serialize($categoriesList), false, 60*60*12 + rand(0,360));
+                }
 
                 $view->shopId = $view->widget['shopId'];
                 $goodsModel = new Goods(Config::getInstance()->getDbConnection());

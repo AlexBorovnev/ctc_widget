@@ -7,98 +7,72 @@ function _widgetType(obj) {
 
 function _widgetSkin(obj) {
 }
-
-function getCategoryList(shopId, cb) {
-    api.call('getCategoryList', {shopId: shopId}, cb);
-}
-function buildCategoryList(categories) {
-    if (categories.length == 0) {
-        toastr.error('нет категорий для отображения');
-        return;
-    }
-    var cats = {};
-    for (var i in categories.list) {
-        var c = categories.list[i];
-        var cid = c.category_id;
-        var pid = c.parent_id;
-        var t = {
-            cid: cid,
-            pid: pid,
-            title: c.title
-        };
-        if (pid == 0) {
-
-            cats[cid] = t;
-        }
-        else {
-            if (cats[pid]['childs'] == undefined)
-                cats[pid]['childs'] = {};
-            cats[pid]['childs'][cid] = t;
-        }
-    }
-    return cats;
-}
 var initEditor = {
     obj: {},
     count: 0,
-    filters: ['color', 'categoryId'],
+    filters: ['param', 'categoryId'],
     catTree: [],
     status: 'ok',
     init: function (obj) {
-        this.catTree = buildTree('myTree', obj.workList.categoryList);
-        $('.colorHolder').append(obj.workList.colorList);
         this.obj = obj;
+
+        //this.catTree = buildTree('myTree', obj.workList.categoryList, this.obj.shopId, undefined, true);
+        //$('.paramsHolder').append(obj.workList.paramsList);
+
         //if (obj.commonRule) {
-            this.initCommonRuleSection();
+        this.initCommonRuleSection();
         //}
         this.count = $('[name="widget_count"]').val();
-        this.initColor();
+        //this.initParams();
         this.initTreeForSinglePosition();
         this.initEvents('.block-content');
         this.manageAddBlockButton();
-
+        //showLoading(false);
     },
-    initColor: function (selector, color) {
+    initParams: function (selector, color) {
         for (var i in color) {
             $(selector + '[data-color-name="' + color[i] + '"]').addClass('active');
         }
     },
     initTreeForSinglePosition: function () {
         var base = this;
-        $('.dev-insert-block .treeHolder').append(this.catTree.clone(true));
+        //$('.dev-insert-block .treeHolder').append(this.catTree.clone(true));
+
         for (var i in base.obj.positions) {
-            $('.dev-block-' + i + ' .treeHolder').append(this.catTree.clone(true));
+            var catIds = [];
+            if (base.obj.positions[i].freeWidgetRules != undefined && base.obj.positions[i].freeWidgetRules.categoryId){
+                catIds = $.map(base.obj.positions[i].freeWidgetRules.categoryId, function(value, index) {
+                    return [value];
+                });
+            }
             $('.dev-block-' + i + ' .treeHolder li').each(function () {
                 if ($(this).parents('.dev-offer-category').length > 0 && base.obj.positions[i].source != undefined && base.obj.positions[i].source.category_id != undefined && ($(this).data('cid') == base.obj.positions[i].source.category_id)) {
                     $(this).find('.Content').addClass('b');
-                    $(this).parents('.IsRoot').removeClass('ExpandClosed').addClass('ExpandOpen');
+                    $(this).parents('.Node').removeClass('ExpandClosed').addClass('ExpandOpen');
                     getOfferList($(this).data('cid'), base.obj.shopId, $(this).parents('.dev-block-' + i), base.obj.positions[i].source.offer_id);
                 }
-                if ($(this).parents('.dev-category-rule').length > 0 && base.obj.positions[i].freeWidgetRules && base.obj.positions[i].freeWidgetRules.categoryId != undefined && (base.obj.positions[i].freeWidgetRules.categoryId.indexOf($(this).data('cid')) != -1)) {
+                if ($(this).parents('.dev-category-rule').length > 0 && catIds && catIds.indexOf($(this).data('cid')) != -1) {
                     $(this).find('.Content').addClass('b');
-                    $(this).parent().parent().removeClass('ExpandClosed').addClass('ExpandOpen');
+                    $(this).parents().parent().removeClass('ExpandClosed').addClass('ExpandOpen');
                 }
             })
-            if (base.obj.positions[i].freeWidgetRules && base.obj.positions[i].freeWidgetRules.color != undefined) {
-                base.initColor('.dev-block-' + i + ' .dev-editor-color', base.obj.positions[i].freeWidgetRules.color);
-            }
         }
     },
     initSectionForRule: function (filter, value) {
         switch (filter) {
             case 'categoryId':
-                $('.ruleHolder').append(this.catTree.clone(true));
                 if (value){
+                    var catIds = $.map(value, function(value, index) {
+                        return [value];
+                    });
                     $('.ruleHolder li').each(function () {
-                        if (value.indexOf($(this).data('cid')) != -1) {
+                        if (catIds.indexOf($(this).data('cid')) != -1) {
                             $(this).find('.Content').addClass('b');
-                            $(this).parent().parent().removeClass('ExpandClosed').addClass('ExpandOpen');
+                            $(this).parents('.Node').removeClass('ExpandClosed').addClass('ExpandOpen');
                         }
                     })
                 }
                 break;
-            case 'color':
-                this.initColor('.dev-editor-color', value);
         }
     },
 
@@ -134,15 +108,17 @@ var initEditor = {
                     $(this).parent().find('li .Content').removeClass('b');
                 }
             }
+            getParamList($(this), 'b');
         });
         $(selector + ' .dev-offer-category').on('click', ".Content", function () {
             var cid = $(this).parent().data('cid'),
                 pid = $(this).parent().data('pid'),
                 $holderOffer = $(this).parents('.dev-positions'),
-                $holderCategory = $(this).parents('.dev-offer-category');
+                $holderCategory = $(this).parents('.dev-offer-category'),
+                childCount = $(this).parent().data('childCount');
             $holderOffer.find(".previewPic img").attr('src', '../../images/preview.png');
             $holderOffer.find(".offerInfo").empty();
-            if (pid != 0) {
+            if (childCount == 0) {
                 $holderCategory.find(".Content.b").removeClass('b');
                 $(this).addClass('b');
                 $holderOffer.find(".noOffers").remove();
@@ -200,15 +176,21 @@ var initEditor = {
             });
 
         });
-        $(selector + ' .colorHolder').on('click', '.dev-editor-color', function () {
+        $(selector + ' .paramsHolder').on('click', '.paramContainer .param', function () {
+            var paramName = $(this).data('param-name');
+            var paramValue = $(this).data('param-value');
             $(this).toggleClass('active');
-            if ($(this).hasClass('active')) {
-                selectedColors.push($(this).data('colorName'));
+            if($(this).hasClass('active')){
+                if (selectedParams[paramName] == undefined){
+                    selectedParams[paramName] = [];
+                }
+                selectedParams[paramName].push(paramValue);
             }
-            else {
-                var ind = selectedColors.indexOf($(this).data('colorName'));
-                if (ind != -1)
-                    selectedColors.slice(ind, 1);
+            else{
+                var ind = selectedParams[paramName].indexOf(paramValue);
+                if(ind != -1){
+                    selectedParams[paramName].splice (ind, 1);
+                }
             }
         });
         $('.removeProduct').on('click', function (e) {
@@ -345,7 +327,7 @@ var initEditor = {
                                 source = [];
                             }
                         }
-                        if (source.length > 0 || source.length == undefined){
+                        if (source.length > 0 || (source.param != undefined || source.categoryId !=undefined)){
                             positions[i].push({type: $(this).val(), params: source});
                         }
                     });
@@ -363,31 +345,36 @@ var initEditor = {
         } else if (type == 2) {
             var offer = $('.dev-block-' + position).find('.offerItem.active').data('offer');
             if (offer) {
-                return new Array(offer['attributes']['id']);
+                return {offerId: offer['attributes']['id'], categoryId: offer.categoryId};
             }
         }
         return params;
     },
     getRule: function (selector) {
-        var colors = $(selector).find('.dev-editor-color.active'),
+        var param = $(selector).find('.paramContainer .param.active'),
             categories = $(selector).find('.dev-category-rule li .Content.b'),
-            colorsValue = [],
+            paramValue = {},
             categoriesValue = [],
-            params = {};
-        colors.each(function () {
-            colorsValue.push($(this).data('colorName'));
+            params = {},
+            paramExist = false;
+        param.each(function () {
+            if (paramValue[$(this).data('param-name')] == undefined){
+                paramValue[$(this).data('param-name')] = [];
+            }
+            paramValue[$(this).data('param-name')].push($(this).data('param-value'));
+            paramExist =true;
         });
         categories.each(function () {
             categoriesValue.push($(this).parent().data('cid'));
         });
-        if (colorsValue) {
-            params.color = colorsValue;
+        if (paramExist) {
+            params.param = paramValue;
         }
         ;
-        if (categoriesValue) {
+        if (categoriesValue.length>0) {
             params.categoryId = categoriesValue;
         }
-        ;
+
         return params;
     }
 }

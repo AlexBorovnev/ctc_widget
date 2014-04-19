@@ -15,4 +15,8 @@ class AbstractModel
     {
         return str_repeat('?,', count($data) - 1) . '?';
     }
+
+    protected function getRussianABC()
+    {
+    }
 }

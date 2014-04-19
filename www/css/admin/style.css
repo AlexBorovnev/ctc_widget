@@ -568,16 +568,16 @@ a.disabledBtn:hover{
 	display: none;
 }
 
-.colorHolder ul li{
+.paramContainer ul li{
 	float: left;
 	margin: 5px;
 	cursor: pointer;
 	color: #2e6e9e;
 }
-.colorHolder ul li.active{
+.paramContainer ul li.active{
 	font-weight: bold;
 }
-.colorHolder ul li:hover{
+.paramContainer ul li:hover{
 	text-decoration: underline;
 }
 .treeHolder{
@@ -598,7 +598,7 @@ a.disabledBtn:hover{
 	font-weight: bold;
 }
 
-.categoryHolder, .colorHolder{
+.categoryHolder, .paramContainer{
 	width: 300px;
 	float: left;
 }
@@ -834,4 +834,38 @@ h5{
 
 .green{
 	color: #00962A !important;
+}
+
+.loading {
+    position: fixed;
+    z-index: 999;
+    height: 2em;
+    width: 2em;
+    overflow: show;
+    margin: auto;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+.loading img {
+    width:100px;
+    height: 100px;
+}
+
+.overlay {
+    height:100%;
+    width:100%;
+    position:fixed;
+    left:0;
+    top:0;
+    background-color:rgba(0, 0, 0, 0.85);
+    z-index:9999;
+    color:white;
+}
+
+.paramTpl.grid13 {
+    width: 50%;
+    margin: 0 auto;
+
 }

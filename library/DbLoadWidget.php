@@ -15,15 +15,30 @@ class DbLoadWidget extends WidgetAbstract
      * @var \PDO
      */
     protected $dbh = null;
+    protected $config;
+    /**
+     * @var $memcached \Memcache
+     */
+    protected $memcached = null;
 
     public function __construct(array $config, \PDO $connection)
     {
         parent::__construct($config);
         $this->dbh = $connection;
+        $this->memcached = Common::getInstance()->getMemcache();
+        $this->config = $config;
     }
 
     protected function getOffers($widgetId)
     {
+        $offers = array();
+
+        //$this->memcached->flush();
+        if ($this->config['env']['prod'] && $this->memcached){
+            if ($offers = @$this->memcached->get('widget' . $widgetId)){
+                return unserialize($offers);
+            }
+        }
         $offers = array();
         foreach ($this->getRules($widgetId) as $rule) {
             if ($offer = $this->getOfferByRule($rule)) {
@@ -32,6 +47,7 @@ class DbLoadWidget extends WidgetAbstract
         }
         $widgetModel = new Widgets($this->dbh);
         $offers = $this->getAdditionalOfferIfNeeded($offers, $widgetModel->getCommonRule($widgetId), count($offers));
+        $this->memcached->set('widget' . $widgetId, serialize($offers), false, 60*5 + rand(0,60));
         return $offers;
     }
 
@@ -51,7 +67,7 @@ class DbLoadWidget extends WidgetAbstract
         } elseif ($delta > 0) {
             for ($i = 0; $i < $delta; $i++) {
                 if ($offer = $this->getRandomItem($rule['shop_id'], $rule['common_rule'])){
-                    $offers[] = $this->getRandomItem($rule['shop_id'], $rule['common_rule']);
+                    $offers[] = $offer;
                 }
             }
         }
@@ -101,7 +117,7 @@ class DbLoadWidget extends WidgetAbstract
         if (!isset($rule['source'])) {
             return array();
         }
-        $offerData = $goodsModel->getSingleOffer(array('offerId' => $rule['source'], 'shopId' => $shopId));
+        $offerData = $goodsModel->getSingleOffer(array('offerId' => $rule['source'], 'shopId' => $shopId), Goods::OFFER_IS_AVAILABLE);
         //if offer not found in db, than implement common rule for position in widget
         if (!$offerData && !empty($rule['common_rule'])) {
             $offerData = $this->getRandomItem($shopId, $rule['common_rule']);

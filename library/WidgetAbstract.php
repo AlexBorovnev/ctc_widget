@@ -28,6 +28,7 @@ abstract class WidgetAbstract
         $widgetsContent = array();
         foreach ($this->getOffers($widgetsId) as $offer) {
             $pictureSrc = $offer['offer_id'] . time();
+            $commonData = unserialize($offer['common_data']);
             $widgetsContent[] = array(
                 'picture' => $offer['picture'],
                 'picture_our_src' => $pictureSrc,
@@ -35,9 +36,10 @@ abstract class WidgetAbstract
                     'totalPrice' => $offer['price'],
                     'viewPrice' => $this->getPrice($offer['price'])
                 ),
+                'title' => $this->getWidgetTitle($commonData),
                 'url' => $offer['url'],
                 'id' => $offer['offer_id'],
-                'common_data' => unserialize($offer['common_data'])
+                'common_data' => $commonData
             );
         }
         return $widgetsContent;
@@ -45,7 +47,33 @@ abstract class WidgetAbstract
 
     protected function getPrice($value)
     {
-        list($intValue, $floatValue) = explode('.', $value);
-        return array('intValue' => $intValue ? : '0', 'floatValue' => $floatValue ? : '00');
+        $viewPrice = explode('.', $value);
+        return array(
+            'intValue' => !empty($viewPrice[0]) ? $viewPrice[0] : '0',
+            'floatValue' => !empty($viewPrice[1]) ? $viewPrice[1] : '00'
+        );
+    }
+
+    protected function getWidgetTitle($data)
+    {
+        $title = '';
+        if (!empty($data['vendor'])) {
+            $title = $this->getValueFromParam($data['vendor']) . ' ';
+        }
+        if (!empty($data['model'])) {
+            $title .= $this->getValueFromParam($data['model']);
+        } elseif (!empty($data['name'])) {
+            $title .= $this->getValueFromParam($data['name']);
+        }
+        return $title;
+    }
+
+    protected function getValueFromParam($param)
+    {
+        if (is_array($param)){
+            return array_pop($param);
+        } else {
+            return $param;
+        }
     }
 }

@@ -6,10 +6,9 @@ var widgets = [],
 	widgetSkins = [],
 	api,
 	serverHostApi = '/handler', //for server use
-	preview
 	_offers = [],
 	_colorList = [],
-	selectedColors = [],
+    selectedParams = [],
 	previewPath = '',
     serverHost = '';
     widgetId = '';
@@ -45,16 +44,16 @@ function mainInit(shopObj){
 
 
 
-	api.call('getColorList', {}, function(response){
-			_colorList = response.list;
-			$(".colorTpl").append(buildColorList());
-
-	})
+//	api.call('getColorList', {}, function(response){
+//			_colorList = response.list;
+//			$(".colorTpl").append(buildColorList());
+//
+//	})
 
     $('.searchProduct').on('click', function(e){
         e.preventDefault();
         var offerId = $(this).parent().find('[name="offer_id"]').val(),
-            shopId = shopObj.id,
+            shopId = shopObj.shop.id,
             holder = $(this).parents('.dev-positions');
         api.call('getOffer', {'shopId': shopId, 'offerId': [offerId], 'allOffer': true}, function(response){
             if(response.list.length == 0){
@@ -74,6 +73,15 @@ function mainInit(shopObj){
     })
 }
 
+function showLoading(display){
+    if(display){
+        $('.overlay').css('display', '');
+        $('.loading').css('display', '');
+    } else {
+        $('.loading').css('display', 'none');
+        $('.overlay').css('display', 'none');
+    }
+}
 
 
 

@@ -30,15 +30,17 @@
 		<ul>
 
 			<?php  //$widgets = $widget->getWidget($widgetsId);
-				foreach ($this->widgets as $key => $widget):?>
+				foreach ($this->widgets as $key => $widget):
+                    $picture = @unserialize($widget['picture']);
+                    ?>
 				
 				<li class="w <?php if (count($this->widgets) <= 3) echo 'widget';?> widget_<?= $widget['id'] ?>">
 					<div class="pic">
 						<a href="<?= $widget['url']; ?>" target="_blank" class="refer_link"><img class="offer_img"
-								src="<?=$widget['picture']?>"
+								src="<?=($picture !== false) ? $picture[0] : $widget['picture'] ?>"
 								alt="" ></a>
 						<div class="desc">
-							<?= $widget['common_data']['vendor']. ' ' . $widget['common_data']['model'] ?>
+							<?= mb_substr($widget['title'], 0, 100) ?>
 						</div>
 					</div>
 					<div>
@@ -96,7 +98,7 @@
 						},
 						onAfter: function(){
 							$arrowRight.show();
-						},
+						}
 					},
 					next	: {
 						button	: ".arrow-right",

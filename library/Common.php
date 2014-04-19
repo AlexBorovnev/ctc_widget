@@ -4,6 +4,7 @@ use library\Config;
 class Common{
 
     protected static $instance = null;
+    protected static $memcache;
 
     private function __construct(){}
 
@@ -19,4 +20,17 @@ class Common{
         $authQuery->execute(array(':login' => $login, ':password' => $password));
         return $authQuery->fetch(\PDO::FETCH_ASSOC);
     }
+
+    public function getMemcache()
+    {
+        if (static::$memcache){
+            return static::$memcache;
+        } else {
+            $config = Config::getConfig();
+            static::$memcache = new \Memcache;
+            static::$memcache->connect($config['memcached']['host'], $config['memcached']['port']);
+            return static::$memcache;
+        }
+    }
+
 }

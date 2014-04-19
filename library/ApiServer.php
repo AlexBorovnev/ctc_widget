@@ -17,6 +17,7 @@ class ApiServer
      */
     protected $dbh;
     protected $config;
+    protected $shopId;
 
     public function __construct(array $config, \PDO $connection)
     {
@@ -79,7 +80,7 @@ class ApiServer
         foreach ($paramsName as $name => $params) {
             switch ($params['required']) {
                 case true:
-                    if (empty($data[$name]) || !$this->correctType($data[$name], $params['type'])) {
+                    if (!isset($data[$name]) || !$this->correctType($data[$name], $params['type'])) {
                         if (!$this->config['env']['prod']){
                             $this->sendResponse(array('message' => sprintf('Param %s is incorrect', $params['type'])), true, 5);
                         }
@@ -87,7 +88,7 @@ class ApiServer
                     }
                     break;
                 case false:
-                    if (!empty($data[$name]) && !$this->correctType($data[$name], $params['type'])) {
+                    if (isset($data[$name]) && !$this->correctType($data[$name], $params['type'])) {
                         if (!$this->config['env']['prod']){
                             $this->sendResponse(array('message' => sprintf('Param %s is incorrect', $params['type'])), true, 5);
                         }
@@ -105,6 +106,8 @@ class ApiServer
                 return is_array($value) ? : false;
             case 'string':
                 return is_string($value) ? : false;
+            case 'boolean':
+                return is_bool($value) ? true : false;
             default:
                 return false;
         }
@@ -172,7 +175,7 @@ class ApiServer
             array(
                 'categoryId' => array('type' => 'array', 'required' => true),
                 'shopId' => array('type' => 'string', 'required' => true),
-                'color' => array('type' => 'array', 'required' => false),
+                'params' => array('type' => 'array', 'required' => false),
             )
         );
         $goodsModel = new Goods($this->dbh);
@@ -180,7 +183,7 @@ class ApiServer
             array(
                 'shopId' => $data['shopId'],
                 'categoryId' => $data['categoryId'],
-                'color' => empty($data['color']) ? null : $data['color'],
+                'params' => empty($data['params']) ? null : $data['params'],
                 'allOffer' => true
             )
         );
@@ -225,6 +228,7 @@ class ApiServer
             }
         }
         try {
+            $this->shopId = $data['shopId'];
             $this->dbh->beginTransaction();
             $data['positions'] = array_slice($data['positions'], 0, $this->getMaxPositions($data['typeId']));
             $widgetId = $this->widgetAdd($data);
@@ -268,11 +272,11 @@ class ApiServer
         }
     }
 
-    protected function insertSingleItem($shopId, $widgetId, $offerId, $position)
+    protected function insertSingleItem($shopId, $widgetId, $offerInfo, $position)
     {
-        $offerId = serialize(array_shift($offerId));
+        $offerInfo = serialize($offerInfo);
         $rulesModel = new Rules($this->dbh);
-        $rulesModel->insertRule($shopId, $widgetId, $offerId, $position, $rulesModel::RULE_TYPE_SINGLE);
+        $rulesModel->insertRule($shopId, $widgetId, $offerInfo, $position, $rulesModel::RULE_TYPE_SINGLE);
     }
 
     protected function insertRuleItem($shopId, $widgetId, $rule, $position)
@@ -287,7 +291,13 @@ class ApiServer
         $preparedRule = array();
         foreach ($rule as $filterName => $filter) {
             if (!empty($filter) && is_array($filter)) {
-                $preparedRule[$filterName] = array_diff($filter, array(''));
+                if ($filterName == 'categoryId'){
+                    $filter = $this->getChildCategory($filter);
+                    $preparedRule[$filterName] = array_diff($filter, array(''));
+                }
+                if ($filterName == 'param'){
+                    $preparedRule[$filterName] = $filter;
+                }
             }
         }
         return serialize($preparedRule);
@@ -328,7 +338,17 @@ class ApiServer
             default:
                 $this->sendResponse(array('message' => $this->config['messages'][5]), true, 5);
         }
-        return serialize($data['commonRule']);
+        if (!empty($data['commonRule'])){
+            $data['commonRule']['categoryId'] = $this->getChildCategory($data['commonRule']['categoryId']);
+            return serialize($data['commonRule']);
+        }
+        return null;
+    }
+
+    protected function getChildCategory($categoryId)
+    {
+        $categoryModel = new Categories($this->dbh);
+        return $categoryModel->getChildCategories($categoryId, $this->shopId);
     }
 
     protected function checkCommonRule($rule)
@@ -384,6 +404,20 @@ class ApiServer
         return array('list' => $colorList, 'count' => count($colorList));
     }
 
+    protected function getParamList($data)
+    {
+        $this->checkNeededParam(
+            $data,
+            array(
+                'shopId' => array('type' => 'string', 'required' => true),
+                'categoryIds' => array('type' => 'array', 'required' => true)
+            )
+        );
+        $categoryModel = new Categories($this->dbh);
+        $paramList = $categoryModel->getParamsWithValueForCategories($data['shopId'], $data['categoryIds']);
+        return array('paramValue' => $paramList);
+    }
+
     protected function referrerAdd($data)
     {
         $this->checkNeededParam(
@@ -408,4 +442,5 @@ class ApiServer
         $widgetModel->deleteWidget($data['widgetId']);
         return true;
     }
+
 }

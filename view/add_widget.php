@@ -1,11 +1,11 @@
 <script type="text/javascript" src="<?=HOST?>js/admin/tree.js?<?=REV?>"></script>
-
 <script type="text/javascript" src="<?=HOST?>js/admin/shop.js?<?=REV?>"></script>
 <script type="text/javascript" src="<?=HOST?>js/admin/widget.js?<?=REV?>"></script>
 <script type="text/javascript" src="<?=HOST?>js/admin/offer.js?<?=REV?>"></script>
 <script type="text/javascript" src="<?=HOST?>js/admin/main2.js?<?=REV?>"></script>
 <script type="text/javascript" src="<?=HOST?>js/admin/main.js?<?=REV?>"></script>
 <script type="text/javascript" src="<?=HOST?>js/admin/system.js?<?=REV?>"></script>
+<script type="text/javascript" src="<?=HOST?>js/admin/param.js?<?=REV?>"></script>
 <script>
 
 	$(function(){
@@ -14,16 +14,11 @@
 	});
 
 </script>
-
 <div class="wrapper clearfix">
 	<div id="tabs">
 		<ul class="tabList">
 
-
 		</ul>
-
-
-
 	</div>
 </div>
 <div class="hidden">
@@ -35,13 +30,13 @@
 		<h5 class="fl mr40">Выбранные правила:</h5><a href="#" class="changeRule green">Изменить</a>
 		<div class="forPreviewRule">
 			<div><span class="b">Категории: </span><span class="ruleCategories">222</span><br></div>
-			<div><span class="b">Цвета: </span><span class="ruleColors">33123</span></div>
+			<div><span class="b">Параметры: </span><span class="ruleColors">33123</span></div>
 		</div>
 	</div>
 	<div class="categoryTpl">
 		<div class="grid13">
 			<h4>Выбор категории</h4>
-			<div class="treeHolder"></div>
+			<div class="treeHolder dev-rule"></div>
 		</div>
 	</div>
 	<div class="categoryOfferTpl">
@@ -73,12 +68,6 @@
 		</div>
 	</div>
 
-	<div class="colorTpl clearfix">
-		<h4>Выбор цвета</h4>
-	</div>
-
-
-
 
 	<div class="block widget widgetTpl">
 		<div class="block-header"></div>
@@ -95,7 +84,6 @@
 		<div class="body clearfix">
 			<a href="#" class="btn choseProduct">Выбрать товар</a>
 			<a href="#" class="btn createRule">Создать правило</a>
-<!--			<a href="#" class="btn savePosition">Сохранить позицию</a>-->
 			<div class="categoryOfferHolder clearfix"></div>
 			<div class="ruleHolder clearfix"></div>
 			<div class="_preview"></div>
@@ -107,9 +95,8 @@
 				<div class="categoryHolder clearfix">
 				</div>
 
-
-				<div class="colorHolder clearfix">
-				</div>
+                <div class="paramTpl clearfix grid13">
+                </div>
 			</div>
 			<div class="clearfix">
 				<a href="#" class="btn saveRule"><span>Сохранить правило</span></a>
@@ -187,8 +174,6 @@
 				<div class="positionHolder clearfix"  data-position-num="1">
 			
 			</div>
-
-
 		</div>
 	</div>
 	<div class="block inner bigWidget bigWidgetTpl widget">
@@ -199,15 +184,10 @@
 				<div class="rule_preview"></div>
 			</div>
 			<div class="ruleHolder"></div>
-			
 			<div class="positionHolder clearfix positionHolder1" data-position-num="1">
-
 			</div>
 			<div class="positionHolder clearfix positionHolder2" data-position-num="2">
-
 			</div>
-			
-
 
 		</div>
 	</div>
@@ -249,11 +229,6 @@
 		</div>
 		<div class="positions clearfix"></div>
 
-
-
-
-
-
 		<div class="tut"></div>
 
 		<div class="block inner clearfix preparedWidget">
@@ -286,8 +261,6 @@
 		</div>
 
 	</div>    
-
-
 		</div>
 		<div class="holder"></div>
 	

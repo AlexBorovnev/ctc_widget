@@ -68,51 +68,16 @@ function buildColorList(colorList){
 
 
 
-function getCategoryList(shopId, cb){
-	api.call('getCategoryList', {shopId: shopId}, cb);
-		//$(".treeTpl").append($tree);
-
-        //$tree.find(".Content").bind('click', function(){
-
-//				var cid = $(this).parent().data('cid'),
-//				pid = $(this).parent().data('pid');
-
-//				$tree.find(".previewPic img").attr('src', './img/preview.png');
-//				$tree.find(".offerInfo").empty();
-//                
-//				if(pid != 0){
-//					$tree.find(".Content").removeClass('b');
-//					$(this).addClass('b');
-//					$tree.find(".noOffers").remove();
-//					$tree.find(".offerHolder li").remove();
-//					getOfferList(cid, shopId, widget);
-//				}
-//				else{
-
-//					$(this).prev().trigger('click');
-//					var event = {};
-//					event.target = $(this).prev()[0];
-//					tree_toggle(event);
-//				}
-//			});
+function getCategoryList(shopId, cb, parentId) {
+    var parentId = parentId || 0;
+    api.call('getCategoryList', {shopId: shopId, parentId: [parentId]}, cb);
 }
-
-
-
-
-
 
 function _position(){
 	
 }
 
-
-
 function buildCategoryList(categories){
-	if(categories.length == 0){
-		toastr.error('нет категорий для отображения');
-		return;
-	}
 
 	var cats = {};
 	for(var i in categories.list){
@@ -123,7 +88,8 @@ function buildCategoryList(categories){
 		var t = {
 			cid: cid,
 			pid: pid,
-			title: c.title
+			title: c.title,
+            childCount: c.child_cat
 
 		};
 		if(pid == 0){
@@ -131,9 +97,13 @@ function buildCategoryList(categories){
 			cats[cid] = t;
 		}
 		else{
-			if(cats[pid]['childs'] == undefined)
-				cats[pid]['childs'] = {};
-			cats[pid]['childs'][cid] = t;
+            if (cats[pid]==undefined){
+                cats[pid] = {};
+            }
+			if(cats[pid]['childs'] == undefined){
+                cats[pid]['childs'] = {};
+            }
+            cats[pid]['childs'][cid] = t;
 		}
 
 	}

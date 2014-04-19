@@ -42,9 +42,8 @@ function constructOffer(data){
 function getOfferList(cid, shopId, $holder, currItem){
 	
 	api.call('getOfferList', {'shopId': shopId, 'categoryId' : [cid]}, function(response){	
-
-
 		if(response.list.length == 0){
+            $holder.find(".offerHolder").empty();
 			$holder.find(".offerHolder").before('<div class="noOffers">товаров нет</div>');
 			return;
 		}
@@ -55,20 +54,17 @@ function getOfferList(cid, shopId, $holder, currItem){
 			var offer = $.parseJSON(item);
 			offers.push(offer);
 		}
-
 		buildOfferList(offers, $holder, currItem);
 
 	});
 }
 
 function buildOfferList(offers, $holder, currItem){
-	//var $w = widget.$w;
-//	var offers = widget.offers;
 	var $ul = $holder.find("ol.offerHolder");
     $ul.empty();
 	for(var i in offers){
 
-		var $li = $('<li class="offerItem">'+ offers[i].vendor +" "+ offers[i].vendorCode +'</li>');
+		var $li = $('<li class="offerItem">'+ offers[i].offer +'</li>');
 		$li.data('offer', offers[i]);
         if(offers[i].attributes.id == currItem){
             $li.addClass('active');
@@ -87,16 +83,21 @@ function buildOfferList(offers, $holder, currItem){
 		$holder.find('.previewPic img').attr('src', offer.picture);
 		var $info = $("<div></div>")
 		var isAvailable = (offer.isAvailable=='1')?'Да':'Нет на складе';
-		$info.append("<div>"+offer.model +' '+ offer.vendor+"</div>")
-
+		$info.append("<div>"+offer.title+"</div>")
 		$info.append("<div>Цена: <span class='b'>"+offer.price+"</span></div>")
 		$info.append("<div>Доступно: "+isAvailable+"</div>")
-		$info.append("<div>Цвет: "+offer.param.color+"</div>")
+        var offerParamText = '';
+        for (var i in offer.param){
+            offerParamText += '&nbsp;&nbsp;&nbsp;' + offer.param[i].title + ': ' + offer.param[i].value + '</br>';
+        }
+		$info.append("<div>Параметры: "+offerParamText+"</div>")
 		$info.append("<div>ID: " + offer.attributes.id + "</div>");
-		$info.append("<div>CODE: "+offer.vendorCode+"</div>")
+        $info.append("<div>Категория: " + offer.title + "</div>");
+        if (offer.vendorCode != undefined){
+            $info.append("<div>CODE: "+offer.vendorCode+"</div>")
+        }
 		$holder.find(".offerInfo").empty();
 		$holder.find(".offerInfo").append($info);
-
+        $holder.data('cid', offer.categoryId);
 	});
-
 }

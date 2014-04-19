@@ -10,6 +10,7 @@ function State(){
 	this.isOfferSaved = false;
 	this.hasPosition = false;
 }
+var shopObject;
 
 function _shop(data){
 	this.id = data.id;
@@ -34,7 +35,7 @@ function _shop(data){
     indexNum = 1,
 	selectedOffers = [],
 	selectedCategories = [],
-	selectedColors = [],
+    selectedParams = {},
 	positions = [],
 	widgetType = 0,
 	widgetId = 0;
@@ -57,7 +58,7 @@ function _shop(data){
 				})
 		for(var i in selectedOffers){
 			var offer = selectedOffers[i];
-			var tpl = {'type': '2', 'params': [offer.attributes.id]}
+			var tpl = {'type': '2', 'params': {offerId: offer.attributes.id, categoryId: offer.categoryId}};
 			params.push([tpl]);
 		}
 		return params;
@@ -70,65 +71,63 @@ function _shop(data){
 			var $p = $($poses[l]);
 			var $offer = $p.find('.categoryOfferHolder').find('.offerItem.active');
 				var offerId = '';
-                var num = $(this).parents('.pos').attr('data-init-pos');
+                var categoryId = '';
+                var num = $p.attr('data-init-pos');
                 var preparedPosition = [];
 				if($offer.length > 0){
 					offerId = $offer.data('offer').attributes.id;
-
-					var position = {'type': 2, 'params': [offerId], 'num': num};
+                    categoryId = $offer.data('offer').categoryId;
+					var position = {'type': 2, 'params': {offerId: offerId, categoryId: categoryId}, 'num': num};
 					preparedPosition.push(position);
 
 				}
 				
 				var $categories = $p.find('.ruleHolder .tree .Content.active');//cid
-				var $colors = $p.find('.ruleHolder .colorHolder .color.active');
+				var $params = $p.find('.ruleHolder .paramTpl .param.active');
 				var catIds = [];
-				var colors = [];
+				var param = {};
+                var paramExist = false;
 				$categories.each(function(){
 						catIds.push($(this).parent().data('cid'));
 				});
 
-				$colors.each(function(){
-						colors.push($(this).data('colorName'));
+                $params.each(function(){
+                    if (param[$(this).data('param-name')] == undefined){
+                        param[$(this).data('param-name')] = [];
+                    }
+                    param[$(this).data('param-name')].push($(this).data('param-value'));
+                    paramExist = true;
 				});
 
-//				if($categories.length == 0){
-//					toastr.error('Необходимо выбрать правило');
-//					return;
-//				}
+
 				var params = {},
                     rule = false;
 				if(catIds.length > 0){
 					params['categoryId'] = catIds;
                     rule = true;
 				}
-				if(colors.length > 0){
-					params['color'] = colors;
+                if (paramExist){
+                    params['param'] = param;
                     rule = true;
-				}
+                }
                 var position = {};
                 if (rule){
                     position = {'type': 1, 'params': params, 'num': num};
                 }
                 preparedPosition.push(position);
                 out.push(preparedPosition);
-				//self.addPosition(preparedPosition);
-				
 		}
 		return out;	
-				
-				
-
 	}
 
 	this.getCommonRule = function(){
 		if(this.getWidgetType == 3){
 			return null;
 		}
-		var rule = {};
-		rule.color = selectedColors;
+		var rule = {'param': [], 'categoryId': []};
 		rule.categoryId = selectedCategories;
-		if(rule.color.length == 0 && rule.categoryId.length == 0)
+        rule.param = selectedParams;
+		if(rule.param.length == 0 && rule.categoryId.length == 0)
 			return [];
 		return rule;
 	}
@@ -180,7 +179,6 @@ function _shop(data){
 		});
 		
 		$shop.on('click', ".saveWidget", function(e){
-				var $saveWidgetButton = $(this);
 				e.preventDefault();
 				var data = {};
 				if(widgetType == 3){//free
@@ -200,10 +198,9 @@ function _shop(data){
 						'skinId': self.getSkinType(),
 						'typeId': self.getWidgetType(),
 						'positions': positions
-					}                        
+					}
 				}
 				else{
-
 					data = {
 						'shopId': self.id,
 						'title' : self.wTitle,
@@ -211,17 +208,12 @@ function _shop(data){
 						'typeId': self.getWidgetType(),
 						'commonRule': self.getCommonRule(),
 						'positions': self.getPositions()
-					};    
-					//data validation
-//					if (data.commonRule.length == 0){
-//						toastr.error('Необходимо выбрать правило');
-//						return;
-//					}
+					};
+
 					if(data.title == ''){
 						toastr.error('Укажите название виджета');
 						return;
 					}
-
 				}
                 if(widgetId){
                     data.widgetId = widgetId;
@@ -230,7 +222,6 @@ function _shop(data){
 						toastr.info('Виджет сохранен, id = ' + response.widgetId);
 						widgetId = response.widgetId;
 						self.widgetPreview();
-						//$saveWidgetButton.hide();
 				});
 
 		});
@@ -258,7 +249,6 @@ function _shop(data){
 				$tpl.parent().find('._preview').append($selectedOfferTpl);
 				$(this).parents('.pos').find('.choseProduct').hide();
 				$(this).parents('.pos').find('.savePosition').show();
-				
 				state.isOfferSaved = true;
 				state.isOfferSelected = false;
 				$pos.data('state', state);
@@ -273,28 +263,17 @@ function _shop(data){
 				var cid = $(this).parent().data('cid'),
 				pid = $(this).parent().data('pid');
 
-				var childs = $(this).data('childs');    
+				var childs = $(this).parent().data('childs');
 				var domChilds = $(this).parent().children('.Container').find('.Content')
 
-				$(this).toggleClass('active')
+				$(this).toggleClass('active');
 				if($(this).hasClass('active')){
 					state.isRuleValid = true;
-					if(childs != undefined && childs.length > 0){//PARENT
-						domChilds.addClass('active');
-					}
+                    domChilds.addClass('active');
 				}
 				else{
-					if(childs != undefined && childs.length > 0){//PARENT
-						domChilds.removeClass('active');
-					}
-					else{//CHILD
-						$(this).parent().parent().parent().find('.Content:first').removeClass('active');
-						var childsActive = $(this).parent().parent().parent().find('.Container .Content.active').length;
-						var childsTotal = $(this).parent().parent().parent().find('.Container .Content').length;
-						if(childsActive == childsTotal)
-							$(this).parent().parent().parent().find('.Content:first').addClass('active');
-							
-					}
+                    $(this).parents('.Node').children('.Content').removeClass('active');
+                    $(this).parent().find('.Content').removeClass('active');
 				}
 				selectedCategories = [];
 				var $activeChilds = $(this).parents('.tree').find('.Content.active');
@@ -306,7 +285,7 @@ function _shop(data){
 				}
 
 				selectedCategories = arrayUnique(selectedCategories);
-				
+                getParamList($(this), 'active');
 				$pos.data('state', state);
 		});
 		
@@ -314,40 +293,45 @@ function _shop(data){
 
 				var cid = $(this).parent().data('cid');
 				var pid = $(this).parent().data('pid');
+                var childCount = $(this).parent().data('childCount');
 				var $holder = $(this).parents('.categoryOfferHolder');
+                var parentNode = $(this).parent();
 				$holder.find(".previewPic img").attr('src', previewPath);
 				$holder.find(".offerInfo").empty();
-
-				if(pid != 0){
+				if(childCount == 0){
 					$holder.find(".Content").removeClass('b');
 					$(this).addClass('b');
 					$holder.find(".noOffers").remove();
-					$holder.find(".offerHolder li").remove();
-					getOfferList(cid, self.id, $holder);
+                    getOfferList(cid, self.id, $holder);
 				}
 				else{
-					//                $(this).prev().trigger('click');
 					var event = {};
+                    $holder.find(".offerHolder").empty();;
 					event.target = $(this).prev()[0];
-					tree_toggle(event);
+					tree_toggle(event, self.id);
 				}
-
 		});
 
-		$shop.on('click', '.colorHolder .color', function(){
+		$shop.on('click', '.paramContainer .param', function(){
 				var $pos = $(this).parents('.pos');
+                var paramName = $(this).data('param-name');
+                var paramValue = $(this).data('param-value');
                 if($pos.length == 0)$pos = $(this).parents('.widget');
 				var state = $pos.data('state');
 				if(state == null) state = new State();
 				$(this).toggleClass('active');
 				if($(this).hasClass('active')){
 					state.isRuleValid = true;
-					selectedColors.push($(this).data('colorName'));
+                    if (selectedParams[paramName] == undefined){
+                        selectedParams[paramName] = [];
+                    }
+                    selectedParams[paramName].push(paramValue);
 				}
 				else{
-					var ind = selectedColors.indexOf($(this).data('colorName'));
-					if(ind != -1)
-						selectedColors.slice(ind, 1);
+					var ind = selectedParams[paramName].indexOf(paramValue);
+					if(ind != -1){
+                        selectedParams[paramName].splice (ind, 1);
+                    }
 				}
 				$pos.data('state', state);
 		})
@@ -379,8 +363,7 @@ function _shop(data){
 						$but.css(css);
 						var $holder = $parent.find('.categoryOfferHolder');
 						$holder.slideUp();
-//						$holder.find('.saveRule').hide();
-						
+
 						$holder.find('.Content.b').removeClass('b');
 						$holder.find('.ExpandOpen').removeClass('ExpandOpen').addClass('ExpandClosed');
 						$holder.find('.offerHolder').empty();
@@ -505,14 +488,22 @@ function _shop(data){
 				if(state == null) state = new State();
 				
 				var cats = [];
-				var colors = [];
-				$tpl.find('.color.active').each(function(){
-						colors.push($(this).html());
+				var params = [];
+				$tpl.find('.param.active').each(function(){
+                    var paramName = $(this).data('param-name');
+                    var paramVlaue = $(this).data('param-value');
+                    if (params[paramName] != undefined){
+                        params[paramName].push(paramVlaue);
+                    } else {
+                        params[paramName] = [];
+                        params[paramName].push(paramVlaue);
+                    }
 				});
+
 				$tpl.find('.Content.active').each(function(){
 						cats.push($(this).html());
 				});
-				if(cats.length === 0 && colors.length === 0){
+				if(cats.length === 0 && params.length === 0){
 					toastr.error('Укажите правило');
 					return;
 				}
@@ -522,16 +513,18 @@ function _shop(data){
 				$tpl.hide();
 				
 				$selectedRule.find('.ruleCategories').html(cats.join(', '));
-				$selectedRule.find('.ruleColors').html(colors.join(', '));
+                var paramHtml = '';
+                for (var i in params){
+                    paramHtml += i + ': ' + params[i].join(', ') + '</br>';
+                }
+				$selectedRule.find('.ruleColors').html(paramHtml);
 				$(this).parents('.pos').find('._preview').append($selectedRule);
 				$(this).parents('.widget').find('.rule_preview').append($selectedRule);
 				$(this).parents('.pos').find('.savePosition').show();
 				var $but = $(this).parents('.pos').find('.createRule');
 				if($but.length == 0)
 					$but = $(this).parents('.widget').find('.createRule');
-				
 				$but.hide();
-				
 		});
 		
 		$shop.on('click', ".savePosition", function(e){
@@ -541,7 +534,7 @@ function _shop(data){
 	}       
     
 	this.initTemplates = function(list){
-		var $tree = buildTree('myTree', list);
+		var $tree = buildTree('myTree', list, self.id);
 		//            $(".treeTpl").append($tree);
 
 		$categoryTpl = $('.categoryTpl').clone(true).removeClass('categoryTpl');//.hide();
@@ -551,11 +544,11 @@ function _shop(data){
 		$categoryOfferTpl = $('.categoryOfferTpl').clone(true).removeClass('categoryOfferTpl');//.hide();
 		$categoryOfferTpl.find('.treeHolder').append($tree.clone(true));
 
-		$colorTpl = $(".colorTpl").clone(true).removeClass('colorTpl');
+		$paramsTpl = $(".paramTpl").clone(true).removeClass('paramTpl');
 
 		$rule = $(".ruleTpl").clone(true).removeClass('ruleTpl');
 		$rule.find('.categoryHolder').append($categoryTpl.clone(true));
-		$rule.find('.colorHolder').append($colorTpl.clone(true));
+		$rule.find('.paramsHolder').append($paramsTpl.clone(true));
 
 		$position = $('.positionTpl').clone(true).removeClass('positionTpl')
 		$position.find('.categoryOfferHolder').append($categoryOfferTpl.clone(true));
@@ -580,7 +573,6 @@ function _shop(data){
 		$bigWidget.find('.ruleHolder').append($rule.clone(true));
 
 		$freeWidget = $('.freeWidgetTpl').clone(true).removeClass('freeWidgetTpl');
-		//$freeWidget.find('.positionHolder').append($freePosition.clone(true));
 
 
 		var $curWidget;
@@ -623,23 +615,22 @@ function _shop(data){
 				$skinList.next().hide().after('<span>'+skinVal+'</span>');
 				$typeList.next().hide().after('<span>'+typeVal+'</span>');
 
-				//                $("#select").prop('disabled',true).trigger("liszt:updated");
-				//                $shop.find(".widgetSkinList").prop('disabled', true).trigger("liszt:updated");
-		});    
+		});
 		this.initEvents();
 	}
 	this.prepareCategories = function(){
 		getCategoryList(self.id, function(response){
 				var list = buildCategoryList(response);
-
 				self.initTemplates(list);
-
-		});
-
+		}, 0);
 
 	}
-	this.init = function(){
+    this.renderCategoryTree = function(list, nodeElement){
+        var catTree = buildTree('myTree', list, self.id, nodeElement);
+        nodeElement.data('download', true);
+    }
 
+	this.init = function(){
 
 		$("#tabs ul.tabList").append('<li><a href="#shop'+this.id+'">'+this.title+'</a></li>');
 		$( "#tabs" ).tabs().addClass( "ui-tabs-vertical ui-helper-clearfix" );
@@ -649,8 +640,6 @@ function _shop(data){
 		$("#tabs").append($shopTpl);
 		self.$shop = $('#shop'+this.id);
 		$shop = self.$shop;
-
-		//self.getWidgetList();
 
 		$shop.find('a.add-widget').bind('click', function(e){
 				var $w = $('.newWidgetTpl').clone().removeClass('newWidgetTpl');
@@ -665,13 +654,8 @@ function _shop(data){
 
 
 				$(this).unbind('click');
-
-
 		});
-
-
-
-
+        shopObject = self;
 	}
 
 	this.getWidgetList= function(){
@@ -679,7 +663,6 @@ function _shop(data){
 		api.call('getWidgetList', {'shopId': self.id}, function(response){
 
 		});
-
 	}
 
 	this.init();

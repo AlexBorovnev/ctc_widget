@@ -7,36 +7,20 @@ function prepareLocalEnvironmet(){
 	if(document.cookie == 'server=local')
 		serverHost = 'api.php';
 }
-function recursiveCount(list){
-	var count = 0;
-	for(var i in list){
-		var item = list[i];
-
-		if(item.cid != 0)
-			count++;
-		if(item.childs != undefined || item.childs != {})
-			count += recursiveCount(item.childs);
-	}
-	return count;
-}
 
 function _api(host){
 
 	this.call = function(methodName, params, callback){
-		//if(isEmpty(params))
-		//			params['bug'] = 'fixItLater';
-		var data = {methodName: methodName, params: params};
 
+		var data = {methodName: methodName, params: params};
 		$.ajax({
 				type: 'POST',
 				url: host,
 				data: data,
-				cache: false, 
-				//			dataType: "json",
+				cache: false
 		}).done(function(response){
-				response = response.replace(/<[^<]+?>(.+)?/g, '');
+				//response = response.replace(/<[^<]+?>(.+)?/g, '');
 				response = jQuery.parseJSON(response);
-
 				if(!response.error){
 					callback(response.data.data);
 					return;

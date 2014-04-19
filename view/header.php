@@ -33,6 +33,12 @@
 		<script type="text/javascript" src="<?=HOST?>js/all.js"></script>
 	</head>
 	<body>
+    <div class="overlay" style="display:none;">
+        <div class="loading" style="display: <? if (isset($this->viewLoading)): echo 'block'; else: echo 'none'; endif;?>;">
+            <img src="<?=HOST?>images/loading.gif">
+        </div>
+    </div>
+
     <div class="wrap">
         <div class="mainHeader">
             <div class="logo"><a href="<?=makeLink("/")?>"><img src="<?=makeLink("/images/sts_logo.png")?>" width="100px" /></a></div>
