@@ -40,7 +40,7 @@
 								src="<?=($picture !== false) ? $picture[0] : $widget['picture'] ?>"
 								alt="" ></a>
 						<div class="desc">
-							<?= mb_substr($widget['title'], 0, 100) ?>
+							<?= $widget['title'] ?>
 						</div>
 					</div>
 					<div>
