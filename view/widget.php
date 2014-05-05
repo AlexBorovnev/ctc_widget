@@ -21,6 +21,7 @@
 
 	<script type="text/javascript" src="<?=HOST?>js/admin/jquery-1.9.1.js"></script>
 	<script type="text/javascript" src="<?=HOST?>js/admin/jquery.carouFredSel-6.2.1-packed.js"></script>
+    <script type="text/javascript" src="<?=HOST?>js/admin/jquery-ui-1.10.3.custom.min.js"></script>
 
 </head>
 <body>
@@ -39,8 +40,12 @@
 						<a href="<?= $widget['url']; ?>" target="_blank" class="refer_link"><img class="offer_img"
 								src="<?=($picture !== false) ? $picture[0] : $widget['picture'] ?>"
 								alt="" ></a>
-						<div class="desc">
-							<?= $widget['title'] ?>
+						<div class="desc" title="<?=htmlspecialchars($widget['title']);?>">
+                            <? if (strlen(utf8_decode($widget['title'])) > 60): ?>
+                                <?= preg_replace('/\s[^\s]*$/', '', mb_substr($widget['title'], 0, 60)) ?>&nbsp;...
+                            <? else: ?>
+                                <?= $widget['title'] ?>
+							<? endif; ?>
 						</div>
 					</div>
 					<div>
@@ -65,6 +70,7 @@
 <script>
 
 	$(function(){
+        //$('.desc').tooltip();
         $('.refer_link').click(function(){
             $.ajax({
                 type: 'POST',
@@ -125,7 +131,6 @@
         $(window).resize(function () {
             setArrowPosition();
         });
-
 	});
     function setArrowPosition(){
         var firstElementLeft = $('li.w').first().offset().left,
