@@ -81,9 +81,13 @@ class Goods extends AbstractModel
                 $paramIdsQuery = $this->dbh->prepare("SELECT gp.param_id, p.title FROM goods_param gp JOIN params p ON p.id=gp.param_id WHERE p.title IN (".$this->getQueryMark($paramNames).") GROUP BY gp.param_id");
                 $paramIdsQuery->execute($paramNames);
                 $paramIds = $paramIdsQuery->fetchAll(\PDO::FETCH_ASSOC);
+                $queryStringList = array();
                 foreach ($paramIds as $row){
-                    $queryString .= " AND (gp.param_id=? AND gp.value IN (".$this->getQueryMark($value[$row['title']])."))";
+                    $queryStringList[] = " (gp.param_id=? AND gp.value IN (".$this->getQueryMark($value[$row['title']])."))";
                     $queryValue = array_merge($queryValue, array($row['param_id']), $value[$row['title']]);
+                }
+                if ($queryStringList){
+                    $queryString .= ' AND (' . join(' OR', $queryStringList) . ') GROUP BY g.offer_id HAVING COUNT(g.offer_id)>=' . count($queryStringList);
                 }
             } else {
                 if (isset($this->fields[$filter]) && !empty($value) && is_array($value)) {
