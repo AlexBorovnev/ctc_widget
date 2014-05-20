@@ -74,6 +74,7 @@ class Goods extends AbstractModel
     public function getRandomItem($shopId, $rule = array())
     {
         $queryString = '';
+        $paramPostfixQuery = '';
         $queryValue = array();
         foreach ($rule as $filter => $value) {
             if ($filter == self::PARAM_LIST_NAME){
@@ -87,7 +88,8 @@ class Goods extends AbstractModel
                     $queryValue = array_merge($queryValue, array($row['param_id']), $value[$row['title']]);
                 }
                 if ($queryStringList){
-                    $queryString .= ' AND (' . join(' OR', $queryStringList) . ') GROUP BY g.offer_id HAVING COUNT(g.offer_id)>=' . count($queryStringList);
+                    $queryString .= ' AND (' . join(' OR', $queryStringList) . ')' ;
+                    $paramPostfixQuery = 'GROUP BY g.offer_id HAVING COUNT(g.offer_id)>=' . count($queryStringList);
                 }
             } else {
                 if (isset($this->fields[$filter]) && !empty($value) && is_array($value)) {
@@ -99,7 +101,7 @@ class Goods extends AbstractModel
             }
         }
         $offerQuery = $this->dbh->prepare(
-            'SELECT * FROM goods g JOIN goods_param gp ON gp.shop_id=g.shop_id AND gp.category_id=g.category_id AND gp.offer_id=g.offer_id WHERE g.shop_id=? ' . $queryString . ' ORDER BY RAND() LIMIT 1'
+            'SELECT * FROM goods g JOIN goods_param gp ON gp.shop_id=g.shop_id AND gp.category_id=g.category_id AND gp.offer_id=g.offer_id WHERE g.shop_id=? ' . $queryString . $paramPostfixQuery .' ORDER BY RAND() LIMIT 1'
         );
         $offerQuery->execute(array_merge(array($shopId), $queryValue));
         return $offerQuery->fetch(\PDO::FETCH_ASSOC);

@@ -299,6 +299,7 @@ class initBase
 
     private function createTmpTable()
     {
+        $this->dbh->exec("DROP goods_tmp TABLE IF EXISTS");
         $this->dbh->prepare($this->createTmpTableCode('goods_tmp'))->execute();
     }
 
