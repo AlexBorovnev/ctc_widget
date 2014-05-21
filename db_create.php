@@ -144,7 +144,7 @@ CREATE TABLE IF NOT EXISTS `goods_param` (
   `category_id` int(11) NOT NULL,
   `param_id` int(11) NOT NULL,
   `value` varchar(50) DEFAULT NULL,
-  UNIQUE KEY `offer_id` (`offer_id`,`category_id`,`shop_id`,`param_id`),
+  UNIQUE KEY `offer_id` (`offer_id`,`category_id`,`shop_id`,`param_id`, `value`),
   KEY `shop_id` (`shop_id`),
   KEY `category_id` (`category_id`),
   KEY `param_id` (`param_id`),

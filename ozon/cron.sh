@@ -1,7 +1,8 @@
 #!/bin/sh
-log_dir="${PWD}/log"
-list_dir="${PWD}/list"
-output_dir="${PWD}/download"
+base_dir="/home/developer/dev/projects/sts.loc"
+log_dir="${base_dir}/ozon/log"
+list_dir="${base_dir}/ozon/list"
+output_dir="${base_dir}/ozon/download"
 # download_list - файл ссылок для скачивания
 download_list="${list_dir}/download.lst"
 # В active_list записываются активные закачки
@@ -22,6 +23,7 @@ move_line()
 {
   if [ -f $2 ]; then
       tmp_file=`mktemp -t downloader.XXXXXX`
+      echo $1 >> $3
       cat $2 | grep -v $1 > $tmp_file
       mv $tmp_file $2
   fi
@@ -52,7 +54,7 @@ download_thread()
       move_line $url $active_list $done_list
       unzip -auq -d "${output_dir}" "${output_dir}/$(basename "$url")"
       rm "${output_dir}/$(basename "$url")"
-      php "${PWD}/cron.php" $shop_name $shop_url "ozon/download/$(basename "$url")"
+      php "${base_dir}/ozon/cron.php" $shop_name $shop_url "ozon/download/$(basename "$url")"
       sleep $timeout
     else
       # Ошибка закачки - перемещаем в файл с ошибочными ссылками
@@ -91,32 +93,31 @@ case "$1" in
   then
     exit
   fi
+  if [ ! -e $error_list ]; then touch $error_list; fi
+  if [ ! -e $active_list ]; then touch $active_list; fi
+  if [ ! -e $done_list ]; then touch $done_list; fi
+  if [ -e ${base_dir}/busy ];then
+      exit;
+  else
+      touch ${base_dir}/busy
+  fi
   # На случай вторичного запуска скрипта останавливаем ранее запущенные процессы
   #stop_script
   # Если не задано кол-во одновременных закачек в $2, устанавливаем 1 поток
-  if [ -z $2 ]
-  then
     threads=1
-  else
-    threads=$2
-  fi
-  php "${PWD}/cron.php" $shop_name $shop_url "before"
+  php "${base_dir}/ozon/cron.php" $shop_name $shop_url "before"
   sleep $timeout
   # Запускаем в фоне закачки
-  i=1
-  while [ $i -le $threads ]
-  do
-    download_thread $i &
+    download_thread &
     downloader_pid="${downloader_pid} $!"
     sleep 1
-    i=`expr $i + 1`
-  done
-  if [ ! -e $error_list ]; then touch $error_list; fi
+
   # Ждем окончания всех закачек
   wait $downloader_pid
   sleep $timeout
-  php "${PWD}/cron.php" $shop_name $shop_url "after"
+  php "${base_dir}/ozon/cron.php" $shop_name $shop_url "after"
   # Все скачали...
+  rm ${base_dir}/busy
   ;;
 * )
   ;;

@@ -4,7 +4,6 @@ use model\Categories;
 
 class UpdateDB
 {
-    private $dbName;
     /**
      * @var \PDO
      */
@@ -14,7 +13,7 @@ class UpdateDB
     private $shopName;
     private $shopUrl;
     private $offerInsertData = array();
-    private $offerInsertQuery;
+    private $offerInsertQuery = '';
     private $elementsInOneRow = 10;
     private $patchElements = 170;
     private $categoryTitleType;
@@ -23,15 +22,18 @@ class UpdateDB
      */
     private $xmlParser;
 
-    public function __construct($shopName, $shopUrl, $baseName)
+    public function __construct($shopName, $shopUrl)
     {
         $this->shopName = $shopName;
         $this->shopUrl = $shopUrl;
-        $this->dbName = $baseName;
-        $this->pathToXml = realpath(__DIR__ . '/../' . $this->dbName);
-        $this->xmlParser = $this->getParser($this->shopUrl);
         $this->config = Config::getInstance()->getConfig();
         $this->dbh = Config::getInstance()->getDbConnection();
+    }
+
+    public function setParser($baseName)
+    {
+        $this->pathToXml = __DIR__ . '/../' . $baseName;
+        $this->xmlParser = $this->getParser($this->shopUrl);
     }
 
     public function beforeAddAction()
@@ -47,6 +49,7 @@ class UpdateDB
             $this->dbh->exec("UPDATE LOW_PRIORITY goods_tmp SET is_available = 0 WHERE shop_id={$shopId}");
             return true;
         } catch(\Exception $e){
+            Config::getInstance()->setBusyStatus(false);
             echo $e->getMessage();
             echo $e->getLine();
             echo $e->getFile();
@@ -57,29 +60,31 @@ class UpdateDB
 
     public function afterAddAction()
     {
-        $shopId = $this->getShopId($this->shopName, $this->shopUrl);
-        $this->dbh->exec('DROP TABLE categories');
-        $this->dbh->exec('RENAME TABLE categories_tmp TO categories');
-        $this->dbh->exec('DROP TABLE goods');
-        $this->dbh->exec('RENAME TABLE goods_tmp TO goods');
-        $this->dbh->exec('DROP TABLE goods_param');
-        $this->dbh->exec('RENAME TABLE goods_param_tmp TO goods_param');
-        $categoriesModel = new Categories($this->dbh);
-        $categoriesModel->setCategoryList($categoriesModel->getCategoriesList(array('shopId' => $shopId)));
-        $categoryChilds = $categoriesModel->getCategoryWithChildList();
-        $categoriesModel->setPrepareQuery($this->dbh->prepare("SELECT p.title FROM goods_param gp JOIN params p ON p.id=gp.param_id WHERE gp.category_id=:cat_id AND gp.shop_id=:shop_id GROUP BY p.title"));
-        foreach ($categoryChilds as $catId => $childs){
-            $categoriesModel->addCategoriesParam($shopId, $catId, $childs);
+        try {
+            $shopId = $this->getShopId($this->shopName, $this->shopUrl);
+            $this->dbh->exec('DROP TABLE categories');
+            $this->dbh->exec('RENAME TABLE categories_tmp TO categories');
+            $this->dbh->exec('DROP TABLE goods');
+            $this->dbh->exec('RENAME TABLE goods_tmp TO goods');
+            $this->dbh->exec('DROP TABLE goods_param');
+            $this->dbh->exec('RENAME TABLE goods_param_tmp TO goods_param');
+            $categoriesModel = new Categories($this->dbh);
+            $categoriesModel->setCategoryList($categoriesModel->getCategoriesList(array('shopId' => $shopId)));
+            $categoryChilds = $categoriesModel->getCategoryWithChildList();
+            $categoriesModel->setPrepareQuery($this->dbh->prepare("SELECT p.title FROM goods_param gp JOIN params p ON p.id=gp.param_id WHERE gp.category_id=:cat_id AND gp.shop_id=:shop_id GROUP BY p.title"));
+            foreach ($categoryChilds as $catId => $childs){
+                $categoriesModel->addCategoriesParam($shopId, $catId, $childs);
+            }
+        } catch (\Exception $e) {
+            Config::getInstance()->setBusyStatus(false);
         }
     }
 
     public function updateBase($titleType)
     {
-        if (!Config::getInstance()->getBusyStatus() && $this->downloadedBase()) {
-            Config::getInstance()->setBusyStatus(true);
+        if ($this->downloadedBase()) {
             $this->categoryTitleType = $titleType;
             $this->updateDB();
-            //$this->removeTmp();
         }
     }
 
@@ -191,22 +196,24 @@ class UpdateDB
             $queryInsert = $this->getInsertOfferQuery();
             $offerUpdate = $this->dbh->prepare($queryInsert['insert'] . substr($this->offerInsertQuery, 0 ,-1) .$queryInsert['update']);
             $offerUpdate->execute($this->offerInsertData);
-            unset($this->offerInsertQuery);
+            $this->offerInsertQuery = '';
             $this->offerInsertData = array();
         }
     }
 
     protected function addOffer($offer, $shopId, $count){
         if (($offer['attributes']['available'] == 'true' || $offer['attributes']['available'] === true)) {
+            $title = $this->getTitle($offer);
             foreach ($offer['categoryId'] as $category){
-                $preparedData = $this->preparedOfferData($shopId, $offer, $count);
+
+                $preparedData = $this->preparedOfferData($shopId, $offer, $count, $title);
                 $preparedData[':category_id' . $count] = $category;
                 if (($offer['attributes']['available'] == 'true' || $offer['attributes']['available'] === true)){
                     $this->addParamsForOffer($shopId, $offer['attributes']['id'], $category, $offer);
                 }
                 $this->offerInsertData = array_merge($this->offerInsertData, $preparedData);
                 $this->offerInsertQuery .= " (:offer_id{$count}, :category_id{$count}, :shop_id{$count}, :is_available{$count}, :url{$count}, :price{$count}, :currency{$count}, :picture{$count}, :title{$count}, :common_data{$count}),";
-                $count+=$this->elementsInOneRow;
+                $count += $this->elementsInOneRow;
             }
         }
     }
@@ -218,13 +225,13 @@ class UpdateDB
         return array('insert' => $insertPart, 'update' => $updatePart);
     }
 
-    protected function preparedOfferData($shopId, $offer, $index)
+    protected function preparedOfferData($shopId, $offer, $index, $title)
     {
         $result = array(
             ':url' . $index => '',
             ':price' . $index => '',
             ':currency' . $index => '',
-            ':title' . $index => '',
+            ':title' . $index => $title,
             ':picture' . $index => '',
         );
         foreach ($offer as $key => $value) {
@@ -245,7 +252,6 @@ class UpdateDB
             }
         }
         $result[':offer_id' . $index] = $offer['attributes']['id'];
-        $result[':title' . $index] = $this->getTitle($offer);
         $result[':common_data' . $index] = serialize($offer);
         $result[':shop_id' . $index] = (int)$shopId;
         $result[':is_available' . $index] = ($offer['attributes']['available'] == 'true' || $offer['attributes']['available'] === true) ? 1 : 0;
@@ -257,27 +263,42 @@ class UpdateDB
         $title = '';
         switch($this->categoryTitleType){
             case Categories::MODEL_VENDOR_TITLE:
-                $title = sprintf("%s %s", $data['model'][0], $data['vendor'][0]);
+                if (isset($data['model'][0]) && isset($data['vendor'][0])) {
+                    $title = sprintf("%s %s", $data['model'][0], $data['vendor'][0]);
+                }
                 break;
             case Categories::AUTHOR_TITLE:
                 $originalName = '';
                 if (isset($data['param']['Оригинальное название'])){
                     $originalName = ' ' . $data['param']['Оригинальное название'];
                 }
-                $title = $data['author'][0] . $originalName;
+                if (isset($data['author'][0])) {
+                    $title = $data['author'][0] . $originalName;
+                }
                 break;
             case Categories::NAME_TITLE:
-                $title = $data['name'][0];
+                if (isset( $data['name'][0])) {
+                    $title = $data['name'][0];
+                }
                 break;
         }
         if (!$title){
-            $title = $data['name'][0];
+            if (isset( $data['name'][0])) {
+                $title = $data['name'][0];
+            }
         }
+        if (!$title) {
+            if (isset($data['model'][0]) && isset($data['vendor'][0])) {
+                $title = sprintf("%s %s", $data['model'][0], $data['vendor'][0]);
+            }
+        }
+
         return $title;
     }
 
     private function createTmpTable($tmpTableName, $sourceTableName)
     {
+        $this->dbh->exec("DROP TABLE IF EXISTS {$tmpTableName}");
         $this->dbh->exec($this->createTmpTableCode($tmpTableName, $sourceTableName));
     }
 
@@ -297,7 +318,6 @@ EOL;
 
     public function __destruct()
     {
-        Config::getInstance()->setBusyStatus(false);
 //        $removeTmpTableQuery = $this->dbh->prepare('SHOW TABLES LIKE "goods_ozon_tmp"');
 //        $removeTmpTableQuery->execute();
 //        if ($removeTmpTableQuery->fetch()){
@@ -342,7 +362,6 @@ EOL;
             } else {
                 $paramId = $data['id'];
             }
-
             $queryAddValue->execute(array(
                     ':shop_id' => $shopId,
                     ':offer_id' => $offerId,

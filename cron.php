@@ -29,6 +29,13 @@ class initBase
 
     public function updateBase()
     {
+        try{
+
+        } catch (Exception $e){
+            echo $e->getMessage();
+            echo $e->getFile();
+            echo $e->getLine();
+        }
         if (!Config::getInstance()->getBusyStatus()){
             Config::getInstance()->setBusyStatus(true);
             foreach ($this->getBaseUrl() as $shopName => $baseUrl) {
@@ -138,6 +145,7 @@ class initBase
 
     private function preparedAction($shopId)
     {
+        $this->dbh->exec("DROP TABLE IF EXISTS goods_param_tmp");
         $this->dbh->exec("CREATE TABLE goods_param_tmp LIKE goods_param");
         $this->dbh->exec("INSERT INTO goods_param_tmp SELECT * FROM goods_param WHERE shop_id<>{$shopId}");
     }
@@ -198,7 +206,6 @@ class initBase
             "INSERT LOW_PRIORITY INTO categories (category_id, shop_id,parent_id, title) VALUES (:category_id, :shop_id, :parent_id, :title) ON DUPLICATE KEY UPDATE parent_id=:parent_id, title=:title"
         );
         foreach ($categories->children() as $category) {
-            $categoryId = (int)$category->attributes()->id;
             $stmt->execute(
                 array(
                     'category_id' => (int)$category->attributes()->id,
@@ -272,6 +279,7 @@ class initBase
                     ':param_id' => $paramId,
                     ':value' => (string) $value
                 ));
+
 
         }
     }

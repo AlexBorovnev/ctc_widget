@@ -36,7 +36,7 @@ abstract class WidgetAbstract
                     'totalPrice' => $offer['price'],
                     'viewPrice' => $this->getPrice($offer['price'])
                 ),
-                'title' => $this->getWidgetTitle($commonData),
+                'title' => $offer['title'],
                 'url' => $offer['url'],
                 'id' => $offer['offer_id'],
                 'common_data' => $commonData
@@ -52,20 +52,6 @@ abstract class WidgetAbstract
             'intValue' => !empty($viewPrice[0]) ? $viewPrice[0] : '0',
             'floatValue' => !empty($viewPrice[1]) ? $viewPrice[1] : '00'
         );
-    }
-
-    protected function getWidgetTitle($data)
-    {
-        $title = '';
-        if (!empty($data['vendor'])) {
-            $title = $this->getValueFromParam($data['vendor']) . ' ';
-        }
-        if (!empty($data['model'])) {
-            $title .= $this->getValueFromParam($data['model']);
-        } elseif (!empty($data['name'])) {
-            $title .= $this->getValueFromParam($data['name']);
-        }
-        return $title;
     }
 
     protected function getValueFromParam($param)

@@ -15,7 +15,7 @@ $titleType = array(
     'div_gifts' => \model\Categories::NAME_TITLE,
     'div_book' => \model\Categories::AUTHOR_TITLE
 );
-$db = new library\UpdateDB($argv[1], $argv[2], str_replace('.zip', '.xml', $argv[3]));
+$db = new library\UpdateDB($argv[1], $argv[2]);
 $categoryTitle = \model\Categories::MODEL_VENDOR_TITLE;
 foreach ($titleType as $catName => $title){
     if (strpos($argv[3], $catName) !== false){
@@ -30,6 +30,7 @@ switch ($argv[3]){
         $db->afterAddAction();
         break;
     default:
+        $db->setParser(str_replace('.zip', '.xml', $argv[3]));
         $db->updateBase($categoryTitle);
         break;
 }
