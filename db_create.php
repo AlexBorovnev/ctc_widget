@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXISTS `goods_param` (
   KEY `shop_id` (`shop_id`),
   KEY `category_id` (`category_id`),
   KEY `param_id` (`param_id`),
-  FULLTEXT KEY `value` (`value`)
+  KEY `value` (`value`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- Экспортируемые данные не выделены.

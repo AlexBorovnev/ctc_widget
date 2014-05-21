@@ -230,21 +230,23 @@ class initBase
         );
         foreach ($offers->children() as $offer) {
             $data = $this->prepareCommonData($offer);
-            $offerUpdate->execute(
-                array(
-                    ':offer_id' => $data['attributes']['id'],
-                    ':category_id' => $data['categoryId'],
-                    ':shop_id' => (int)$shopId,
-                    ':is_available' => ($data['attributes']['available'] == true) ? 1 : 0,
-                    ':url' => $data['url'],
-                    ':price' => $data['price'],
-                    ':currency' => $data['currencyId'],
-                    ':picture' => $data['picture'],
-                    ':title' => sprintf("%s %s", $data['model'], $data['vendor']),
-                    ':common_data' => serialize($this->prepareCommonData($offer)),
-                )
-            );
-            $this->addParamsForOffer($shopId,  $data['attributes']['id'], $data['categoryId'], $offer);
+            if ($data['attributes']['available']){
+                $offerUpdate->execute(
+                    array(
+                        ':offer_id' => $data['attributes']['id'],
+                        ':category_id' => $data['categoryId'],
+                        ':shop_id' => (int)$shopId,
+                        ':is_available' => ($data['attributes']['available'] == true) ? 1 : 0,
+                        ':url' => $data['url'],
+                        ':price' => $data['price'],
+                        ':currency' => $data['currencyId'],
+                        ':picture' => $data['picture'],
+                        ':title' => sprintf("%s %s", $data['model'], $data['vendor']),
+                        ':common_data' => serialize($this->prepareCommonData($offer)),
+                    )
+                );
+                $this->addParamsForOffer($shopId,  $data['attributes']['id'], $data['categoryId'], $offer);
+            }
         }
     }
 
@@ -299,7 +301,7 @@ class initBase
 
     private function createTmpTable()
     {
-        $this->dbh->exec("DROP goods_tmp TABLE IF EXISTS");
+        $this->dbh->exec("DROP TABLE IF EXISTS goods_tmp ");
         $this->dbh->prepare($this->createTmpTableCode('goods_tmp'))->execute();
     }
 

@@ -154,6 +154,7 @@ class UpdateDB
         $prefix = mb_strtolower(str_replace('.', '', $shopName));
         $stmt->bindValue(':title', $shopName);
         $stmt->bindValue(':url', $url);
+        $stmt->bindValue(':prefix', $prefix);
         $stmt->execute();
         return $this->dbh->lastInsertId();
     }
@@ -196,15 +197,17 @@ class UpdateDB
     }
 
     protected function addOffer($offer, $shopId, $count){
-        foreach ($offer['categoryId'] as $category){
-            $preparedData = $this->preparedOfferData($shopId, $offer, $count);
-            $preparedData[':category_id' . $count] = $category;
-            if (($offer['attributes']['available'] == 'true' || $offer['attributes']['available'] === true)){
-                $this->addParamsForOffer($shopId, $offer['attributes']['id'], $category, $offer);
+        if (($offer['attributes']['available'] == 'true' || $offer['attributes']['available'] === true)) {
+            foreach ($offer['categoryId'] as $category){
+                $preparedData = $this->preparedOfferData($shopId, $offer, $count);
+                $preparedData[':category_id' . $count] = $category;
+                if (($offer['attributes']['available'] == 'true' || $offer['attributes']['available'] === true)){
+                    $this->addParamsForOffer($shopId, $offer['attributes']['id'], $category, $offer);
+                }
+                $this->offerInsertData = array_merge($this->offerInsertData, $preparedData);
+                $this->offerInsertQuery .= " (:offer_id{$count}, :category_id{$count}, :shop_id{$count}, :is_available{$count}, :url{$count}, :price{$count}, :currency{$count}, :picture{$count}, :title{$count}, :common_data{$count}),";
+                $count+=$this->elementsInOneRow;
             }
-            $this->offerInsertData = array_merge($this->offerInsertData, $preparedData);
-            $this->offerInsertQuery .= " (:offer_id{$count}, :category_id{$count}, :shop_id{$count}, :is_available{$count}, :url{$count}, :price{$count}, :currency{$count}, :picture{$count}, :title{$count}, :common_data{$count}),";
-            $count+=$this->elementsInOneRow;
         }
     }
 
@@ -285,6 +288,7 @@ class UpdateDB
 
     private function createTmpTableCode($tmpTableName, $sourceTableName)
     {
+        $this->dbh->exec("DROP TABLE IF EXISTS " . $tmpTableName);
         return <<<EOL
 CREATE TABLE `{$tmpTableName}` LIKE {$sourceTableName}
 EOL;

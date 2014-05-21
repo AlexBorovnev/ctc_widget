@@ -10,5 +10,7 @@ composer.phar
 composer.json
 composer.lock
 README.md
-ozon/download
+ozon/download/*
 !ozon/download/.gitkeep
+ozon/log/*
+!ozon/log/.gitkeep

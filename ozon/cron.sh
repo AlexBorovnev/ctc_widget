@@ -51,7 +51,7 @@ download_thread()
       # Закачка файла завершилась удачно
       move_line $url $active_list $done_list
       unzip -auq -d "${output_dir}" "${output_dir}/$(basename "$url")"
-     # rm "${output_dir}/$(basename "$url")"
+      rm "${output_dir}/$(basename "$url")"
       php "${PWD}/cron.php" $shop_name $shop_url "ozon/download/$(basename "$url")"
       sleep $timeout
     else
