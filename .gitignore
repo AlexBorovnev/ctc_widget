@@ -14,3 +14,6 @@ ozon/download/*
 !ozon/download/.gitkeep
 ozon/log/*
 !ozon/log/.gitkeep
+ozon/list/*
+!ozon/list/download_init.lst
+!ozon/list/.gitkeep

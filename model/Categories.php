@@ -28,7 +28,6 @@ class Categories extends AbstractModel
 
     private $categoryParamList = array();
     private $categoryList = array();
-    private $paramsValueList = array();
     /**
      * @var $preparedQuery \PDOStatement
      */
@@ -175,7 +174,7 @@ class Categories extends AbstractModel
         }
         $params = array_unique($params);
         sort($params);
-        $paramsValue = $this->getParamsValue($params, $shopId);
+        $paramsValue = $this->getParamsValue($params, $shopId, $childs);
         $query = $this->dbh->prepare("INSERT INTO categories_param (shop_id, categories_id, param_list, params_value) VALUES(:shop_id, :cat_id, :params, :values) ON DUPLICATE KEY UPDATE param_list=:params, params_value=:values");
         $query->execute(array(':shop_id' => $shopId, ':cat_id' => $catId, ':params' => serialize($params), ':values' => serialize($paramsValue)));
     }
@@ -205,42 +204,37 @@ class Categories extends AbstractModel
             foreach ($returnedList as $row){
                 $paramList = array_unique(array_merge($paramList, $row));
             }
-            $paramValue = $this->getParamsValue($paramList, $shopId);
+            $paramValue = $this->getParamsValue($paramList, $shopId, $catIds);
             return array('categoryParam' => $returnedList, 'paramValue' => $paramValue);
         }else {
             return array('categoryParam' => $returnedList, 'paramValue' =>array());
         }
     }
 
-    private function getParamsValue($paramList, $shopId)
+    private function getParamsValue($paramList, $shopId, $categoryList)
     {
-        $getParamValueQuery = $this->dbh->prepare("SELECT gp.value FROM goods_param gp JOIN params p ON gp.param_id=p.id WHERE p.title LIKE ? AND shop_id=? GROUP BY gp.value");
+        $categoryQueryMark = $this->getQueryMark($categoryList);
+
+        $getParamValueQuery = $this->dbh->prepare("SELECT gp.value FROM goods_param gp JOIN params p ON gp.param_id=p.id WHERE p.title LIKE ? AND shop_id=? AND gp.category_id IN ({$categoryQueryMark}) GROUP BY gp.value");
         $paramValue = array();
         foreach($paramList as $param){
-            if (in_array($param, $this->disabledParam)
-                || (isset($this->paramsValueList[$param]) && empty($this->paramsValueList[$param]))){
+            if (in_array($param, $this->disabledParam)){
                 continue;
             }
-            if (isset($this->paramsValueList[$param])){
-                $paramValue[$param] = $this->paramsValueList[$param];
-            } else {
-                $getParamValueQuery->execute(array($param, $shopId));
-                $paramValue[$param] = array();
-                foreach ($getParamValueQuery->fetchAll(\PDO::FETCH_ASSOC) as $row){
-                    $value = trim($row['value']);
-                    if ($value){
-                        $paramValue[$param][] = $value;
-                    }
-                }
-                if (count($paramValue[$param]) > static::MAX_COUNT_PARAMS_VALUE){
-                    $paramValue[$param] = array();
-                    $this->paramsValueList[$param] = array();
-                } else {
-                    sort($paramValue[$param]);
-                    $this->paramsValueList[$param] =  $paramValue[$param];
+            $getParamValueQuery->execute(array_merge(array($param, $shopId), $categoryList));
+            $paramValue[$param] = array();
+            foreach ($getParamValueQuery->fetchAll(\PDO::FETCH_ASSOC) as $row){
+                $value = trim($row['value']);
+                if ($value){
+                    $paramValue[$param][] = $value;
                 }
             }
-        }
+            if (count($paramValue[$param]) > static::MAX_COUNT_PARAMS_VALUE){
+                $paramValue[$param] = array();
+            } else {
+                sort($paramValue[$param]);
+            }
+            }
         return $paramValue;
     }
 

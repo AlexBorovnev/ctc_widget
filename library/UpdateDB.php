@@ -17,6 +17,23 @@ class UpdateDB
     private $elementsInOneRow = 10;
     private $patchElements = 170;
     private $categoryTitleType;
+    private $firstLevelCategory = array(
+        'книги',
+        'иностранные книги',
+        'букинистические издания',
+        'детям и мамам',
+        'электроника',
+        'бытовая техника',
+        'софт и игры',
+        'dvd и blu-ray',
+        'музыка',
+        'дом, сад, зоо',
+        'спорт и отдых',
+        'красота и здоровье',
+        'одежда, обувь, аксессуары',
+        'подарки и сувениры',
+        'антиквариат, винтаж, искусство'
+    );
     /**
      * @var XMLParser
      */
